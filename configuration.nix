@@ -10,8 +10,10 @@
     ./modules/graphical.nix
     ./modules/services.nix
     ./modules/packages.nix
-    <nixpkgs/nixos/modules/installer/scan/not-detected.nix>
   ];
+
+  # find better palce / method to handle firmware
+  hardware.enableAllFirmware = true;
 
   nix = {
     package = pkgs.nixFlakes;
@@ -37,6 +39,7 @@
   };
 
   nixpkgs.overlays = [
+    #(import ./overlays/compile-flags.nix)
     #(import ./overlays/global-flags.nix)
     #(import ./overlays/package-flags.nix)
   ];

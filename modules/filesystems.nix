@@ -1,24 +1,26 @@
 { config, pkg, ... }:
 
 {
-  fileSystems."/" = {
-    device = "/dev/disk/by-uuid/8440905f-dbd5-462d-b039-827a895c7d8e";
-    fsType = "ext4";
-  };
+  fileSystems = {
+    "/" = {
+      device = "/dev/disk/by-uuid/8440905f-dbd5-462d-b039-827a895c7d8e";
+      fsType = "ext4";
+    };
 
-  fileSystems."/boot" = {
-    device = "/dev/disk/by-uuid/C2A2-75DA";
-    fsType = "vfat";
-  };
+    "/boot" = {
+      device = "/dev/disk/by-uuid/C2A2-75DA";
+      fsType = "vfat";
+    };
 
-  fileSystems."/home/will/VMs" = {
-    device = "/dev/sdb2";
-    fsType = "ext4";
-  };
+    "/home/will/VMs" = {
+      device = "/dev/sdb2";
+      fsType = "ext4";
+    };
 
-  fileSystems."/home/will/VMs/SSD" = {
-    device = "/dev/sdc1";
-    fsType = "ext4";
+    "/home/will/VMs/SSD" = {
+      device = "/dev/sdc1";
+      fsType = "ext4";
+    };
   };
 
   swapDevices = [{

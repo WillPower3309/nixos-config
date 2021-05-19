@@ -2,6 +2,8 @@
 
 {
   boot = {
+    kernelPackages = pkgs.linuxPackages_latest;
+
     loader = {
       systemd-boot.enable = true;
       #timeout = 0;
@@ -15,7 +17,7 @@
           preLVM = true;
         };
       };
-      
+
       availableKernelModules = [ "xhci_pci" "ahci" "usbhid" "usb_storage" "sd_mod" ];
       kernelModules = [ "dm-snapshot" ];
     };

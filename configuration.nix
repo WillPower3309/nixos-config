@@ -1,4 +1,4 @@
-{ config, pkgs, options, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   imports = [
@@ -12,8 +12,7 @@
     ./modules/packages.nix
   ];
 
-  # find better palce / method to handle firmware
-  hardware.enableAllFirmware = true;
+  hardware.enableRedistributableFirmware = lib.mkDefault true;
 
   nix = {
     package = pkgs.nixFlakes;
@@ -39,7 +38,6 @@
   };
 
   nixpkgs.overlays = [
-    #(import ./overlays/compile-flags.nix)
     #(import ./overlays/global-flags.nix)
     #(import ./overlays/package-flags.nix)
   ];

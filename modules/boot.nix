@@ -6,7 +6,6 @@
 
     loader = {
       systemd-boot.enable = true;
-      #timeout = 0;
       efi.canTouchEfiVariables = true;
     };
 
@@ -22,9 +21,9 @@
       kernelModules = [ "dm-snapshot" ];
     };
 
+    kernelModules = [ "kvm-intel" "vfio_virqfd" "vfio_pci" "vfio_iommu_type1" "vfio" ];
     kernelParams = [ "intel_iommu=on" ];
     blacklistedKernelModules = ["nouveau"];
-    kernelModules = [ "kvm-intel" "vfio_virqfd" "vfio_pci" "vfio_iommu_type1" "vfio" ];
 
     extraModprobeConfig = "options vfio-pci ids=10de:1c03,10de:10f1";
   };

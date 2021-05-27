@@ -36,7 +36,7 @@
     neofetch
     mpv
     youtube-dl
-    pulseeffects-pw
+    #pulseeffects-pw
     gnome3.nautilus
     nextcloud-client
     keepassxc
@@ -52,6 +52,7 @@
     pavucontrol
     spotify
     python3
+    colorls
 
     # gtk theming
     glib #gsettings command
@@ -63,5 +64,8 @@
     #tela-icon-theme
 
     #hybridbar
+
+    #unityhub
+    unzip
   ];
 }

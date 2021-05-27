@@ -8,6 +8,7 @@
       roboto
       roboto-mono
       source-serif-pro
+      meslo-lgs-nf
     ];
 
     fontconfig = {

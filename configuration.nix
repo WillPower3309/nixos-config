@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, options, ... }:
 
 {
   imports = [
@@ -26,21 +26,16 @@
       options = "--delete-older-than 8d";
     };
 
-#    nixPath = 
-#      options.nix.nixPath.default ++ 
-#      [ "nixpkgs-overlays=/etc/nixos/overlays/init.nix" ]
-#    ;
+    nixPath = 
+      options.nix.nixPath.default ++ 
+      [ "nixpkgs-overlays=/etc/nixos/overlays/init.nix" ]
+    ;
   };
 
   nixpkgs.config = {
     allowUnfree = true;
     oraclejdk.accept_license = true;
   };
-
-  nixpkgs.overlays = [
-    #(import ./overlays/global-flags.nix)
-    #(import ./overlays/package-flags.nix)
-  ];
 
   i18n.defaultLocale = "en_US.UTF-8";
   time.timeZone = "America/Toronto";

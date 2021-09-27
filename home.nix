@@ -3,13 +3,15 @@
 {
   programs.home-manager.enable = true;
 
-  home.packages = [
-    pkgs.zsh
-    pkgs.alacritty
+  home.packages = [];
+  
+  imports = [
+    ./home-manager/alacritty.nix
+    ./home-manager/emacs.nix
+    ./home-manager/zsh.nix
   ];
 
-  imports = [
-    ./home-manager/zsh.nix
-    ./home-manager/alacritty.nix
-  ];
+  home.file = {
+    ".config/sway/config".source = ./home-manager/additional-config/sway/config;
+  };
 }

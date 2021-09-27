@@ -3,6 +3,8 @@
 {
   imports = [];
 
+  programs.dconf.enable = true;
+
   programs.sway = {
     enable = true;
     wrapperFeatures.gtk = true;
@@ -21,29 +23,18 @@
     ];
   };
   
-
-  programs.dconf.enable = true;
-  
-
   environment.systemPackages = with pkgs; [
-    alacritty
     qutebrowser
     discord
     neovim
-    emacs
     pavucontrol
     git
     neofetch
     mpv
     youtube-dl
-    #pulseeffects-pw
-    gnome3.nautilus
-    nextcloud-client
+    pulseeffects-pw
     keepassxc
     ungoogled-chromium
-    gcc
-    valgrind
-    gnumake
     virt-manager
     OVMF
     pciutils
@@ -53,19 +44,40 @@
     spotify
     python3
     colorls
-
-    # gtk theming
-    glib #gsettings command
-    gtk-engine-murrine
-    gtk_engines
-    gsettings-desktop-schemas
-
-    #arc-theme
-    #tela-icon-theme
-
-    #hybridbar
-
-    #unityhub
+    obs-studio
+    nextcloud-client
     unzip
+    gtop
+    alacritty
+    zsh
+
+    # theming
+    arc-theme
+    tela-icon-theme
+
+    #wayfire
+    #wcm
+    #swayfire
+    #hybridbar
+    slurp
+    grim
+
+    mono
+    wineWowPackages.stable
+    (winetricks.override { wine = wineWowPackages.staging; })
+    steam
+
+    mpd
+    ncmpcpp
+    mpc_cli
+    libnotify
+
+    gnome3.nautilus
+    lutris
+    openssl
+
+    ripgrep
+
+    runelite
   ];
 }

@@ -17,7 +17,7 @@
       colors = {
         primary = {
           background =     "0x2e3440";
-          foreground =     "0xd8dee9";
+          foreground =     "0xeceff4";
           dim_foreground = "0xa5abb6";
         };
 
@@ -47,17 +47,6 @@
           cyan =    "0x8fbcbb";
           white =   "0xeceff4";
         };
-
-	dim = {
-          black =   "0x373e4d";
-          red =     "0x94545d";
-          green =   "0x809575";
-          yellow =  "0xb29e75";
-          blue =    "0x68809a";
-          magenta = "0x8c738c";
-          cyan =    "0x6d96a5";
-          white =   "0xaeb3bb";
-	};
       };
     };
   };

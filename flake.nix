@@ -3,6 +3,7 @@
 
   inputs = {
     nixos.url = "nixpkgs/nixos-unstable";
+    nixpkgs.url = "nixpkgs/nixpkgs-unstable";
 
     home-manager = {
       url = "github:nix-community/home-manager/master";
@@ -16,7 +17,7 @@
 
     pkgs = import nixpkgs {
       inherit system;
-      config = { allowUnfree = true; };
+      config.allowUnfree = true;
     };
 
     lib = nixpkgs.lib;
@@ -28,12 +29,15 @@
 
 	modules = [
 	  ./configuration.nix
+	  
 	  home-manager.nixosModules.home-manager
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.users.will = import ./home.nix;
           }
+
+	  { nixpkgs.overlays = (import ./overlays/init.nix); }
 	];
       };
     };

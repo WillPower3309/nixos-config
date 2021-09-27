@@ -25,18 +25,13 @@
       dates = "thursday";
       options = "--delete-older-than 8d";
     };
-
-    nixPath = 
-      options.nix.nixPath.default ++ 
-      [ "nixpkgs-overlays=/etc/nixos/overlays/init.nix" ]
-    ;
   };
 
   nixpkgs.config = {
     allowUnfree = true;
     oraclejdk.accept_license = true;
   };
-
+  
   i18n.defaultLocale = "en_US.UTF-8";
   time.timeZone = "America/Toronto";
   

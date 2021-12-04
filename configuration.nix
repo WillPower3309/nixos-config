@@ -10,6 +10,7 @@
     ./modules/graphical.nix
     ./modules/services.nix
     ./modules/packages.nix
+    ./modules/security.nix
   ];
 
   hardware.enableRedistributableFirmware = lib.mkDefault true;
@@ -20,6 +21,8 @@
       experimental-features = nix-command flakes
     '';
 
+    autoOptimiseStore = true;
+
     gc = {
       automatic = true;
       dates = "thursday";
@@ -27,9 +30,12 @@
     };
   };
 
-  nixpkgs.config = {
-    allowUnfree = true;
-    oraclejdk.accept_license = true;
+  nixpkgs = {
+    overlays = (import ./overlays/init.nix);
+    config = {
+      allowUnfree = true;
+      oraclejdk.accept_license = true;
+    };
   };
 
   i18n.defaultLocale = "en_US.UTF-8";

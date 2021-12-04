@@ -1,0 +1,5 @@
+[output *]
+image=/home/will/wallpaper/wallpaper.jpg
+filter=nearest
+scaling-mode=fill
+anchor=center

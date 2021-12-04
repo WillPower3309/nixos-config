@@ -15,12 +15,42 @@
 ;; UI LAYOUT
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Pixel scroll (as opposed to char scrool)
-(pixel-scroll-mode t)
+;; No startup  screen
+(setq inhibit-startup-screen t)
 
-;; Completion style, see
-;; gnu.org/software/emacs/manual/html_node/emacs/Completion-Styles.html
-(setq completion-styles '(basic substring))
+;; No startup message
+(setq inhibit-startup-message t)
+(setq inhibit-startup-echo-area-message t)
+
+;; No message in scratch buffer
+(setq initial-scratch-message nil)
+
+;; Initial buffer
+(setq initial-buffer-choice nil)
+
+;; No frame title
+(setq frame-title-format nil)
+
+;; No file dialog
+(setq use-file-dialog nil)
+
+;; No dialog box
+(setq use-dialog-box nil)
+
+;; No popup windows
+(setq pop-up-windows nil)
+
+;; No empty line indicators
+(setq indicate-empty-lines nil)
+
+;; No cursor in inactive windows
+(setq cursor-in-non-selected-windows nil)
+
+;; Text mode is initial mode
+(setq initial-major-mode 'text-mode)
+
+;; Text mode is default major mode
+(setq default-major-mode 'text-mode)
 
 ;; No cursor in inactive windows
 (setq cursor-in-non-selected-windows nil)
@@ -36,6 +66,15 @@
 
 ;; Fill column at 80
 (setq fill-column 80)
+
+;; No scroll bars
+(scroll-bar-mode -1)
+
+;; No toolbar
+(tool-bar-mode -1)
+
+;; No menu bar (may have problems on macOS)
+(menu-bar-mode -1)
 
 ;; Wrap lines
 (global-visual-line-mode t)
@@ -59,7 +98,7 @@
   (doom-themes-treemacs-config))
 
 ;; Nano (TODO: better way)
-(add-to-list 'load-path "/etc/nixos/home-manager/additional-config/nano-emacs")
+(add-to-list 'load-path "/etc/nixos/home-manager/additional-config/emacs/nano-emacs")
 
 ;; TODO: ui elements reappear on refocus
 (require 'nano-layout)
@@ -77,12 +116,34 @@
 (require 'nano-splash)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; UX
+;; Org Mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; Nano writer
 (require 'nano-writer)
 (add-to-list 'auto-mode-alist '("\\.org\\'" . writer-mode))
+
+; Org Roam
+(use-package org-roam
+  :custom
+  (org-roam-directory (file-truename "~/Nextcloud/Notes"))
+  :bind (("C-c n l" . org-roam-buffer-toggle)
+         ("C-c n f" . org-roam-node-find)
+         ("C-c n g" . org-roam-graph)
+         ("C-c n i" . org-roam-node-insert)
+         ("C-c n c" . org-roam-capture)
+         ;; Dailies
+         ("C-c n j" . org-roam-dailies-capture-today))
+  :config
+  (org-roam-db-autosync-mode))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; UX
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Completion style, see
+;; gnu.org/software/emacs/manual/html_node/emacs/Completion-Styles.html
+(setq completion-styles '(basic substring))
 
 ;; Enable which-key
 (use-package which-key
@@ -191,11 +252,12 @@
   :hook
   ;; TODO: syntax highlighting issue with web-mode
   ;(web-mode . lsp-deferred)
-  (js-mode . lsp-deferred)
+  (prog-mode . lsp-deferred)
   (lsp-mode . lsp-enable-which-key-integration)
   :config
   (setq lsp-auto-guess-root t
 	lsp-headerline-breadcrumb-enable nil
+	lsp-eldoc-enable-hover nil
         lsp-file-watch-ignored'("[/\\\\]\\.git$"
                                 "[/\\\\]\\.elixir_ls$"
                                 "[/\\\\]_build$"
@@ -210,8 +272,8 @@
 ;; DAP Mode
 (use-package dap-mode
   :after lsp-mode
-  (require 'dap-node)
-  (require 'dap-cpptools)
+  ;(require 'dap-node)
+  ;(require 'dap-cpptools)
   :hook
   (prog-mode 'enable-dap-mode-and-ui))
 
@@ -286,3 +348,4 @@
        "b p"   '(previous-buffer :which-key "Previous buffer")
        "b B"   '(ibuffer-list-buffers :which-key "Ibuffer list buffers")
        "b K"   '(kill-buffer :which-key "Kill buffer"))
+

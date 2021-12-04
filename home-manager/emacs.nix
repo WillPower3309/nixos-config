@@ -19,15 +19,18 @@
       lsp-mode
       lsp-ivy
       dap-mode
+      company
       yasnippet
       undo-tree
       editorconfig
       evil
       general
+      org-roam
     ];
   };
 
   #services.emacs.enable = true;
 
-  home.file.".emacs.d/init.el".source = ./additional-config/init.el;
+  home.file.".emacs.d/init.el".source = ./additional-config/emacs/init.el;
 }
+

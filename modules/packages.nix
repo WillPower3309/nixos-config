@@ -3,6 +3,8 @@
 {
   imports = [];
 
+  programs.steam.enable = true;
+
   programs.dconf.enable = true;
 
   programs.sway = {
@@ -20,6 +22,7 @@
       brightnessctl
       slurp
       grim
+      oguri
     ];
   };
   
@@ -48,24 +51,19 @@
     nextcloud-client
     unzip
     gtop
-    alacritty
+    foot
     zsh
 
     # theming
     arc-theme
     tela-icon-theme
+    breeze-gtk
 
-    #wayfire
-    #wcm
-    #swayfire
     #hybridbar
-    slurp
-    grim
 
     mono
-    wineWowPackages.stable
-    (winetricks.override { wine = wineWowPackages.staging; })
-    steam
+    wine
+    winetricks
 
     mpd
     ncmpcpp
@@ -73,11 +71,16 @@
     libnotify
 
     gnome3.nautilus
-    lutris
     openssl
 
     ripgrep
 
-    runelite
+    imagemagick
+
+    lutris
+    gamemode
+
+    swaybg
+    nur.repos.willpower3309.ani-cli
   ];
 }

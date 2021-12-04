@@ -2,16 +2,17 @@
   description = "Will McKinnon's personal nix configuration";
 
   inputs = {
+    # Core dependencies
     nixos.url = "nixpkgs/nixos-unstable";
     nixpkgs.url = "nixpkgs/nixpkgs-unstable";
-
     home-manager = {
       url = "github:nix-community/home-manager/master";
       inputs.nixpkgs.follows = "nixos";
     };
+    nur.url = github:nix-community/NUR/master;
   };
 
-  outputs = { nixpkgs, home-manager, ... }:
+  outputs = { nixpkgs, home-manager, nur, ... }:
   let
     system = "x86_64-linux";
 
@@ -37,7 +38,7 @@
             home-manager.users.will = import ./home.nix;
           }
 
-	  { nixpkgs.overlays = (import ./overlays/init.nix); }
+	  { nixpkgs.overlays = [ nur.overlay ]; }
 	];
       };
     };

@@ -4,7 +4,7 @@
   virtualisation = {
     libvirtd = {
       enable = true;
-      qemuVerbatimConfig = ''
+      qemu.verbatimConfig = ''
         user = "will"
         group = "kvm"
 

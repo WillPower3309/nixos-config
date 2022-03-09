@@ -10,4 +10,5 @@ My personal nixos config
 5. [Connect to the internet](https://wiki.archlinux.org/title/wpa_supplicant#Connecting_with_wpa_cli)
 6. Run `nix-shell -p git nixFlakes`
 7. Now that you are in an environment with git and flakes, clone this repository to the `/mnt/etc/nixos` folder
-8. Run `nixos-install --option pure-eval no --flake $FLAKE#farnsworth`
+8. Exit the nix shell with `exit` and change into the `/mnt/etc/nixos` directory and run `nix-shell`
+9. Run `nixos-install --option pure-eval no --flake $FLAKE#farnsworth`

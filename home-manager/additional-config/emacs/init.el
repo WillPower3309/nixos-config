@@ -85,6 +85,12 @@
 ;; Shorten "yes" or "no" to y/n
 (fset 'yes-or-no-p 'y-or-n-p)
 
+;; no auto save
+(setq auto-save-default nil)
+
+;; no backups
+(setq make-backup-files nil)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; THEME
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -100,7 +106,6 @@
 ;; Nano (TODO: better way)
 (add-to-list 'load-path "/etc/nixos/home-manager/additional-config/emacs/nano-emacs")
 
-;; TODO: ui elements reappear on refocus
 (require 'nano-layout)
 
 (require 'nano-theme-dark)
@@ -110,8 +115,6 @@
 
 (require 'nano-theme)
 (nano-theme)
-
-(require 'nano-modeline)
 
 (require 'nano-splash)
 
@@ -248,26 +251,37 @@
 ;	("\\.json\\'" . web-mode)))
 
 ; LSP mode
+(use-package lsp-python-ms
+  :ensure t
+  :hook (python-mode . (lambda ()
+                         (require 'lsp-python-ms)
+                         (lsp)))
+  :init
+  (setq lsp-python-ms-executable (executable-find "python-language-server")))
+
+(use-package nix-mode
+  :mode "\\.nix\\'")
+
 (use-package lsp-mode
   :hook
   ;; TODO: syntax highlighting issue with web-mode
   ;(web-mode . lsp-deferred)
-  (prog-mode . lsp-deferred)
+  (python-mode . lsp-deferred)
+  (c-mode      . lsp-deferred)
+  (nix-mode    . lsp-deferred)
   (lsp-mode . lsp-enable-which-key-integration)
   :config
   (setq lsp-auto-guess-root t
 	lsp-headerline-breadcrumb-enable nil
 	lsp-eldoc-enable-hover nil
-        lsp-file-watch-ignored'("[/\\\\]\\.git$"
-                                "[/\\\\]\\.elixir_ls$"
-                                "[/\\\\]_build$"
-                                "[/\\\\]assets$"
-                                "[/\\\\]cover$"
-                                "[/\\\\]node_modules$"
-                                "[/\\\\]submodules$")))
-(use-package lsp-ivy
-  :after lsp-mode
-  :commands lsp-ivy-workspace-symbol)
+    lsp-log-io nil
+    lsp-file-watch-ignored'("[/\\\\]\\.git$"
+                            "[/\\\\]\\.elixir_ls$"
+                            "[/\\\\]_build$"
+                            "[/\\\\]assets$"
+                            "[/\\\\]cover$"
+                            "[/\\\\]node_modules$"
+                            "[/\\\\]submodules$")))
 
 ;; DAP Mode
 (use-package dap-mode
@@ -330,7 +344,13 @@
   "w h"   '(evil-window-left :which-key "Window left")
   "w j"   '(evil-window-down :which-key "Window down")
   "w k"   '(evil-window-up :which-key "Window up")
-  "w l"   '(evil-window-right :which-key "Window right"))
+  "w l"   '(evil-window-right :which-key "Window right")
+
+  ;; todo: fix me
+  "w H"   '(evil-window-move-far-left :which-key "Move window left")
+  "w J"   '(evil-window-move-far-down :which-key "Move window down")
+  "w K"   '(evil-window-move-far-up :which-key "Move window up")
+  "w L"   '(evil-window-move-far-right :which-key "Move window right"))
 
 ;; Module Keybinds
 (nvmap :prefix "SPC"

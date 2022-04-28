@@ -1,4 +1,4 @@
-{ config, pkg, ... }:
+{ config, pkgs, ... }:
 
 {
   services.pipewire = {
@@ -12,4 +12,9 @@
   };
 
   sound.enable = true;
+
+  environment.systemPackages = with pkgs; [
+    pavucontrol
+    easyeffects
+  ];
 }

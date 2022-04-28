@@ -4,6 +4,8 @@
   programs.emacs = {
     enable = true;
 
+    #package = pkgs.emacsGit;
+
     extraPackages = epkgs: with epkgs; [
       use-package
       all-the-icons
@@ -17,15 +19,17 @@
       treemacs-magit
       eshell-syntax-highlighting
       lsp-mode
-      lsp-ivy
-      dap-mode
+      lsp-python-ms
       company
+      dap-mode
       yasnippet
       undo-tree
       editorconfig
       evil
       general
       org-roam
+      nix-mode
+      nano-modeline
     ];
   };
 

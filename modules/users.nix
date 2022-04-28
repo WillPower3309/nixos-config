@@ -2,10 +2,18 @@
 
 {
   users = {
+    mutableUsers = false;
     defaultUserShell = pkgs.zsh;
-    users.will = {
-      isNormalUser = true;
-      extraGroups = [ "wheel" "libvirtd" "input" "kvm" "docker" ];
+
+    users = {
+      root = {
+        initialPassword = "NICE TRY";
+      };
+      will = {
+        isNormalUser = true;
+        initialPassword = "NICE TRY";
+        extraGroups = [ "wheel" "libvirtd" "input" "kvm" "docker" ];
+      };
     };
   };
 }

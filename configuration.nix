@@ -1,27 +1,47 @@
-{ config, pkgs, lib, options, ... }:
+{ config, pkgs, ... }:
 
 {
-  imports = [
-    ./modules/boot.nix
-    ./modules/filesystems.nix
-    ./modules/users.nix
-    ./modules/net.nix
-    ./modules/sound.nix
-    ./modules/graphical.nix
-    ./modules/services.nix
-    ./modules/packages.nix
-    ./modules/security.nix
+  imports =
+    [
+      ./hardware-configuration.nix
+      ./modules/boot.nix
+      ./modules/kernel.nix
+      ./modules/net.nix
+      ./modules/sound.nix
+      ./modules/users.nix
+      ./modules/fonts.nix
+      ./modules/vim.nix
+      ./modules/music.nix
+      ./modules/games.nix
+      ./modules/development.nix
+      ./modules/virtualization.nix
+      ./modules/packages.nix
+    ];
+
+  # Set your time zone.
+  time.timeZone = "America/Toronto";
+
+  # Enable the Plasma 5 Desktop Environment.
+  services.xserver = {
+    enable = true;
+    videoDrivers = [ "nvidia" ];
+    displayManager.sddm.enable = true;
+    desktopManager.plasma5.enable = true;
+  };
+
+  environment.systemPackages = with pkgs; [
+    libsForQt5.kwin-tiling
+    latte-dock
   ];
-
-  hardware.enableRedistributableFirmware = lib.mkDefault true;
-
+  
   nix = {
     package = pkgs.nixFlakes;
     extraOptions = ''
       experimental-features = nix-command flakes
     '';
 
-    autoOptimiseStore = true;
+    maxJobs = 1;
+    buildCores = 4;
 
     gc = {
       automatic = true;
@@ -38,9 +58,6 @@
     };
   };
 
-  i18n.defaultLocale = "en_US.UTF-8";
-  time.timeZone = "America/Toronto";
-  
-  system.stateVersion = "20.09";
-}
+  system.stateVersion = "22.05";
 
+}

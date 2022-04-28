@@ -25,13 +25,10 @@
   
     sessionVariables = {
       TERM="xterm-256color";
-      EDITOR="nvim";
     };
 
     shellGlobalAliases = {
       ls = "colorls";
-      vi = "nvim";
-      vim = "nvim";
     };
   };
 }

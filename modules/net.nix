@@ -1,7 +1,7 @@
 { config, pkg, ... }:
 
 {
-  networking.hostName = "farnsworth";
+  networking.hostName = "surface";
 
   networking.networkmanager = {
     enable = true;

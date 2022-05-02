@@ -7,11 +7,11 @@
 
     users = {
       root = {
-        initialPassword = "NICE TRY";
+        initialPassword = "1012917";
       };
       will = {
         isNormalUser = true;
-        initialPassword = "NICE TRY";
+        initialPassword = "1012917";
         extraGroups = [ "wheel" "libvirtd" "input" "kvm" "docker" ];
       };
     };

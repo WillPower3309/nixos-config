@@ -1,7 +1,7 @@
 { config, pkgs, ... }:
 
 {
-  boot = {
+#  boot = {
 #    kernelPackages = pkgs.linuxPackages_custom rec {
 #      version = "5.10.37";
 #      src = pkgs.fetchurl {
@@ -11,6 +11,6 @@
 #      configfile = ./kernelConfig;
 #    };
 
-    kernelPackages = pkgs.linuxPackages_xanmod;
-  };
+#    kernelPackages = pkgs.linuxPackages_xanmod;
+#  };
 }

@@ -35,6 +35,6 @@
 
   #services.emacs.enable = true;
 
-  home.file.".emacs.d/init.el".source = ./additional-config/emacs/init.el;
+  home.file.".emacs.d/init.el".source = ./config/emacs/init.el;
 }
 

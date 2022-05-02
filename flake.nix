@@ -2,56 +2,60 @@
   description = "Will McKinnon's personal nix configuration";
 
   inputs = {
-    # Core dependencies
     nixpkgs.url = "nixpkgs/nixos-21.11";
-    nixos.url = "nixpkgs/nixos-unstable";
+
     home-manager = {
       url = "github:nix-community/home-manager/master";
-      inputs.nixpkgs.follows = "nixos";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
+
     impermanence.url = github:nix-community/impermanence/master;
 
-    nur.url = github:nix-community/NUR/master;
+    nur = {
+      url = github:nix-community/NUR/master;
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     emacs-overlay.url  = "github:nix-community/emacs-overlay";
   };
 
-  outputs = { nixpkgs, home-manager, nur, emacs-overlay, impermanence, ... }:
+  outputs = { nixpkgs, home-manager, impermanence, nur, emacs-overlay, ... }:
   let
     system = "x86_64-linux";
-
-    pkgs = import nixpkgs {
-      inherit system;
-      config.allowUnfree = true;
-    };
-
     lib = nixpkgs.lib;
 
   in {
     nixosConfigurations = {
-      farnsworth = lib.nixosSystem {
+      desktop = lib.nixosSystem {
         inherit system;
 
-	modules = [
-	  ./configuration.nix
-
-	  impermanence.nixosModules.impermanence
-	  {
-	    environment.persistence."/nix/persist" = import ./persistence.nix;
-	  }
-
-	  home-manager.nixosModules.home-manager {
-        home-manager.useGlobalPkgs = true;
-        home-manager.useUserPackages = true;
-        home-manager.users.will = import ./home.nix;
-      }
-
-	  {
-        nixpkgs.overlays = [
-          nur.overlay
-          emacs-overlay.overlay
+        modules = [
+          ./hosts/desktop
+          {
+            nixpkgs.overlays = [
+              nur.overlay
+              emacs-overlay.overlay
+            ];
+          }
         ];
-      }
-	];
+
+        specialArgs = { inherit impermanence home-manager; };
+      };
+
+      surface = lib.nixosSystem {
+        inherit system;
+
+        modules = [
+          #nixos-hardware.nixosModules.microsoft-surface
+          ./hosts/surface
+          {
+            nixpkgs.overlays = [
+              nur.overlay
+              emacs-overlay.overlay
+            ];
+          }
+        ];
+        specialArgs = { inherit home-manager; };
       };
     };
   };

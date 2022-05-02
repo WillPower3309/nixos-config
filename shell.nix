@@ -15,3 +15,4 @@ in mkShell {
     export PATH="$FLAKE/bin:${nixBin}/bin:$PATH"
   '';
 }
+

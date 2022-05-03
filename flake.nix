@@ -4,6 +4,8 @@
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-21.11";
 
+    nixos-hardware.url = github:NixOS/nixos-hardware/master;
+
     home-manager = {
       url = "github:nix-community/home-manager/master";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -19,43 +21,24 @@
     emacs-overlay.url  = "github:nix-community/emacs-overlay";
   };
 
-  outputs = { nixpkgs, home-manager, impermanence, nur, emacs-overlay, ... }:
+  outputs = { nixpkgs, nixos-hardware, home-manager, impermanence, nur, emacs-overlay, ... }:
   let
     system = "x86_64-linux";
     lib = nixpkgs.lib;
+    flake-overlays = [nur.overlay emacs-overlay.overlay];
 
   in {
     nixosConfigurations = {
       desktop = lib.nixosSystem {
         inherit system;
-
-        modules = [
-          ./hosts/desktop
-          {
-            nixpkgs.overlays = [
-              nur.overlay
-              emacs-overlay.overlay
-            ];
-          }
-        ];
-
-        specialArgs = { inherit impermanence home-manager; };
+        modules = [ ./hosts/desktop ];
+        specialArgs = { inherit impermanence home-manager flake-overlays; };
       };
 
       surface = lib.nixosSystem {
         inherit system;
-
-        modules = [
-          #nixos-hardware.nixosModules.microsoft-surface
-          ./hosts/surface
-          {
-            nixpkgs.overlays = [
-              nur.overlay
-              emacs-overlay.overlay
-            ];
-          }
-        ];
-        specialArgs = { inherit home-manager; };
+        modules = [ ./hosts/surface ];
+        specialArgs = { inherit nixos-hardware home-manager flake-overlays; };
       };
     };
   };

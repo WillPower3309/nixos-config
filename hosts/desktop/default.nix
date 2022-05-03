@@ -1,4 +1,4 @@
-{ config, pkgs, impermanence, home-manager, ... }:
+{ config, pkgs, impermanence, home-manager, flake-overlays, ... }:
 
 {
   imports = [
@@ -60,7 +60,7 @@
   };
 
   nixpkgs = {
-    overlays = (import ../../overlays/init.nix);
+    overlays = flake-overlays;
     config = {
       allowUnfree = true;
       oraclejdk.accept_license = true;

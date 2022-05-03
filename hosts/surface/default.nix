@@ -1,11 +1,11 @@
-{ config, pkgs, home-manager, ... }:
+{ config, pkgs, nixos-hardware, home-manager, flake-overlays, ... }:
 
 {
   imports = [
+    nixos-hardware.nixosModules.microsoft-surface
     home-manager.nixosModules.home-manager
     ./hardware-configuration.nix
     ../../modules/boot.nix
-    ../../modules/kernel.nix
     ../../modules/net.nix
     ../../modules/sound.nix
     ../../modules/users.nix
@@ -39,6 +39,7 @@
   };
 
   nixpkgs = {
+    overlays = flake-overlays;
     config = {
       allowUnfree = true;
       oraclejdk.accept_license = true;
@@ -46,6 +47,5 @@
   };
 
   system.stateVersion = "22.05";
-
 }
 

@@ -2,7 +2,7 @@
   description = "Will McKinnon's personal nix configuration";
 
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-21.11";
+    nixpkgs.url = "nixpkgs/nixpkgs-unstable";
 
     nixos-hardware.url = github:NixOS/nixos-hardware/master;
 

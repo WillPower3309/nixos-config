@@ -28,6 +28,11 @@
       fsType = "ext4";
     };
 
+  fileSystems."/home/will/Games" =
+    { device = "/dev/disk/by-uuid/daa19567-ec41-4eec-9f29-9e4d1c079a00";
+      fsType = "ext4";
+    };
+
   fileSystems."/boot" =
     { device = "/dev/disk/by-uuid/EDE1-75B4";
       fsType = "vfat";

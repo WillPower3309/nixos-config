@@ -3,10 +3,11 @@
 {
   programs.home-manager.enable = true;
 
-  home.packages = [];
+  home.packages = [
+    pkgs.emacs
+  ];
   
   imports = [
-    ./emacs.nix
     ./zsh.nix
   ];
 
@@ -17,6 +18,9 @@
     ".config/mpv/mpv.conf".source = ./config/mpv/mpv.conf;
     ".config/pipewire/pipewire.conf".source = ./config/pipewire/pipewire.conf;
     ".config/qutebrowser/config.py".source = ./config/qutebrowser/config.py;
+
+    # emacs
+    ".emacs.d/init.el".source = ./config/emacs/init.el;
   };
 }
 

@@ -34,8 +34,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;
 
 (setq package-list
-  '(use-package
-    all-the-icons
+  '(all-the-icons
     projectile
     magit
     ivy
@@ -203,23 +202,24 @@
 ;; Typography
 ;;;;;;;;;;;;;;;;;;;;;;;
 
-(setq-default
-  fill-column 80                          ; Default line width 
-  sentence-end-double-space nil           ; Use a single space after dots
-  bidi-paragraph-direction 'left-to-right ; Faster
-  truncate-string-ellipsis "…")           ; Nicer ellipsis
+(setq-default fill-column 80                          ; Default line width 
+              sentence-end-double-space nil           ; Use a single space after dots
+              bidi-paragraph-direction 'left-to-right ; Faster
+              truncate-string-ellipsis "…")           ; Nicer ellipsis
 
 (require 'nano-theme)
 
 ;; Nicer glyphs for continuation and wrap 
-(set-display-table-slot standard-display-table 'truncation (make-glyph-code ?… 'nano-faded))
+(set-display-table-slot standard-display-table
+                        'truncation (make-glyph-code ?… 'nano-faded))
 
 (defface wrap-symbol-face
   '((t (:family "Fira Code"
         :inherit nano-faded)))
   "Specific face for wrap symbol")
 
-(set-display-table-slot standard-display-table 'wrap (make-glyph-code ?↩ 'wrap-symbol-face))
+(set-display-table-slot standard-display-table
+                        'wrap (make-glyph-code ?↩ 'wrap-symbol-face))
 
 ; Fix a bug on OSX in term mode & zsh (spurious “%” after each command)
 (when (eq system-type 'darwin)
@@ -228,10 +228,9 @@
               (setq buffer-display-table (make-display-table)))))
 
 ; ensure underline is positionned at the very bottom
-(setq
-  x-underline-at-descent-line nil
-  x-use-underline-position-properties t
-  underline-minimum-offset 10)
+(setq x-underline-at-descent-line nil
+      x-use-underline-position-properties t
+      underline-minimum-offset 10)
 
 ;;;;;;;;;;;;;;;;;;;;;;;
 ;; Modeline
@@ -241,6 +240,12 @@
 (require 'nano-modeline)
 
 (nano-modeline-mode 1)
+
+;;;;;;;;;;;;;;;;;;;;;;;
+;; Minibuffer
+;;;;;;;;;;;;;;;;;;;;;;;
+
+(nano-minibuffer-mode 1)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -263,84 +268,48 @@
 (add-hook 'before-save-hook 'whitespace-cleanup)
 
 ;;;;;;;;;;;;;;;;;;;;;;;
-;; Projectile
-;;;;;;;;;;;;;;;;;;;;;;;
-
-(use-package projectile
-  :config
-  (setq projectile-completion-system 'ivy)
-  (projectile-mode +1))
-
-;; Treemacs
-(use-package treemacs
-  :config
-  (setq
-    treemacs-git-mode 'simple
-    treemacs-follow-mode t
-    treemacs-filewatch-mode t))
-
-(use-package treemacs-projectile
-  :after treemacs)
-(use-package treemacs-magit
-  :after treemacs magit)
-
-;;;;;;;;;;;;;;;;;;;;;;;
 ;; LSP Mode
 ;;;;;;;;;;;;;;;;;;;;;;;
 
-(use-package lsp-python-ms
-  :hook 
-  (python-mode . (lambda ()
+; Python language server
+(require 'lsp-python-ms)
+(add-hook
+  'python-mode
+  '(lambda ()
     (require 'lsp-python-ms)
     (lsp)))
-  :init
-  (setq lsp-python-ms-executable (executable-find "python-language-server")))
+(setq lsp-python-ms-executable (executable-find "python-language-server"))
 
-(use-package nix-mode
-  :mode "\\.nix\\'")
+; Define nix-mode for lsp-mode hooks
+(require 'nix-mode)
+(add-to-list 'auto-mode-alist '("\\.nix\\'" . nix-mode))
 
-(use-package lsp-mode
-  :hook
-  (python-mode . lsp-deferred)
-  (c-mode      . lsp-deferred)
-  (nix-mode    . lsp-deferred)
-  (lsp-mode . lsp-enable-which-key-integration)
-  :config
-  (setq
-    lsp-auto-guess-root t
-    lsp-headerline-breadcrumb-enable nil
-    lsp-eldoc-enable-hover nil
-    lsp-log-io nil
-    lsp-file-watch-ignored'(
-      "[/\\\\]\\.git$"
-      "[/\\\\]\\.elixir_ls$"
-      "[/\\\\]_build$"
-      "[/\\\\]assets$"
-      "[/\\\\]cover$"
-      "[/\\\\]node_modules$"
-      "[/\\\\]submodules$")))
+(require 'lsp-mode)
+(add-hook 'python-mode 'lsp-deferred)
+(add-hook 'c-mode      'lsp-deferred)
+(add-hook 'nix-mode    'lsp-deferred)
+(add-hook 'lsp-mode    'lsp-enable-which-key-integration)
+(setq
+  lsp-auto-guess-root t
+  lsp-headerline-breadcrumb-enable nil
+  lsp-eldoc-enable-hover nil
+  lsp-log-io nil
+  lsp-file-watch-ignored'(
+    "[/\\\\]\\.git$"
+    "[/\\\\]\\.elixir_ls$"
+    "[/\\\\]_build$"
+    "[/\\\\]assets$"
+    "[/\\\\]cover$"
+    "[/\\\\]node_modules$"
+    "[/\\\\]submodules$"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;
 ;; DAP Mode
 ;;;;;;;;;;;;;;;;;;;;;;;
 
-;; DAP Mode
-(use-package dap-mode
-  :after lsp-mode
-  :hook
-  (prog-mode 'enable-dap-mode-and-ui))
+(require 'dap-mode)
+(add-hook 'prog-mode 'enable-dap-mode-and-ui)
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ORG MODE
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-;;;;;;;;;;;;;;;;;;;;;;;
-;; Org Roam
-;;;;;;;;;;;;;;;;;;;;;;;
-
-; TODO
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; KEYBINDS
@@ -351,19 +320,16 @@
 ;; Evil Mode
 ;;;;;;;;;;;;;;;;;;;;;;;
 
-(use-package evil
-  :init
-  (setq evil-undo-system 'undo-tree)
-  :config
-  (evil-mode))
+(require 'evil)
+(setq evil-undo-system 'undo-tree)
+(evil-mode)
 
 ;;;;;;;;;;;;;;;;;;;;;;;
 ;; General Keybinds
 ;;;;;;;;;;;;;;;;;;;;;;;
 
-(use-package general
-  :config
-  (general-evil-setup t))
+(require 'general)
+(general-evil-setup t)
 
 (nvmap :keymaps 'override :prefix "SPC"
   ":"     '(counsel-M-x :which-key "M-x")

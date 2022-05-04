@@ -9,6 +9,7 @@
     ../../modules/net.nix
     ../../modules/sound.nix
     ../../modules/users.nix
+    ../../modules/sway.nix
     ../../modules/fonts.nix
     ../../modules/vim.nix
     ../../modules/music.nix
@@ -23,12 +24,6 @@
     useGlobalPkgs = true;
     useUserPackages = true;
     users.will = import ../../home;
-  };
-
-  services.xserver = {
-    enable = true;
-    displayManager.sddm.enable = true;
-    desktopManager.plasma5.enable = true;
   };
 
   nix = {

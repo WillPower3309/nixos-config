@@ -263,6 +263,16 @@
 (add-hook 'before-save-hook 'whitespace-cleanup)
 
 ;;;;;;;;;;;;;;;;;;;;;;;
+;; Undo-tree
+;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package undo-tree
+  :config
+  (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo")))
+  (setq undo-tree-auto-save-history t)
+  (global-undo-tree-mode 1))
+
+;;;;;;;;;;;;;;;;;;;;;;;
 ;; Projectile
 ;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -352,6 +362,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package evil
+  :after undo-tree
   :init
   (setq evil-undo-system 'undo-tree)
   :config

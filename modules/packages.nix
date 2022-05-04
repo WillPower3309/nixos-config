@@ -38,7 +38,7 @@
 
     imagemagick
 
-    nur.repos.willpower3309.ani-cli
+    ani-cli
 
     udiskie
 

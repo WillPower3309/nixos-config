@@ -151,6 +151,25 @@
 
 (setq-default select-enable-clipboard t) ; Merge system's and Emacs' clipboard
 
+;;;;;;;;;;;;;;;;;;;;;;;
+;; Backup & Lock Files
+;;;;;;;;;;;;;;;;;;;;;;;
+
+; No lock files
+(setq create-lockfiles nil)
+
+; Backup files config
+(setq
+  backup-directory-alist
+    `((".*" . ,temporary-file-directory))
+  auto-save-file-name-transforms
+    `((".*" ,temporary-file-directory t))
+  backup-by-copying t
+  delete-old-versions t
+  kept-new-versions 6
+  kept-old-versions 2
+  version-control t)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; VISUAL
@@ -162,9 +181,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;
 
 (require 'nano-theme)
-(setq nano-fonts-use t) ; Use theme font stack
-(nano-dark)            ; Use theme light version
-(nano-mode)             ; Recommended settings
+(setq nano-fonts-use t)
+(nano-dark)
+(nano-mode)
 
 ;;;;;;;;;;;;;;;;;;;;;;;
 ;; Splash
@@ -273,7 +292,7 @@
   (global-undo-tree-mode 1))
 
 ;;;;;;;;;;;;;;;;;;;;;;;
-;; Projectile
+;; Projectile & Treemacs
 ;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package projectile
@@ -281,7 +300,6 @@
   (setq projectile-completion-system 'ivy)
   (projectile-mode +1))
 
-;; Treemacs
 (use-package treemacs
   :config
   (setq
@@ -290,9 +308,18 @@
     treemacs-filewatch-mode t))
 
 (use-package treemacs-projectile
-  :after treemacs)
+  :after treemacs projectile)
 (use-package treemacs-magit
   :after treemacs magit)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;
+;; EditorConfig support
+;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package editorconfig
+  :config
+  (editorconfig-mode 1))
 
 ;;;;;;;;;;;;;;;;;;;;;;;
 ;; LSP Mode
@@ -323,6 +350,7 @@
     lsp-log-io nil
     lsp-file-watch-ignored'(
       "[/\\\\]\\.git$"
+      "[/\\\\]\\.cache"
       "[/\\\\]\\.elixir_ls$"
       "[/\\\\]_build$"
       "[/\\\\]assets$"

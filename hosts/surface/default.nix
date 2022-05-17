@@ -14,11 +14,17 @@
     ../../modules/vim.nix
     ../../modules/music.nix
     ../../modules/development.nix
+    ../../modules/games.nix
     ../../modules/packages.nix
   ];
 
   # Set your time zone.
   time.timeZone = "America/Toronto";
+
+  # Laptop: Needs backlight
+  environment.systemPackages = with pkgs; [
+    brightnessctl
+  ];
 
   home-manager = {
     useGlobalPkgs = true;

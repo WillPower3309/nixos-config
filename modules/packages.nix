@@ -58,7 +58,6 @@
 
     libreoffice
 
-    teams
     openconnect
     remmina
     audacity

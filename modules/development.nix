@@ -7,11 +7,10 @@
     git
     python3
 
-    android-studio
-    androidenv.androidPkgs_9_0.androidsdk
+    #android-studio
+    #androidenv.androidPkgs_9_0.androidsdk
 
     # Language Servers
-    python-language-server # python
     rnix-lsp # nix
     clang-tools # c / cpp
 

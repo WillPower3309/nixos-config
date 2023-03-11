@@ -2,7 +2,6 @@
 
 {
   imports = [
-    nixos-hardware.nixosModules.microsoft-surface
     home-manager.nixosModules.home-manager
     ./hardware-configuration.nix
     ../../modules/boot.nix

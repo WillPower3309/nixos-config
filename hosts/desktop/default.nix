@@ -10,6 +10,7 @@
     ../../modules/net.nix
     ../../modules/sound.nix
     ../../modules/users.nix
+    ../../modules/sway.nix
     ../../modules/fonts.nix
     ../../modules/vim.nix
     ../../modules/music.nix
@@ -30,27 +31,11 @@
     users.will = import ../../home;
   };
 
-  # Enable the Plasma 5 Desktop Environment.
-  services.xserver = {
-    enable = true;
-    videoDrivers = [ "nvidia" ];
-    displayManager.sddm.enable = true;
-    desktopManager.plasma5.enable = true;
-  };
-
-  environment.systemPackages = with pkgs; [
-    libsForQt5.kwin-tiling
-    latte-dock
-  ];
-  
   nix = {
     package = pkgs.nixFlakes;
     extraOptions = ''
       experimental-features = nix-command flakes
     '';
-
-    maxJobs = 1;
-    buildCores = 4;
 
     gc = {
       automatic = true;

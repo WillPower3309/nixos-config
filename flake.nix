@@ -13,19 +13,14 @@
 
     impermanence.url = github:nix-community/impermanence/master;
 
-    nur = {
-      url = github:nix-community/NUR/master;
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     emacs-overlay.url  = "github:nix-community/emacs-overlay";
   };
 
-  outputs = { nixpkgs, nixos-hardware, home-manager, impermanence, nur, emacs-overlay, ... }:
+  outputs = { nixpkgs, nixos-hardware, home-manager, impermanence, emacs-overlay, ... }:
   let
     system = "x86_64-linux";
     lib = nixpkgs.lib;
-    flake-overlays = [nur.overlay emacs-overlay.overlay];
+    flake-overlays = [ emacs-overlay.overlay ];
 
   in {
     nixosConfigurations = {

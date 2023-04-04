@@ -12,4 +12,4 @@ My personal nixos config
 7. Now that you are in an environment with git and flakes, clone this repository
 8. Exit the nix shell with `exit` change into the cloned directory, and run `nix-shell`
 9. Run `sudo git config --global --add safe.directory $(pwd)`
-10. Run `sudo nixos-install --option pure-eval no --flake $FLAKE#farnsworth`
+10. Run `sudo nixos-install --option pure-eval no --flake $FLAKE#desktop`

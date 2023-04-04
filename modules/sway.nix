@@ -36,7 +36,6 @@
       grim
       oguri    
       gammastep
-      #nur.repos.willpower3309.swayblur
     ];
   };
 }

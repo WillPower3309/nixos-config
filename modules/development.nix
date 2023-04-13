@@ -4,7 +4,6 @@
   nixpkgs.config.android_sdk.accept_license = true;
 
   environment.systemPackages = with pkgs; [
-    git
     python3
 
     #android-studio

@@ -1,6 +1,8 @@
 { pkgs, lib, ... }:
+
 {
   programs.zsh = {
+    # TODO: already enabled system wide?
     enable = true;
 
     defaultKeymap = "viins";
@@ -22,7 +24,7 @@
          file = "share/zsh-powerlevel10k/powerlevel10k.zsh-theme";
       }
     ];
-  
+
     sessionVariables = {
       TERM="xterm-256color";
     };

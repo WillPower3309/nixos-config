@@ -39,7 +39,8 @@
   };
 
   nixpkgs = {
-    overlays = flake-overlays;
+    # TODO: overlays
+    # overlays = flake-overlays;
     config = {
       allowUnfree = true;
       oraclejdk.accept_license = true;
@@ -48,4 +49,3 @@
 
   system.stateVersion = "22.05";
 }
-

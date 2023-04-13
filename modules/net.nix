@@ -1,7 +1,7 @@
 { config, pkg, ... }:
 
 {
-  networking.hostName = "surface";
+  networking.hostName = "desktop";
 
   networking.networkmanager = {
     enable = true;

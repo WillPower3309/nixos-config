@@ -6,6 +6,7 @@
     ./zsh.nix
     ./git.nix
     ./emacs.nix
+    ./web-browsers.nix
   ];
 
   programs.home-manager.enable = true;
@@ -35,7 +36,6 @@
       ".config/foot/foot.ini".source =  ./config/foot/foot.ini;
       ".config/mpv/mpv.conf".source = ./config/mpv/mpv.conf;
       ".config/pipewire/pipewire.conf".source = ./config/pipewire/pipewire.conf;
-      ".config/qutebrowser/config.py".source = ./config/qutebrowser/config.py;
     };
 
     stateVersion = "22.05";

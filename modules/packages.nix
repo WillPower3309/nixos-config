@@ -4,13 +4,11 @@
   imports = [];
 
   environment.systemPackages = with pkgs; [
-    qutebrowser
     discord
     neofetch
     mpv
     youtube-dl
     keepassxc
-    ungoogled-chromium
     pciutils
     colorls
     nextcloud-client
@@ -67,4 +65,3 @@
     jdk
   ];
 }
-

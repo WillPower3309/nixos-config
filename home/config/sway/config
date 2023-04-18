@@ -19,12 +19,8 @@ set $right l
 ########################
 
 
-exec --no-startup-id gnome-keyring-daemon --start --components=secrets
 exec foot --server
 exec autotiling
-exec nextcloud
-exec keepassxc
-exec gammastep -l 43.651:-79.347
 
 
 #######################
@@ -33,15 +29,15 @@ exec gammastep -l 43.651:-79.347
 
 
 # Input setup
-input type:touchpad {
-    tap enabled
+input type:touchpad tap enabled
+
+# Output setup (Samsung Odyssey G9)
+output DP-3 {
+    mode 5120x1440@239.761Hz
+    adaptive_sync off
+    render_bit_depth 10
+    background ~/Downloads/wallpaper.png fill
 }
-
-# Output setup
-output DP-1 pos 0 0
-output HDMI-1 pos 1920 1080
-
-focus output HDMI-1 # main monitor
 
 # Output wallpaper
 exec oguri
@@ -62,9 +58,7 @@ gaps inner 15
 gaps outer 0
 
 # Status Bar
-bar {
-    swaybar_command waybar
-}
+bar swaybar_command waybar
 
 # Theme
 exec gsettings set org.gnome.desktop.interface gtk-theme 'Arc-Dark'  
@@ -90,7 +84,7 @@ seat * hide_cursor 3000
 
     # Start your launcher
     bindsym $mod+d exec $menu
-    
+
     bindsym $mod+Escape exec nwgbar
 
     # Drag floating windows by holding down $mod and left mouse button.

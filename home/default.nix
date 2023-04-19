@@ -7,9 +7,13 @@
     ./git.nix
     ./emacs.nix
     ./web-browsers.nix
+    ./discord.nix
   ];
 
   programs.home-manager.enable = true;
+
+  # TODO: already declared in host file, don't double declare
+  nixpkgs.config.allowUnfree = true;
 
   home = {
     username = "will";

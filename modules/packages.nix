@@ -4,7 +4,6 @@
   imports = [];
 
   environment.systemPackages = with pkgs; [
-    discord
     neofetch
     mpv
     youtube-dl

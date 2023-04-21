@@ -3,11 +3,15 @@
 {
   imports = [
     impermanence.nixosModules.home-manager.impermanence
+    #./sway.nix
+    ./gtk.nix
+    ./qt.nix
     ./zsh.nix
     ./git.nix
     ./emacs.nix
     ./web-browsers.nix
     ./discord.nix
+    ./kde-connect.nix
   ];
 
   programs.home-manager.enable = true;
@@ -23,6 +27,7 @@
       "/nix/persist/home/will" = {
         directories = [
           "Downloads"
+          "Pictures"
           "Projects"
           ".ssh"
           {
@@ -36,7 +41,7 @@
     };
 
     file = {
-      ".config/sway/config".source = ./config/sway/config;
+      ".config/sway/config".source =  ./config/sway/config;
       ".config/foot/foot.ini".source =  ./config/foot/foot.ini;
       ".config/mpv/mpv.conf".source = ./config/mpv/mpv.conf;
       ".config/pipewire/pipewire.conf".source = ./config/pipewire/pipewire.conf;

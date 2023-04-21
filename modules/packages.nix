@@ -16,16 +16,6 @@
     foot
     zsh
 
-    # gtk theming
-    glib #gsettings command
-    gtk-engine-murrine
-    gtk_engines
-    gsettings-desktop-schemas
-    # theming
-    arc-theme
-    tela-icon-theme
-    breeze-gtk
-
     libnotify
 
     gnome3.nautilus

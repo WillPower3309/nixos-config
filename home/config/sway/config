@@ -36,12 +36,8 @@ output DP-3 {
     mode 5120x1440@239.761Hz
     adaptive_sync off
     render_bit_depth 10
-    background ~/Downloads/wallpaper.png fill
+    background ~/Pictures/wallpaper.png fill
 }
-
-# Output wallpaper
-exec oguri
-exec swayblur -a 8
 
 
 #######################
@@ -50,23 +46,22 @@ exec swayblur -a 8
 
 
 # Disable titlebar and border
-default_border none
+default_border pixel 2
 default_floating_border none
-
-# Gaps
-gaps inner 15
-gaps outer 0
 
 # Status Bar
 bar swaybar_command waybar
 
-# Theme
-exec gsettings set org.gnome.desktop.interface gtk-theme 'Arc-Dark'  
-exec gsettings set org.gnome.desktop.interface icon-theme 'Tela'
-exec gsettings set org.gnome.desktop.interface cursor-theme 'breeze_cursors'
+# Gaps
+gaps {
+    inner 15
+    outer 0
+}
 
-seat seat0 xcursor_theme breeze_cursors 10
-seat * hide_cursor 3000
+seat seat0 {
+    xcursor_theme breeze_cursors 10
+    hide_cursor 3000
+}
 
 
 #######################
@@ -95,7 +90,7 @@ seat * hide_cursor 3000
     bindsym $mod+Shift+c reload
 
     # Screenshot
-    bindsym Print exec grim -t jpeg -g "$(slurp)" ~/screenshots/$(date +%Y-%m-%d_%H-%m-%s).jpg
+    bindsym Print exec grim -t jpeg -g "$(slurp)" ~/Pictures/$(date +%Y-%m-%d_%H-%m-%s).jpg
 
     # Exit sway (logs you out of your Wayland session)
     bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -b 'Yes, exit sway' 'swaymsg exit'
@@ -219,5 +214,3 @@ bindsym XF86AudioMute exec "amixer -q sset Master,0 toggle"
 #brightness control
 bindsym XF86MonBrightnessDown exec brightnessctl set 15%-
 bindsym XF86MonBrightnessUp exec brightnessctl set +15%
-
-include /etc/sway/config.d/*

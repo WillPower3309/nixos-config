@@ -6,10 +6,11 @@
     ./hardware-configuration.nix
     ../../modules/boot.nix
     ../../modules/kernel.nix
+    ../../modules/greetd.nix
+    ../../modules/sway.nix
     ../../modules/net.nix
     ../../modules/sound.nix
     ../../modules/users.nix
-    ../../modules/sway.nix
     ../../modules/fonts.nix
     ../../modules/vim.nix
     ../../modules/music.nix

@@ -10,6 +10,7 @@
     ./git.nix
     ./emacs.nix
     ./web-browsers.nix
+    ./games.nix
     ./discord.nix
     ./kde-connect.nix
   ];

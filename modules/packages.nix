@@ -3,6 +3,8 @@
 {
   imports = [];
 
+  programs.steam.enable = true;
+
   environment.systemPackages = with pkgs; [
     neofetch
     mpv
@@ -14,7 +16,6 @@
     unzip
     gtop
     foot
-    zsh
 
     libnotify
 
@@ -29,8 +30,6 @@
 
     udiskie
 
-    zoom-us
-
     obs-studio
 
     tutanota-desktop
@@ -43,14 +42,8 @@
     winetricks
     mono
 
-    libreoffice
-
-    openconnect
-    remmina
-    audacity
-
     python39Packages.psutil
 
-    jdk
+    darktable
   ];
 }

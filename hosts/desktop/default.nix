@@ -14,7 +14,6 @@
     ../../modules/fonts.nix
     ../../modules/vim.nix
     ../../modules/music.nix
-    ../../modules/games.nix
     ../../modules/development.nix
     ../../modules/virtualization.nix
     ../../modules/packages.nix

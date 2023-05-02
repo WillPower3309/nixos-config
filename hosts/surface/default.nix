@@ -1,19 +1,21 @@
-{ config, pkgs, nixos-hardware, home-manager, flake-overlays, ... }:
+{ config, pkgs, impermanence, flake-overlays, ... }:
 
 {
   imports = [
-    home-manager.nixosModules.home-manager
+    impermanence.nixosModules.impermanence
     ./hardware-configuration.nix
     ../../modules/boot.nix
+    ../../modules/kernel.nix
+    ../../modules/greetd.nix
+    ../../modules/sway.nix
     ../../modules/net.nix
     ../../modules/sound.nix
     ../../modules/users.nix
-    ../../modules/sway.nix
     ../../modules/fonts.nix
     ../../modules/vim.nix
     ../../modules/music.nix
-    ../../modules/development.nix
     ../../modules/games.nix
+    ../../modules/development.nix
     ../../modules/packages.nix
   ];
 
@@ -21,15 +23,10 @@
   time.timeZone = "America/Toronto";
 
   # Laptop: Needs backlight
+  # TODO: use light?
   environment.systemPackages = with pkgs; [
     brightnessctl
   ];
-
-  home-manager = {
-    useGlobalPkgs = true;
-    useUserPackages = true;
-    users.will = import ../../home;
-  };
 
   nix = {
     package = pkgs.nixFlakes;
@@ -45,6 +42,23 @@
       allowUnfree = true;
       oraclejdk.accept_license = true;
     };
+  };
+
+  # persistence (TODO: make one file)
+  programs.fuse.userAllowOther = true;
+
+  environment.persistence."/nix/persist" = {
+    directories = [
+      "/etc/NetworkManager/system-connections"
+      "/var/log"
+      "/var/lib/libvirt"
+      "/var/lib/mpd"
+      "/var/lib/docker"
+    ];
+
+    files = [
+      "/etc/machine-id" # used by systemd for journalctl
+    ];
   };
 
   system.stateVersion = "22.05";

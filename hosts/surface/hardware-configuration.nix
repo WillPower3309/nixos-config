@@ -12,6 +12,11 @@
   boot.extraModulePackages = [ ];
 
   fileSystems."/" =
+    { device = "none";
+      fsType = "tmpfs";
+    };
+
+  fileSystems."/nix" =
     { device = "/dev/disk/by-uuid/21480de3-7626-4636-a8eb-8ce6bea90d5b";
       fsType = "ext4";
     };
@@ -28,8 +33,6 @@
   powerManagement.cpuFreqGovernor = lib.mkDefault "powersave";
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
   virtualisation.hypervGuest.enable = true;
-  # high-resolution display
-  hardware.video.hidpi.enable = lib.mkDefault true;
 
   hardware.enableAllFirmware = true;
 }

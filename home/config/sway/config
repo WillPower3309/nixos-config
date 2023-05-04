@@ -32,10 +32,7 @@ exec autotiling
 input type:touchpad tap enabled
 
 # Output setup (Samsung Odyssey G9)
-output DP-3 {
-    mode 5120x1440@239.761Hz
-    adaptive_sync off
-    render_bit_depth 10
+output * {
     background ~/Pictures/wallpaper.png fill
 }
 

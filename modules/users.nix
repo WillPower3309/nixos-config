@@ -18,7 +18,7 @@
       will = {
         isNormalUser = true;
         initialPassword = "1012917";
-        extraGroups = [ "wheel" "libvirtd" "input" "kvm" "docker" ];
+        extraGroups = [ "wheel" "libvirtd" "input" "kvm" "docker" "video" ];
       };
     };
   };

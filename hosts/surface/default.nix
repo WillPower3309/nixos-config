@@ -4,6 +4,7 @@
   imports = [
     impermanence.nixosModules.impermanence
     ./hardware-configuration.nix
+    ../../modules/nix.nix
     ../../modules/boot.nix
     ../../modules/kernel.nix
     ../../modules/greetd.nix
@@ -20,22 +21,6 @@
 
   # Set your time zone.
   time.timeZone = "America/Toronto";
-
-  nix = {
-    package = pkgs.nixFlakes;
-    extraOptions = ''
-      experimental-features = nix-command flakes
-    '';
-  };
-
-  nixpkgs = {
-    # TODO: overlays
-    # overlays = flake-overlays;
-    config = {
-      allowUnfree = true;
-      oraclejdk.accept_license = true;
-    };
-  };
 
   programs = {
     light.enable = true; # laptop needs backlight

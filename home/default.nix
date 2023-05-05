@@ -18,7 +18,7 @@
 
   programs.home-manager.enable = true;
 
-  # TODO: already declared in host file, don't double declare
+  # TODO: already declared in nix.nix file, don't double declare
   nixpkgs.config.allowUnfree = true;
 
   home = {

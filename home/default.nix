@@ -9,6 +9,7 @@
     ./zsh.nix
     ./git.nix
     ./emacs.nix
+    ./vim.nix
     ./web-browsers.nix
     ./games.nix
     ./discord.nix

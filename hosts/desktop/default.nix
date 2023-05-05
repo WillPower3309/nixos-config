@@ -12,7 +12,6 @@
     ../../modules/sound.nix
     ../../modules/users.nix
     ../../modules/fonts.nix
-    ../../modules/vim.nix
     ../../modules/music.nix
     ../../modules/development.nix
     ../../modules/virtualization.nix

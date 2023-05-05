@@ -48,17 +48,8 @@
   programs.fuse.userAllowOther = true;
 
   environment.persistence."/nix/persist" = {
-    directories = [
-      "/etc/NetworkManager/system-connections"
-      "/var/log"
-      "/var/lib/libvirt"
-      "/var/lib/mpd"
-      "/var/lib/docker"
-    ];
-
-    files = [
-      "/etc/machine-id" # used by systemd for journalctl
-    ];
+    directories = [ "/var/log" ];
+    files = [ "/etc/machine-id" ]; # used by systemd for journalctl
   };
 
   system.stateVersion = "22.05";

@@ -13,6 +13,7 @@
     ../../modules/users.nix
     ../../modules/fonts.nix
     ../../modules/vim.nix
+    ../../modules/virtualization.nix
     ../../modules/music.nix
     ../../modules/development.nix
     ../../modules/packages.nix
@@ -20,12 +21,6 @@
 
   # Set your time zone.
   time.timeZone = "America/Toronto";
-
-  # Laptop: Needs backlight
-  # TODO: use light?
-  environment.systemPackages = with pkgs; [
-    brightnessctl
-  ];
 
   nix = {
     package = pkgs.nixFlakes;
@@ -43,21 +38,14 @@
     };
   };
 
-  # persistence (TODO: make one file)
-  programs.fuse.userAllowOther = true;
+  programs = {
+    light.enable = true; # laptop needs backlight
+    fuse.userAllowOther = true; # persistence (TODO: make one file)
+  };
 
   environment.persistence."/nix/persist" = {
-    directories = [
-      "/etc/NetworkManager/system-connections"
-      "/var/log"
-      "/var/lib/libvirt"
-      "/var/lib/mpd"
-      "/var/lib/docker"
-    ];
-
-    files = [
-      "/etc/machine-id" # used by systemd for journalctl
-    ];
+    directories = [ "/var/log" ];
+    files = [ "/etc/machine-id" ]; # used by systemd for journalctl
   };
 
   system.stateVersion = "22.05";

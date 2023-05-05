@@ -19,7 +19,7 @@ in
 
   environment.etc = {
     "greetd/environments".text = ''
-      sway
+      dbus-run-session sway
       zsh
     '';
   };

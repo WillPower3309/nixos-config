@@ -21,20 +21,30 @@
 
     docker = {
       enable = true;
-      enableNvidia = true;
+#      enableNvidia = true;
     };
   };
 
   boot = {
 #    kernelModules = [ "kvm-intel" "vfio_virqfd" "vfio_pci" "vfio_iommu_type1" "vfio" ];
 #    kernelParams = [ "intel_iommu=on" ];
-    blacklistedKernelModules = ["nouveau"];
-
+#    blacklistedKernelModules = ["nouveau"];
 #    extraModprobeConfig = "options vfio-pci ids=10de:1c03,10de:10f1";
   };
 
-  environment.systemPackages = with pkgs; [
-#    virt-manager
-#    OVMF
-  ];
+  environment = {
+    systemPackages = with pkgs; [
+    #    virt-manager
+    #    OVMF
+        distrobox
+    ];
+
+    persistence."/nix/persist" = {
+      directories = [
+#        "/var/lib/libvirt"
+        "/var/lib/docker"
+        "/var/lib/docker/overlay2"
+      ];
+    };
+  };
 }

@@ -8,4 +8,8 @@
     wifi.macAddress = "random";
     ethernet.macAddress = "random";
   };
+
+  environment.persistence."/nix/persist" = {
+    directories = [ "/etc/NetworkManager/system-connections" ];
+  };
 }

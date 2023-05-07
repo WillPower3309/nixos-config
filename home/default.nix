@@ -12,6 +12,7 @@
     ./vim.nix
     ./web-browsers.nix
     ./games.nix
+    ./video.nix
     ./discord.nix
     ./kde-connect.nix
   ];
@@ -45,7 +46,6 @@
     file = {
       ".config/sway/config".source =  ./config/sway/config;
       ".config/foot/foot.ini".source =  ./config/foot/foot.ini;
-      ".config/mpv/mpv.conf".source = ./config/mpv/mpv.conf;
       ".config/pipewire/pipewire.conf".source = ./config/pipewire/pipewire.conf;
     };
 

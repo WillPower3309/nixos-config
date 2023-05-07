@@ -7,8 +7,6 @@
 
   environment.systemPackages = with pkgs; [
     neofetch
-    mpv
-    youtube-dl
     keepassxc
     pciutils
     colorls
@@ -23,10 +21,6 @@
     openssl
 
     ripgrep
-
-    imagemagick
-
-    ani-cli
 
     udiskie
 
@@ -45,5 +39,6 @@
     python39Packages.psutil
 
     darktable
+    imagemagick
   ];
 }

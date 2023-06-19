@@ -10,6 +10,7 @@
     ../../modules/greetd.nix
     ../../modules/sway.nix
     ../../modules/net.nix
+    ../../modules/bluetooth.nix
     ../../modules/sound.nix
     ../../modules/users.nix
     ../../modules/fonts.nix

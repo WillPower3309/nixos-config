@@ -39,8 +39,5 @@ in
     "kdeconnect-scripts/fortune.sh".source = "${script-fortune}/bin/fortune";
   };
 
-  home.persistence."/persist/home/will" = {
-    directories = [ ".config/kdeconnect" ];
-    allowOther = true;
-  };
+  home.persistence."/nix/persist/home/will".directories = [ ".config/kdeconnect" ];
 }

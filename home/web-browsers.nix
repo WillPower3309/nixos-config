@@ -11,8 +11,5 @@
     enable = true;
   };
 
-  home.persistence."/nix/persist/home/will" = {
-    directories = [ ".config/chromium" ];
-    allowOther = true;
-  };
+  home.persistence."/nix/persist/home/will".directories = [ ".config/chromium" ];
 }

@@ -26,6 +26,7 @@
   programs.fuse.userAllowOther = true;
 
   environment.persistence."/nix/persist" = {
+    hideMounts = true;
     directories = [ "/var/log" ];
     files = [ "/etc/machine-id" ]; # used by systemd for journalctl
   };

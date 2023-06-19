@@ -3,19 +3,20 @@
 {
   imports = [
     impermanence.nixosModules.home-manager.impermanence
-    #./sway.nix
-    ./gtk.nix
-    ./qt.nix
-    ./zsh.nix
-    ./git.nix
-    ./emacs.nix
-    ./vim.nix
-    ./web-browsers.nix
-    ./games.nix
-    ./video.nix
     ./discord.nix
+    ./emacs.nix
+    ./games.nix
+    ./git.nix
+    ./gtk.nix
     ./kde-connect.nix
+    ./qt.nix
+    ./ssh-client.nix
+    #./sway.nix
+    ./video.nix
+    ./vim.nix
     ./waybar.nix
+    ./web-browsers.nix
+    ./zsh.nix
   ];
 
   programs.home-manager.enable = true;
@@ -28,19 +29,16 @@
     homeDirectory = "/home/will";
 
     persistence."/nix/persist/home/will" = {
+      allowOther = true;
       directories = [
         "Downloads"
         "Pictures"
         "Projects"
-        ".ssh"
         {
           directory = ".local/share/Steam ";
           method = "symlink";
         }
       ];
-
-      allowOther = true;
-      hideMounts = true;
     };
 
     file = {

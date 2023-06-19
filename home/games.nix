@@ -9,12 +9,9 @@
       minecraft
     ];
 
-    persistence."/nix/persist/home/will" = {
-      directories = [
-        ".local/share/Steam"
-        ".minecraft"
-      ];
-      allowOther = true;
-    };
+    persistence."/nix/persist/home/will".directories = [
+      ".local/share/Steam"
+      ".minecraft"
+    ];
   };
 }

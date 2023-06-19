@@ -39,12 +39,10 @@
         distrobox
     ];
 
-    persistence."/nix/persist" = {
-      directories = [
-#        "/var/lib/libvirt"
-        "/var/lib/docker"
-        "/var/lib/docker/overlay2"
-      ];
-    };
+    persistence."/nix/persist".directories = [
+     #"/var/lib/libvirt"
+      "/var/lib/docker"
+      "/var/lib/docker/overlay2"
+    ];
   };
 }

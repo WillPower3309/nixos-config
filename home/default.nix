@@ -15,6 +15,7 @@
     ./video.nix
     ./discord.nix
     ./kde-connect.nix
+    ./waybar.nix
   ];
 
   programs.home-manager.enable = true;
@@ -26,21 +27,20 @@
     username = "will";
     homeDirectory = "/home/will";
 
-    persistence = {
-      "/nix/persist/home/will" = {
-        directories = [
-          "Downloads"
-          "Pictures"
-          "Projects"
-          ".ssh"
-          {
-            directory = ".local/share/Steam ";
-            method = "symlink";
-          }
-        ];
+    persistence."/nix/persist/home/will" = {
+      directories = [
+        "Downloads"
+        "Pictures"
+        "Projects"
+        ".ssh"
+        {
+          directory = ".local/share/Steam ";
+          method = "symlink";
+        }
+      ];
 
-        allowOther = true;
-      };
+      allowOther = true;
+      hideMounts = true;
     };
 
     file = {

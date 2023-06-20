@@ -9,7 +9,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     impermanence.url = "github:nix-community/impermanence/master";
   };
 
@@ -18,7 +17,7 @@
     mkNixos = modules: nixpkgs.lib.nixosSystem {
       inherit modules;
       system = "x86_64-linux";
-      specialArgs = { inherit impermanence home-manager nixos-hardware; };
+      specialArgs = { inherit impermanence home-manager ; };
     };
 
     mkHome = modules: pkgs: home-manager.lib.homeManagerConfiguration {

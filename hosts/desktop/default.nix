@@ -9,7 +9,6 @@
     ../../modules/kernel.nix
     ../../modules/greetd.nix
     ../../modules/sway.nix
-    ../../modules/net.nix
     ../../modules/sound.nix
     ../../modules/users.nix
     ../../modules/fonts.nix
@@ -21,6 +20,11 @@
 
   # Set your time zone.
   time.timeZone = "America/Toronto";
+
+  networking = {
+    hostName = "desktop";
+    wireless.enable = false;
+  };
 
   # persistence (TODO: make one file)
   programs.fuse.userAllowOther = true;

@@ -9,7 +9,6 @@
     ../../modules/kernel.nix
     ../../modules/greetd.nix
     ../../modules/sway.nix
-    ../../modules/net.nix
     ../../modules/bluetooth.nix
     ../../modules/sound.nix
     ../../modules/users.nix
@@ -18,10 +17,13 @@
     ../../modules/music.nix
     ../../modules/development.nix
     ../../modules/packages.nix
+    ../../modules/wifi.nix
   ];
 
   # Set your time zone.
   time.timeZone = "America/Toronto";
+
+  networking.hostName = "surface";
 
   programs = {
     light.enable = true; # laptop needs backlight

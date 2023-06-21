@@ -5,7 +5,7 @@
     impermanence.nixosModules.impermanence
     ./hardware-configuration.nix
     ../../modules/nix.nix
-    ../../modules/boot.nix
+    ../../modules/bootloader.nix
     ../../modules/kernel.nix
     ../../modules/greetd.nix
     ../../modules/sway.nix

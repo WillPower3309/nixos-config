@@ -6,7 +6,8 @@
 set $mod Mod4
 
 set $term footclient
-set $menu nwggrid
+set $app-menu nwggrid
+set $power-menu nwgbar
 
 set $left h
 set $down j
@@ -75,9 +76,9 @@ seat seat0 {
     bindsym $mod+q kill
 
     # Start your launcher
-    bindsym $mod+d exec $menu
+    bindsym $mod+d exec $app-menu
 
-    bindsym $mod+Escape exec nwgbar
+    bindsym $mod+Escape exec $power-menu
 
     # Drag floating windows by holding down $mod and left mouse button.
     # Resize them with right mouse button + $mod.

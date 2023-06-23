@@ -28,6 +28,7 @@
   in {
     nixosConfigurations = {
       desktop = mkNixos [ ./hosts/desktop ];
+      server = mkNixos [ ./hosts/server ]; 
       surface = mkNixos [ ./hosts/surface ];
     };
 

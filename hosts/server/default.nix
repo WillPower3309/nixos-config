@@ -11,6 +11,8 @@ in
     ./hardware-configuration.nix
     ../../modules/nix.nix
     ../../modules/bootloader.nix
+    ../../modules/containerized-services/plex.nix
+    ../../modules/containerized-services/syncthing.nix
   ];
 
   boot = {

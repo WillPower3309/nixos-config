@@ -30,7 +30,18 @@ exec autotiling
 
 
 # Input setup
-input type:touchpad tap enabled
+input * {
+    accel_profile flat
+}
+
+input "1133:16495:Logitech_MX_Ergo" {
+    accel_profile adaptive
+}
+
+input type:touchpad {
+    tap enabled
+    accel_profile adaptive
+}
 
 # Output setup (Samsung Odyssey G9)
 output * {

@@ -13,7 +13,6 @@
     nextcloud-client
     unzip
     gtop
-    foot
 
     libnotify
 

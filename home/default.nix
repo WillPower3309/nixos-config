@@ -3,20 +3,21 @@
 {
   imports = [
     impermanence.nixosModules.home-manager.impermanence
-    ./discord.nix
-    ./emacs.nix
-    ./games.nix
-    ./git.nix
-    ./gtk.nix
-    ./kde-connect.nix
-    ./qt.nix
-    ./ssh-client.nix
-    #./sway.nix
-    ./video.nix
-    ./vim.nix
-    ./waybar.nix
-    ./web-browsers.nix
-    ./zsh.nix
+    ./modules/discord.nix
+    ./modules/emacs.nix
+    ./modules/foot.nix
+    ./modules/games.nix
+    ./modules/git.nix
+    ./modules/gtk.nix
+    ./modules/kde-connect.nix
+    ./modules/qt.nix
+    ./modules/ssh-client.nix
+    #./modules/sway.nix
+    ./modules/video.nix
+    ./modules/vim.nix
+    ./modules/waybar.nix
+    ./modules/web-browsers.nix
+    ./modules/zsh.nix
   ];
 
   programs.home-manager.enable = true;
@@ -42,9 +43,8 @@
     };
 
     file = {
-      ".config/sway/config".source =  ./config/sway/config;
-      ".config/foot/foot.ini".source =  ./config/foot/foot.ini;
-      ".config/pipewire/pipewire.conf".source = ./config/pipewire/pipewire.conf;
+      ".config/sway/config".source =  ./modules/config/sway/config;
+      ".config/pipewire/pipewire.conf".source = ./modules/config/pipewire/pipewire.conf;
     };
 
     stateVersion = "22.05";

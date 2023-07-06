@@ -9,6 +9,7 @@
 
     enableAutosuggestions = true;
     enableCompletion = true;
+    syntaxHighlighting.enable = true;
 
     initExtraBeforeCompInit = ''
       source ${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k/powerlevel10k.zsh-theme
@@ -29,8 +30,9 @@
       TERM="xterm-256color";
     };
 
-    shellGlobalAliases = {
+    shellAliases = {
       ls = "colorls";
+      # TODO = nixos-rebuild boot --flake ~/Projects/nixos-config/<$HOSTNAME>";
     };
   };
 }

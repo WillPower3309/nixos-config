@@ -17,7 +17,7 @@
     mkNixos = modules: nixpkgs.lib.nixosSystem {
       inherit modules;
       system = "x86_64-linux";
-      specialArgs = { inherit impermanence home-manager ; };
+      specialArgs = { inherit impermanence home-manager; };
     };
 
     mkHome = modules: pkgs: home-manager.lib.homeManagerConfiguration {
@@ -28,7 +28,7 @@
   in {
     nixosConfigurations = {
       desktop = mkNixos [ ./hosts/desktop ];
-      server = mkNixos [ ./hosts/server ]; 
+      server = mkNixos [ ./hosts/server ];
       surface = mkNixos [ ./hosts/surface ];
     };
 

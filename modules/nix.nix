@@ -15,7 +15,6 @@
   };
 
   nixpkgs = {
-    # TODO: overlays
     # overlays = flake-overlays;
     config = {
       allowUnfree = true;

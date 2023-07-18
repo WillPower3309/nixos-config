@@ -8,7 +8,6 @@
     ../../modules/bootloader.nix
     ../../modules/kernel.nix
     ../../modules/greetd.nix
-    ../../modules/sway.nix
     ../../modules/sound.nix
     ../../modules/users.nix
     ../../modules/fonts.nix
@@ -26,8 +25,12 @@
     wireless.enable = false;
   };
 
-  # persistence (TODO: make one file)
-  programs.fuse.userAllowOther = true;
+  programs = {
+    dconf.enable = true; # needed for sway
+    fuse.userAllowOther = true; # persistence (TODO: make one file)
+  };
+
+  security.polkit.enable = true; # needed for sway
 
   environment.persistence."/nix/persist" = {
     hideMounts = true;

@@ -8,7 +8,6 @@
     ../../modules/bootloader.nix
     ../../modules/kernel.nix
     ../../modules/greetd.nix
-    ../../modules/sway.nix
     ../../modules/bluetooth.nix
     ../../modules/sound.nix
     ../../modules/users.nix
@@ -26,9 +25,12 @@
   networking.hostName = "surface";
 
   programs = {
+    dconf.enable = true; # needed for sway
     light.enable = true; # laptop needs backlight
     fuse.userAllowOther = true; # persistence (TODO: make one file)
   };
+
+  security.polkit.enable = true; # needed for sway
 
   environment.persistence."/nix/persist" = {
     hideMounts = true;

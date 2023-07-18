@@ -12,7 +12,7 @@
     ./modules/kde-connect.nix
     ./modules/qt.nix
     ./modules/ssh-client.nix
-    #./modules/sway.nix
+    ./modules/sway.nix
     ./modules/video.nix
     ./modules/vim.nix
     ./modules/waybar.nix
@@ -42,10 +42,7 @@
       ];
     };
 
-    file = {
-      ".config/sway/config".source =  ./modules/config/sway/config;
-      ".config/pipewire/pipewire.conf".source = ./modules/config/pipewire/pipewire.conf;
-    };
+    file.".config/pipewire/pipewire.conf".source = ./modules/config/pipewire/pipewire.conf;
 
     stateVersion = "22.05";
   };

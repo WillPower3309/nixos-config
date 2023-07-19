@@ -69,7 +69,7 @@
         { command = "autotiling"; }
       ];
 
-      keybindings = let 
+      keybindings = let
         mod = "Mod4";
         term = "footclient";
         app-menu = "nwggrid";
@@ -182,6 +182,8 @@
       shadows enable
       corner_radius 12
       for_window [app_id="foot"] blur enable
+      blur_radius 7
+      blur_passes 4
     '';
   };
 }

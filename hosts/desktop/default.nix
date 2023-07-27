@@ -1,4 +1,4 @@
-{ config, pkgs, impermanence, flake-overlays, ... }:
+{ config, pkgs, impermanence, ... }:
 
 {
   imports = [

@@ -10,6 +10,7 @@
     ./modules/git.nix
     ./modules/gtk.nix
     ./modules/kde-connect.nix
+    ./modules/photography.nix
     ./modules/qt.nix
     ./modules/ssh-client.nix
     ./modules/sway.nix

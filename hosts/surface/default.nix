@@ -8,11 +8,11 @@
     ../../modules/bootloader.nix
     ../../modules/kernel.nix
     ../../modules/greetd.nix
+    ../../modules/containerization.nix
     ../../modules/bluetooth.nix
     ../../modules/sound.nix
     ../../modules/users.nix
     ../../modules/fonts.nix
-    ../../modules/virtualization.nix
     ../../modules/music.nix
     ../../modules/development.nix
     ../../modules/packages.nix

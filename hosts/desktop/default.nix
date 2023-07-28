@@ -6,6 +6,7 @@
     ./hardware-configuration.nix
     ../../modules/nix.nix
     ../../modules/bootloader.nix
+    ../../modules/containerization.nix
     ../../modules/kernel.nix
     ../../modules/greetd.nix
     ../../modules/sound.nix
@@ -13,7 +14,6 @@
     ../../modules/fonts.nix
     ../../modules/music.nix
     ../../modules/development.nix
-    ../../modules/virtualization.nix
     ../../modules/packages.nix
   ];
 

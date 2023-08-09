@@ -4,17 +4,18 @@
   imports = [
     impermanence.nixosModules.impermanence
     ./hardware-configuration.nix
-    ../../modules/nix.nix
     ../../modules/bootloader.nix
     ../../modules/containerization.nix
-    ../../modules/kernel.nix
-    ../../modules/greetd.nix
-    ../../modules/sound.nix
-    ../../modules/users.nix
-    ../../modules/fonts.nix
-    ../../modules/music.nix
     ../../modules/development.nix
+    ../../modules/fonts.nix
+    ../../modules/greetd.nix
+    ../../modules/kernel.nix
+    ../../modules/music.nix
+    ../../modules/nix.nix
     ../../modules/packages.nix
+    ../../modules/sound.nix
+    ../../modules/syncthing.nix
+    ../../modules/users.nix
   ];
 
   # Set your time zone.

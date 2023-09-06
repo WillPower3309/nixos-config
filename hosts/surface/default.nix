@@ -31,7 +31,15 @@
     fuse.userAllowOther = true; # persistence (TODO: make one file)
   };
 
-  security.polkit.enable = true; # needed for sway
+  # needed for sway
+  security.polkit.enable = true;
+  xdg.portal = {
+    enable = true;
+    wlr.enable = true; # provides screen share
+#    extraPortals = with pkgs; [
+#      xdg-desktop-portal-gtk # provides file chooser
+#    ];
+  };
 
   environment.persistence."/nix/persist" = {
     hideMounts = true;

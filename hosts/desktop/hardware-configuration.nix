@@ -16,6 +16,7 @@
   fileSystems."/" =
     { device = "none";
       fsType = "tmpfs";
+      options = [ "defaults" "noatime" "size=20%" "mode=755" ];
     };
 
   fileSystems."/nix" =
@@ -27,6 +28,14 @@
     { device = "/dev/disk/by-uuid/B18B-60D0";
       fsType = "vfat";
     };
+  # TODO: convert to systemd.mounts as described in https://nixos.wiki/wiki/NFS ?
+  # TODO: move to photography module
+#  fileSystems."/home/will/Pictures/photography" = {
+#    device = "10.27.27.3:/photos";
+#    fsType = "nfs";
+#    # lazy mount, disconnect after 10 minutes
+#    options = [ "x-systemd.automount" "noauto" "x-systemd.idle-timeout=600" ];
+#  };
 
   swapDevices = [ ];
 

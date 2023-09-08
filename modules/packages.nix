@@ -1,8 +1,6 @@
 { config, pkgs, ... }:
 
 {
-  imports = [];
-
   programs.steam.enable = true;
 
   environment.systemPackages = with pkgs; [
@@ -22,8 +20,6 @@
 
     udiskie
 
-    obs-studio
-
     tutanota-desktop
 
     psmisc # fuser, killall and pstree etc
@@ -35,4 +31,5 @@
 
     python39Packages.psutil
   ];
+  services.udisks2.enable = true;
 }

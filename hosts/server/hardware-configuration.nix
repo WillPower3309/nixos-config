@@ -16,7 +16,7 @@
   fileSystems."/" =
     { device = "none";
       fsType = "tmpfs";
-      options = [ "defaults" "size=2G" "mode=755" ];
+      options = [ "defaults" "noatime" "size=20%" "mode=755" ];
     };
 
   fileSystems."/boot" =
@@ -32,6 +32,12 @@
 
   fileSystems."/persist" =
     { device = "rpool/safe/persist";
+      fsType = "zfs";
+      options = [ "zfsutil" ];
+      neededForBoot = true;
+    };
+  fileSystems."/data" =
+    { device = "dataPool";
       fsType = "zfs";
       options = [ "zfsutil" ];
       neededForBoot = true;
@@ -53,4 +59,3 @@
   powerManagement.cpuFreqGovernor = lib.mkDefault "powersave";
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 }
-

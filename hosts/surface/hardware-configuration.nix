@@ -14,6 +14,7 @@
   fileSystems."/" =
     { device = "none";
       fsType = "tmpfs";
+      options = [ "defaults" "noatime" "size=20%" "mode=755" ];
     };
 
   fileSystems."/nix" =

@@ -13,6 +13,7 @@
     ../../modules/music.nix
     ../../modules/nix.nix
     ../../modules/packages.nix
+    ../../modules/screen-record.nix
     ../../modules/sound.nix
     ../../modules/syncthing.nix
     ../../modules/users.nix
@@ -31,7 +32,18 @@
     fuse.userAllowOther = true; # persistence (TODO: make one file)
   };
 
+  hardware.opengl.enable = true;
   security.polkit.enable = true; # needed for sway
+  xdg.portal = {
+    enable = true;
+    wlr.enable = true; # provides screen share
+#    extraPortals = with pkgs; [
+#      xdg-desktop-portal-gtk # provides file chooser
+#    ];
+  };
+
+  # TODO: make this across all hosts
+  environment.systemPackages = with pkgs; [ deploy-rs ];
 
   environment.persistence."/nix/persist" = {
     hideMounts = true;

@@ -9,7 +9,7 @@ in
     settings = {
       default_session = {
         command = "${pkgs.cage}/bin/cage -d -- ${pkgs.greetd.gtkgreet}/bin/gtkgreet -s /etc/${gtkgreetCssEtcPath}";
-        user = "greeter";
+        #user = "greeter";
       };
     };
   };

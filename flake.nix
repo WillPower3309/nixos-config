@@ -5,14 +5,19 @@
     nixpkgs.url = "nixpkgs/nixpkgs-unstable";
 
     home-manager = {
-      url = "github:nix-community/home-manager/master";
+      url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    impermanence.url = "github:nix-community/impermanence/master";
+    deploy-rs = {
+      url = "github:serokell/deploy-rs";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    impermanence.url = "github:nix-community/impermanence";
   };
 
-  outputs = { nixpkgs, nixos-hardware, home-manager, impermanence, ... }:
+  outputs = { self, nixpkgs, home-manager, deploy-rs, impermanence, ... }:
   let
     mkNixos = modules: nixpkgs.lib.nixosSystem {
       inherit modules;
@@ -32,8 +37,19 @@
       surface = mkNixos [ ./hosts/surface ];
     };
 
-    homeConfigurations = {
-      "will" = mkHome [ ./home ] nixpkgs.legacyPackages."x86_64-linux";
+    homeConfigurations."will" = mkHome [ ./home ] nixpkgs.legacyPackages."x86_64-linux";
+
+    # TODO: ex https://github.com/disassembler/network/blob/18e4d34b3d09826f1239772dc3c2e8c6376d5df6/nixos/deploy.nix
+    deploy.nodes = {
+      server = {
+        hostname = "10.27.27.3";
+        profiles.system = {
+          user = "root";
+          sshUser = "root";
+          sshOpts = [ "-i" "~/.ssh/server" ];
+          path = deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.server;
+        };
+      };
     };
   };
 }

@@ -14,6 +14,7 @@
     ../../modules/music.nix
     ../../modules/nix.nix
     ../../modules/packages.nix
+    ../../modules/screen-record.nix
     ../../modules/sound.nix
     ../../modules/syncthing.nix
     ../../modules/users.nix

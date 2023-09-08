@@ -1,8 +1,8 @@
 { config, pkgs, impermanence, ... }:
 
 let
-  desktopKey = "";
-  surfaceKey = "";
+  desktopkey = "";
+  surfacekey = "";
 
 in
 {
@@ -10,12 +10,12 @@ in
     impermanence.nixosModules.impermanence
     ./hardware-configuration.nix
     ../../modules/nix.nix
-    ../../modules/bootloader.nix
     ../../modules/containerized-services/plex.nix
     ../../modules/containerized-services/syncthing.nix
   ];
 
   boot = {
+    loader.systemd-boot.enable = true;
     supportedFilesystems = [ "zfs" ];
     kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
 
@@ -66,8 +66,8 @@ in
     enable = true;
     openFirewall = true;
     settings = {
-      passwordAuthentication = false;
-      kbdInteractiveAuthentication = false;
+      PasswordAuthentication = false;
+      KbdInteractiveAuthentication = false;
     };
     hostKeys = [
       {
@@ -80,18 +80,18 @@ in
 
   users.users.root.openssh.authorizedKeys.keys = [ "${desktopKey}" "${surfaceKey}" ];
 
+  services.nfs.server = {
+    enable = true;
+    exports = ''
+      /export        10.27.27.5(rw,fsid=0,no_subtree_check)
+      /export/photos 10.27.27.5(rw,insecure,no_subtree_check)
+    '';
+  };
+  # open nfs ports
+  networking.firewall.allowedTCPPorts = [ 2049 ];
+
   # Set your time zone.
   time.timeZone = "America/Toronto";
-
-  environment.systemPackages = with pkgs; [ git vim ];
-
-  virtualisation.docker.rootless = {
-    enable = true;
-    setSocketVariable = true;
-  };
-
-  # persistence (TODO: make one file)
-  programs.fuse.userAllowOther = true;
 
   environment.persistence."/persist" = {
     directories = [

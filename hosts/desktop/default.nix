@@ -1,8 +1,9 @@
-{ config, pkgs, impermanence, ... }:
+{ config, pkgs, impermanence, agenix, ... }:
 
 {
   imports = [
     impermanence.nixosModules.impermanence
+    agenix.nixosModules.default
     ./hardware-configuration.nix
     ../../modules/bootloader.nix
     ../../modules/containerization.nix
@@ -43,7 +44,11 @@
   };
 
   # TODO: make this across all hosts
-  environment.systemPackages = with pkgs; [ deploy-rs ];
+  # TODO: get deploy-rs file from flake too?
+  environment.systemPackages = with pkgs; [
+    deploy-rs
+    agenix.packages.x86_64-linux.default
+  ];
 
   environment.persistence."/nix/persist" = {
     hideMounts = true;

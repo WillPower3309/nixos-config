@@ -1,4 +1,4 @@
-{ config, pkgs, impermanence, ... }:
+{ config, pkgs, impermanence, agenix, ... }:
 
 let
   desktopKey = "";
@@ -8,11 +8,16 @@ in
 {
   imports = [
     impermanence.nixosModules.impermanence
+    agenix.nixosModules.default
     ./hardware-configuration.nix
     ../../modules/nix.nix
-    ../../modules/containerized-services/plex.nix
-    ../../modules/containerized-services/syncthing.nix
+#    ../../modules/containerized-services/plex.nix
+#    ../../modules/containerized-services/syncthing.nix
   ];
+
+  age.secrets = {
+    desktopPrivateKey.file = ../../secrets/desktopPrivateKey.age;
+  };
 
   boot = {
     loader.systemd-boot.enable = true;
@@ -30,7 +35,11 @@ in
           port = 2222;
 
           hostKeys = [ /persist/etc/ssh/ssh_host_rsa_key ];
-          authorizedKeys = [ "${desktopKey}" "${surfaceKey}" ];
+          authorizedKeys = [
+#            "$(cat ${config.age.secrets.desktopPrivateKey.path})"
+            "${desktopKey}"
+            "${surfaceKey}"
+          ];
         };
 
        # auto load zfs password prompt on login & kill other prompt so boot can continue
@@ -70,15 +79,29 @@ in
       KbdInteractiveAuthentication = false;
     };
     hostKeys = [
+      # TODO: remove rsa key
       {
         bits = 4096;
         path = "/persist/etc/ssh/ssh_host_rsa_key";
         type = "rsa";
       }
+      {
+        path = "/persist/etc/ssh/ssh_host_ed25519_key";
+        type = "ed25519";
+      }
     ];
   };
 
-  users.users.root.openssh.authorizedKeys.keys = [ "${desktopKey}" "${surfaceKey}" ];
+  users.users.root.openssh.authorizedKeys = {
+    keys = [
+      "${desktopKey}"
+      "${surfaceKey}"
+      "$(cat ${config.age.secrets.desktopPrivateKey.path})"
+    ];
+#    keyFiles = [
+#      config.age.secrets.desktopPrivateKey.path
+#    ];
+  };
 
   services.nfs.server = {
     enable = true;

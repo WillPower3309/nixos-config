@@ -9,20 +9,26 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    impermanence.url = "github:nix-community/impermanence";
+
     deploy-rs = {
       url = "github:serokell/deploy-rs";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    impermanence.url = "github:nix-community/impermanence";
+    agenix = {
+      url = "github:ryantm/agenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, deploy-rs, impermanence, ... }:
+  outputs = { self, nixpkgs, home-manager, impermanence, deploy-rs, agenix, ... }:
   let
     mkNixos = modules: nixpkgs.lib.nixosSystem {
       inherit modules;
       system = "x86_64-linux";
-      specialArgs = { inherit impermanence home-manager; };
+      specialArgs = { inherit impermanence home-manager agenix; };
     };
 
     mkHome = modules: pkgs: home-manager.lib.homeManagerConfiguration {

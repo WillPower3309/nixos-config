@@ -1,8 +1,8 @@
 { config, pkgs, impermanence, ... }:
 
 let
-  desktopkey = "";
-  surfacekey = "";
+  desktopKey = "";
+  surfaceKey = "";
 
 in
 {
@@ -84,7 +84,7 @@ in
     enable = true;
     exports = ''
       /export        10.27.27.5(rw,fsid=0,no_subtree_check)
-      /export/photos 10.27.27.5(rw,insecure,no_subtree_check)
+      /export/photos 10.27.27.5(rw,insecure,no_subtree_check,all_squash,anonuid=65534,anongid=65534)
     '';
   };
   # open nfs ports

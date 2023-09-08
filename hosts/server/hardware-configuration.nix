@@ -36,12 +36,38 @@
       options = [ "zfsutil" ];
       neededForBoot = true;
     };
+
   fileSystems."/data" =
     { device = "dataPool";
       fsType = "zfs";
       options = [ "zfsutil" ];
       neededForBoot = true;
     };
+  fileSystems."/data/media" =
+    { device = "dataPool/media";
+      fsType = "zfs";
+      options = [ "zfsutil" ];
+    };
+  fileSystems."/data/photos" =
+    { device = "dataPool/photos";
+      fsType = "zfs";
+      options = [ "zfsutil" ];
+    };
+  fileSystems."/data/container_data" =
+    { device = "dataPool/container_data";
+      fsType = "zfs";
+      options = [ "zfsutil" ];
+    };
+  fileSystems."/data/container_data/torrents" =
+    { device = "dataPool/container_data/torrents";
+      fsType = "zfs";
+      options = [ "zfsutil" ];
+    };
+
+  fileSystems."/export/photos" = {
+    device = "/data/photos";
+    options = [ "bind" ];
+  };
 
   swapDevices =
     [ { device = "/dev/disk/by-uuid/3ba36441-4c9c-45ab-b586-d7b5ef07a4b4"; }

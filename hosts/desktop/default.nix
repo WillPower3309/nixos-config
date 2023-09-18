@@ -14,6 +14,7 @@
     ../../modules/music.nix
     ../../modules/nix.nix
     ../../modules/packages.nix
+    ../../modules/polkit.nix # needed for sway
     ../../modules/screen-record.nix
     ../../modules/sound.nix
     ../../modules/syncthing.nix
@@ -34,7 +35,6 @@
   };
 
   hardware.opengl.enable = true;
-  security.polkit.enable = true; # needed for sway
   xdg.portal = {
     enable = true;
     wlr.enable = true; # provides screen share

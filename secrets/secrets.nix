@@ -1,11 +1,15 @@
 let
-  desktopUser = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDQWOO2qMk2MP/YWfe2KKd8M1whdYYirh89/pAgMyEqW";
-  users = [ desktopUser ];
+  systemDesktop = builtins.readFile ../hosts/desktop/ssh_host_ed25519_key.pub;
+  systemSurface = builtins.readFile ../hosts/surface/ssh_host_ed25519_key.pub;
+  systemServer = builtins.readFile ../hosts/server/ssh_host_ed25519_key.pub;
+  systems = [ systemDesktop systemSurface systemServer ];
 
-  serverSystem = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDSiB38H1D4rTLcUsu617Z3n29L53OhdAk+QW/ibHQXW root@server";
-  systems = [ serverSystem ];
+  userWill = builtins.readFile ../home/id_ed25519.pub;
+  editors = [ userWill ];
 
 in
 {
-  "desktopPrivateKey.age".publicKeys = [ serverSystem ];
+  # hashed user passwords (can be generated with `mkpasswd -m sha-512`)
+  "hashedRootPassword.age".publicKeys = systems ++ editors;
+  "hashedWillPassword.age".publicKeys = [ systemDesktop systemSurface ] ++ editors;
 }

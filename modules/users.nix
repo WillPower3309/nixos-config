@@ -1,4 +1,4 @@
-{ pkgs, config, home-manager, impermanence, ... }:
+{ pkgs, config, home-manager, impermanence, agenix, ... }:
 
 {
   imports = [
@@ -7,17 +7,21 @@
 
   programs.zsh.enable = true;
 
+  age.secrets = {
+    hashedWillPassword.file = ../secrets/hashedWillPassword.age;
+    hashedRootPassword.file = ../secrets/hashedRootPassword.age;
+  };
+
   users = {
     mutableUsers = false;
     defaultUserShell = pkgs.zsh;
 
     users = {
-      root = {
-        initialPassword = "1012917";
-      };
+      root.hashedPasswordFile = config.age.secrets.hashedRootPassword.path;
+
       will = {
         isNormalUser = true;
-        initialPassword = "1012917";
+        hashedPasswordFile = config.age.secrets.hashedWillPassword.path;
         extraGroups = [ "wheel" "libvirtd" "input" "kvm" "docker" "video" ];
       };
     };

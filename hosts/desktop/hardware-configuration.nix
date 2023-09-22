@@ -28,6 +28,7 @@
     { device = "/dev/disk/by-uuid/B18B-60D0";
       fsType = "vfat";
     };
+
   # TODO: convert to systemd.mounts as described in https://nixos.wiki/wiki/NFS ?
   # TODO: move to photography module
   fileSystems."/mnt/photos" = {

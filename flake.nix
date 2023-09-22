@@ -52,7 +52,6 @@
         profiles.system = {
           user = "root";
           sshUser = "root";
-          sshOpts = [ "-i" "~/.ssh/server" ];
           path = deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.server;
         };
       };

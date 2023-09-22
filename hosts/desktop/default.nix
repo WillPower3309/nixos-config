@@ -29,6 +29,8 @@
     wireless.enable = false;
   };
 
+  age.identityPaths = [ "/nix/persist/etc/ssh/ssh_host_ed25519_key" ];
+
   programs = {
     dconf.enable = true; # needed for sway
     fuse.userAllowOther = true; # persistence (TODO: make one file)
@@ -43,17 +45,24 @@
 #    ];
   };
 
-  # TODO: make this across all hosts
+  # TODO: make this across all hosts, remove agenix import here
   # TODO: get deploy-rs file from flake too?
   environment.systemPackages = with pkgs; [
     deploy-rs
     agenix.packages.x86_64-linux.default
   ];
 
-  environment.persistence."/nix/persist" = {
-    hideMounts = true;
-    directories = [ "/var/log" ];
-    files = [ "/etc/machine-id" ]; # used by systemd for journalctl
+  environment = {
+    persistence."/nix/persist" = {
+      hideMounts = true;
+      directories = [ "/var/log" ];
+      files = [
+        "/etc/machine-id" # used by systemd for journalctl
+        "/etc/ssh/ssh_host_ed25519_key"
+      ];
+    };
+
+    etc."ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;
   };
 
   system.stateVersion = "22.05";

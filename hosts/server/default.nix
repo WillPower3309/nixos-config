@@ -1,8 +1,8 @@
 { config, pkgs, impermanence, agenix, ... }:
 
 let
-  desktopKey = "";
-  surfaceKey = "";
+  authorizedKeyPath = ../../home/id_ed25519.pub;
+  hostKeyPath = /etc/ssh/ssh_host_ed25519_key;
 
 in
 {
@@ -11,13 +11,9 @@ in
     agenix.nixosModules.default
     ./hardware-configuration.nix
     ../../modules/nix.nix
-#    ../../modules/containerized-services/plex.nix
-#    ../../modules/containerized-services/syncthing.nix
+    #../../modules/containerized-services/plex.nix
+    #../../modules/containerized-services/syncthing.nix
   ];
-
-  age.secrets = {
-    desktopPrivateKey.file = ../../secrets/desktopPrivateKey.age;
-  };
 
   boot = {
     loader.systemd-boot.enable = true;
@@ -34,15 +30,11 @@ in
           enable = true;
           port = 2222;
 
-          hostKeys = [ /persist/etc/ssh/ssh_host_rsa_key ];
-          authorizedKeys = [
-#            "$(cat ${config.age.secrets.desktopPrivateKey.path})"
-            "${desktopKey}"
-            "${surfaceKey}"
-          ];
+          hostKeys = [ hostKeyPath ];
+          authorizedKeys = [ (builtins.readFile authorizedKeyPath) ];
         };
 
-       # auto load zfs password prompt on login & kill other prompt so boot can continue
+        # auto load zfs password prompt on login & kill other prompt so boot can continue
         postCommands = ''
           cat <<EOF > /root/.profile
           if pgrep -x "zfs" > /dev/null
@@ -64,8 +56,10 @@ in
     wireless.enable = false;
   };
 
+  age.secrets.hashedRootPassword.file = ../../secrets/hashedRootPassword.age;
+
   users = {
-    users.root.initialPassword = "1012917";
+    users.root.hashedPasswordFile = config.age.secrets.hashedRootPassword.path;
     mutableUsers = false;
   };
 
@@ -78,30 +72,13 @@ in
       PasswordAuthentication = false;
       KbdInteractiveAuthentication = false;
     };
-    hostKeys = [
-      # TODO: remove rsa key
-      {
-        bits = 4096;
-        path = "/persist/etc/ssh/ssh_host_rsa_key";
-        type = "rsa";
-      }
-      {
-        path = "/persist/etc/ssh/ssh_host_ed25519_key";
-        type = "ed25519";
-      }
-    ];
+    hostKeys = [{
+      path = toString hostKeyPath;
+      type = "ed25519";
+    }];
   };
 
-  users.users.root.openssh.authorizedKeys = {
-    keys = [
-      "${desktopKey}"
-      "${surfaceKey}"
-      "$(cat ${config.age.secrets.desktopPrivateKey.path})"
-    ];
-#    keyFiles = [
-#      config.age.secrets.desktopPrivateKey.path
-#    ];
-  };
+  users.users.root.openssh.authorizedKeys.keys = [ (builtins.readFile authorizedKeyPath) ];
 
   services.nfs.server = {
     enable = true;
@@ -116,12 +93,17 @@ in
   # Set your time zone.
   time.timeZone = "America/Toronto";
 
-  environment.persistence."/persist" = {
-    directories = [
-      "/var/log"
-      "/etc/ssh"
-    ];
-    files = [ "/etc/machine-id" ]; # used by systemd for journalctl
+  environment = {
+    persistence."/persist" = {
+      hideMounts = true;
+      directories = [ "/var/log" ];
+      files = [
+        "/etc/machine-id" # used by systemd for journalctl
+        (toString hostKeyPath)
+      ];
+    };
+
+    etc."ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;
   };
 
   system.stateVersion = "22.05";

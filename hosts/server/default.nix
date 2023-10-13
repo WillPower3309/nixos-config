@@ -12,6 +12,7 @@ in
     ./hardware-configuration.nix
     ../../modules/nix.nix
     ../../modules/syncthing.nix
+    ../../modules/plex.nix
   ];
 
   boot = {

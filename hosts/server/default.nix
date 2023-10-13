@@ -11,8 +11,6 @@ in
     agenix.nixosModules.default
     ./hardware-configuration.nix
     ../../modules/nix.nix
-    #../../modules/containerized-services/plex.nix
-    #../../modules/containerized-services/syncthing.nix
   ];
 
   boot = {
@@ -29,7 +27,6 @@ in
         ssh = {
           enable = true;
           port = 2222;
-
           hostKeys = [ hostKeyPath ];
           authorizedKeys = [ (builtins.readFile authorizedKeyPath) ];
         };
@@ -73,7 +70,7 @@ in
       KbdInteractiveAuthentication = false;
     };
     hostKeys = [{
-      path = toString hostKeyPath;
+      path = "/persist/etc/ssh/ssh_host_ed25519_key";
       type = "ed25519";
     }];
   };

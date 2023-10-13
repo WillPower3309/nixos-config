@@ -17,7 +17,6 @@
     ../../modules/polkit.nix # needed for sway
     ../../modules/screen-record.nix
     ../../modules/sound.nix
-    ../../modules/syncthing.nix
     ../../modules/users.nix
   ];
 
@@ -64,6 +63,34 @@
 
     etc."ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;
   };
+
+  age.secrets = {
+    desktopSyncthingKey.file = ../../secrets/desktopSyncthingKey.age;
+    desktopSyncthingCert.file = ../../secrets/desktopSyncthingCert.age;
+  };
+
+  services.syncthing = {
+    enable = true;
+    dataDir = "/syncthing";
+    openDefaultPorts = true;
+    overrideDevices = true; # overrides any devices added or deleted through the WebUI
+    overrideFolders = true; # overrides any folders added or deleted through the WebUI
+    guiAddress = "0.0.0.0:8384";
+    key = config.age.secrets.desktopSyncthingKey.path;
+    cert = config.age.secrets.desktopSyncthingCert.path;
+
+    settings = {
+      options.urAccepted = -1;
+
+      devices = {
+        server = {
+          id = "V5AV6D5-5ITLYTL-35UHX6S-LKMFZ6U-FVGLEZP-EFGGR3R-O6AVGG7-ONT5MQE";
+          autoAcceptFolders = true;
+        };
+      };
+    };
+  };
+  networking.firewall.allowedTCPPorts = [ 8384 ];
 
   system.stateVersion = "22.05";
 }

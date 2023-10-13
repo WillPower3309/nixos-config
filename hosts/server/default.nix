@@ -11,6 +11,7 @@ in
     agenix.nixosModules.default
     ./hardware-configuration.nix
     ../../modules/nix.nix
+    ../../modules/syncthing.nix
   ];
 
   boot = {

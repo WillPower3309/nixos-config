@@ -18,7 +18,6 @@
     ../../modules/polkit.nix # needed for sway
     ../../modules/screen-record.nix
     ../../modules/sound.nix
-    ../../modules/syncthing.nix
     ../../modules/users.nix
     ../../modules/wifi.nix
   ];

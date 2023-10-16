@@ -1,5 +1,12 @@
 { pkgs, config, ... }:
 
+let
+  desktopDevice = "desktop";
+  surfaceDevice = "surface";
+
+  allDevices = [ desktopDevice surfaceDevice ];
+
+in
 {
   age.secrets = {
     serverSyncthingKey.file = ../secrets/serverSyncthingKey.age;
@@ -21,13 +28,18 @@
       options.urAccepted = -1;
 
       devices = {
-        desktop.id = "QPGKBDU-6S4XWKH-DLNIZLR-RBRUSQ2-7RMMZS3-G2QB7RJ-ANZS36W-KTTAIQM";
+        ${desktopDevice}.id = "QPGKBDU-6S4XWKH-DLNIZLR-RBRUSQ2-7RMMZS3-G2QB7RJ-ANZS36W-KTTAIQM";
+        ${surfaceDevice}.id = "M5ENPZ2-OHBNDZO-XGUI444-LDR5VBD-ELEOO4H-JSCI35U-VHHSNDL-HBUMFAF";
       };
 
       folders = {
         "keepass" = {
           path = "/data/keepass";
-          devices = [ "desktop" ];
+          devices = allDevices;
+        };
+        "notes" = {
+          path = "/data/notes";
+          devices = allDevices;
         };
       };
     };

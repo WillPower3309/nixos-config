@@ -13,8 +13,10 @@ in
   "hashedRootPassword.age".publicKeys = systems ++ editors;
   "hashedWillPassword.age".publicKeys = [ systemDesktop systemSurface ] ++ editors;
 
-  "serverSyncthingKey.age".publicKeys = [ systemServer ] ++ editors;
-  "serverSyncthingCert.age".publicKeys = [ systemServer ] ++ editors;
   "desktopSyncthingKey.age".publicKeys = [ systemDesktop ] ++ editors;
   "desktopSyncthingCert.age".publicKeys = [ systemDesktop ] ++ editors;
+  "surfaceSyncthingKey.age".publicKeys = [ systemSurface ] ++ editors;
+  "surfaceSyncthingCert.age".publicKeys = [ systemSurface ] ++ editors;
+  "serverSyncthingKey.age".publicKeys = [ systemServer ] ++ editors;
+  "serverSyncthingCert.age".publicKeys = [ systemServer ] ++ editors;
 }

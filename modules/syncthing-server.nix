@@ -3,8 +3,9 @@
 let
   desktopDevice = "desktop";
   surfaceDevice = "surface";
+  phoneDevice = "phone";
 
-  allDevices = [ desktopDevice surfaceDevice ];
+  allDevices = [ desktopDevice surfaceDevice phoneDevice ];
 
 in
 {
@@ -30,6 +31,7 @@ in
       devices = {
         ${desktopDevice}.id = "QPGKBDU-6S4XWKH-DLNIZLR-RBRUSQ2-7RMMZS3-G2QB7RJ-ANZS36W-KTTAIQM";
         ${surfaceDevice}.id = "M5ENPZ2-OHBNDZO-XGUI444-LDR5VBD-ELEOO4H-JSCI35U-VHHSNDL-HBUMFAF";
+        ${phoneDevice}.id = "73BNDKD-TZUEVZE-TLCRORI-Y4MV2ZR-M4IRLSR-TR4L6GQ-TGXQ4K7-XW5UUQN";
       };
 
       folders = {

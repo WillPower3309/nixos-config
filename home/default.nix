@@ -1,14 +1,16 @@
-{ pkgs, impermanence, ... }:
+{ pkgs, impermanence, agenix, ... }:
 
 {
   imports = [
     impermanence.nixosModules.home-manager.impermanence
+    agenix.homeManagerModules.age
     ./modules/discord.nix
     ./modules/emacs.nix
     ./modules/foot.nix
     ./modules/games.nix
     ./modules/git.nix
     ./modules/gtk.nix
+    ./modules/keepass.nix
     ./modules/kde-connect.nix
     ./modules/notetaking.nix
     ./modules/photography.nix

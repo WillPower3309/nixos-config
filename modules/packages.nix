@@ -5,7 +5,6 @@
 
   environment.systemPackages = with pkgs; [
     neofetch
-    keepassxc
     pciutils
     colorls
     unzip

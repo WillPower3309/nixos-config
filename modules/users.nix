@@ -29,7 +29,7 @@
 
   home-manager = {
     useUserPackages = true;
-    extraSpecialArgs = { inherit impermanence; };
+    extraSpecialArgs = { inherit impermanence agenix; };
     users.will = import ../home;
   };
 }

@@ -1,5 +1,6 @@
 { pkgs, ... }:
 
+# TODO: gtkgreet spawn delay
 let
   gtkgreetCssEtcPath = "greetd/gtkgreet.css";
 in
@@ -7,10 +8,7 @@ in
   services.greetd = {
     enable = true;
     settings = {
-      default_session = {
-        command = "${pkgs.cage}/bin/cage -d -- ${pkgs.greetd.gtkgreet}/bin/gtkgreet -s /etc/${gtkgreetCssEtcPath}";
-        #user = "greeter";
-      };
+      default_session.command = "${pkgs.cage}/bin/cage -d -- ${pkgs.greetd.gtkgreet}/bin/gtkgreet -s /etc/${gtkgreetCssEtcPath}";
     };
   };
 

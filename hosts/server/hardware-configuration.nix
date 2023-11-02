@@ -68,6 +68,10 @@
     device = "/data/photos";
     options = [ "bind" ];
   };
+  fileSystems."/export/music" = {
+    device = "/data/media/Music";
+    options = [ "bind" ];
+  };
 
   swapDevices =
     [ { device = "/dev/disk/by-uuid/3ba36441-4c9c-45ab-b586-d7b5ef07a4b4"; }

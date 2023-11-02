@@ -1,7 +1,7 @@
 { config, pkgs, impermanence, agenix, ... }:
 
 let
-  authorizedKeyPath = ../../home/id_ed25519.pub;
+  authorizedKey = (builtins.readFile ../../home/id_ed25519.pub);
   hostKeyPath = /etc/ssh/ssh_host_ed25519_key;
 
 in
@@ -11,8 +11,8 @@ in
     agenix.nixosModules.default
     ./hardware-configuration.nix
     ../../modules/nix.nix
-    ../../modules/syncthing-server.nix
     ../../modules/plex.nix
+    ../../modules/syncthing-server.nix
   ];
 
   boot = {
@@ -29,8 +29,8 @@ in
         ssh = {
           enable = true;
           port = 2222;
-          hostKeys = [ hostKeyPath ];
-          authorizedKeys = [ (builtins.readFile authorizedKeyPath) ];
+          hostKeys = [ (/persist + hostKeyPath) ];
+          authorizedKeys = [ authorizedKey ];
         };
 
         # auto load zfs password prompt on login & kill other prompt so boot can continue
@@ -72,12 +72,12 @@ in
       KbdInteractiveAuthentication = false;
     };
     hostKeys = [{
-      path = "/persist/etc/ssh/ssh_host_ed25519_key";
+      path = "/persist/${(toString hostKeyPath)}";
       type = "ed25519";
     }];
   };
 
-  users.users.root.openssh.authorizedKeys.keys = [ (builtins.readFile authorizedKeyPath) ];
+  users.users.root.openssh.authorizedKeys.keys = [ authorizedKey ];
 
   services.nfs.server = {
     enable = true;

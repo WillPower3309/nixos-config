@@ -5,13 +5,12 @@
     impermanence.nixosModules.impermanence
     agenix.nixosModules.default
     ./hardware-configuration.nix
-    ../../modules/bootloader.nix
-    ../../modules/containerization.nix
-    ../../modules/development.nix
+    ../../modules/boot.nix
+    #../../modules/containerization.nix
+    ../../modules/file-management.nix
     ../../modules/fonts.nix
     ../../modules/greetd.nix
     ../../modules/kernel.nix
-    ../../modules/music.nix
     ../../modules/nix.nix
     ../../modules/packages.nix
     ../../modules/polkit.nix # needed for sway

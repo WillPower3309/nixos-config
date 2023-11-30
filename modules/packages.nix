@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 
 {
   programs.steam.enable = true;
@@ -7,17 +7,9 @@
     neofetch
     pciutils
     colorls
-    unzip
     gtop
 
     libnotify
-
-    gnome3.nautilus
-    openssl
-
-    ripgrep
-
-    udiskie
 
     tutanota-desktop
 
@@ -30,5 +22,4 @@
 
     python39Packages.psutil
   ];
-  services.udisks2.enable = true;
 }

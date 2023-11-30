@@ -12,6 +12,7 @@
     ./modules/gtk.nix
     ./modules/keepass.nix
     ./modules/kde-connect.nix
+    ./modules/music.nix
     ./modules/notetaking.nix
     ./modules/photography.nix
     ./modules/qt.nix

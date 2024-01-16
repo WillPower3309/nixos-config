@@ -21,7 +21,7 @@ in
     kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
 
     initrd = {
-      kernelModules = [ "e1000e" ];
+      kernelModules = [ "igc" ];
 
       network = {
         enable = true;
@@ -51,7 +51,7 @@ in
 
   networking = {
     hostName = "server";
-    hostId = "276fb82b";
+    hostId = "7347e9d6";
     wireless.enable = false;
   };
 
@@ -79,14 +79,16 @@ in
 
   users.users.root.openssh.authorizedKeys.keys = [ authorizedKey ];
 
-  services.nfs.server = {
-    enable = true;
-    exports = ''
-      /export        10.27.27.5(rw,fsid=0,no_subtree_check)
-      /export/photos 10.27.27.5(rw,insecure,no_subtree_check,all_squash,anonuid=65534,anongid=65534)
-      /export/music  10.27.27.5(rw,insecure,no_subtree_check,all_squash,anonuid=65534,anongid=65534)
-    '';
-  };
+  zramSwap.enable = true;
+
+#  services.nfs.server = {
+#    enable = true;
+#    exports = ''
+#      /export        10.27.27.5(rw,fsid=0,no_subtree_check)
+#      /export/photos 10.27.27.5(rw,insecure,no_subtree_check,all_squash,anonuid=65534,anongid=65534)
+#      /export/music  10.27.27.5(rw,insecure,no_subtree_check,all_squash,anonuid=65534,anongid=65534)
+#    '';
+#  };
   # open nfs ports
   networking.firewall.allowedTCPPorts = [ 2049 ];
 
@@ -106,5 +108,5 @@ in
     etc."ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;
   };
 
-  system.stateVersion = "22.05";
+  system.stateVersion = "22.11";
 }

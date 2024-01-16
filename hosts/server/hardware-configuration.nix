@@ -8,19 +8,19 @@
     [ (modulesPath + "/installer/scan/not-detected.nix")
     ];
 
-  boot.initrd.availableKernelModules = [ "xhci_pci" "ahci" "usb_storage" "usbhid" "sd_mod" ];
+  boot.initrd.availableKernelModules = [ "xhci_pci" "ahci" "nvme" "usb_storage" "usbhid" "sd_mod" ];
   boot.initrd.kernelModules = [ ];
-  boot.kernelModules = [ "kvm-intel" ];
+  boot.kernelModules = [ "kvm-amd" ];
   boot.extraModulePackages = [ ];
 
   fileSystems."/" =
     { device = "none";
       fsType = "tmpfs";
-      options = [ "defaults" "noatime" "size=20%" "mode=755" ];
+      options = [ "defaults" "noatime" "size=2G" "mode=755" ];
     };
 
   fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/99B0-69BE";
+    { device = "/dev/disk/by-uuid/3B61-50EC";
       fsType = "vfat";
     };
 
@@ -38,54 +38,32 @@
     };
 
   fileSystems."/data" =
-    { device = "dataPool";
+    { device = "tank";
       fsType = "zfs";
       options = [ "zfsutil" ];
       neededForBoot = true;
     };
-  fileSystems."/data/media" =
-    { device = "dataPool/media";
-      fsType = "zfs";
-      options = [ "zfsutil" ];
-    };
+
   fileSystems."/data/photos" =
-    { device = "dataPool/photos";
-      fsType = "zfs";
-      options = [ "zfsutil" ];
-    };
-  fileSystems."/data/container_data" =
-    { device = "dataPool/container_data";
-      fsType = "zfs";
-      options = [ "zfsutil" ];
-    };
-  fileSystems."/data/container_data/torrents" =
-    { device = "dataPool/container_data/torrents";
+    { device = "tank/photos";
       fsType = "zfs";
       options = [ "zfsutil" ];
     };
 
-  fileSystems."/export/photos" = {
-    device = "/data/photos";
-    options = [ "bind" ];
-  };
-  fileSystems."/export/music" = {
-    device = "/data/media/Music";
-    options = [ "bind" ];
-  };
-
-  swapDevices =
-    [ { device = "/dev/disk/by-uuid/3ba36441-4c9c-45ab-b586-d7b5ef07a4b4"; }
-    ];
+  fileSystems."/data/media" =
+    { device = "tank/media";
+      fsType = "zfs";
+      options = [ "zfsutil" ];
+    };
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
   # (the default) this is the recommended approach. When using systemd-networkd it's
   # still possible to use this option, but it's recommended to use it in conjunction
   # with explicit per-interface declarations with `networking.interfaces.<interface>.useDHCP`.
   networking.useDHCP = lib.mkDefault true;
-  # networking.interfaces.enp0s31f6.useDHCP = lib.mkDefault true;
-  # networking.interfaces.wlp4s0.useDHCP = lib.mkDefault true;
+  # networking.interfaces.enp4s0.useDHCP = lib.mkDefault true;
+  # networking.interfaces.wlp5s0.useDHCP = lib.mkDefault true;
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
-  powerManagement.cpuFreqGovernor = lib.mkDefault "powersave";
-  hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+  hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 }

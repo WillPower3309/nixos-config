@@ -28,7 +28,7 @@
     mkNixos = modules: nixpkgs.lib.nixosSystem {
       inherit modules;
       system = "x86_64-linux";
-      specialArgs = { inherit impermanence home-manager agenix; };
+      specialArgs = { inherit nixpkgs impermanence home-manager agenix; };
     };
 
     mkHome = modules: pkgs: home-manager.lib.homeManagerConfiguration {
@@ -39,6 +39,7 @@
   in {
     nixosConfigurations = {
       desktop = mkNixos [ ./hosts/desktop ];
+      lighthouse = mkNixos [ ./hosts/lighthouse ];
       server = mkNixos [ ./hosts/server ];
       surface = mkNixos [ ./hosts/surface ];
     };
@@ -53,6 +54,14 @@
           user = "root";
           sshUser = "root";
           path = deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.server;
+        };
+      };
+      lighthouse = {
+        hostname = "143.110.232.34";
+        profiles.system = {
+          user = "root";
+          sshUser = "root";
+          path = deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.lighthouse;
         };
       };
     };

@@ -13,6 +13,11 @@
       "server-boot" = {
         port = 2222;
       };
+
+      "lighthouse" = {
+        hostname = "143.110.232.34";
+        user = "root";
+      };
     };
   };
 

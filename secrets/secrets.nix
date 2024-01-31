@@ -26,8 +26,10 @@ in
   "serverSyncthingKey.age".publicKeys = [ systemServer ] ++ editors;
   "serverSyncthingCert.age".publicKeys = [ systemServer ] ++ editors;
 
-  "nebulaCaCert.age".publicKeys = [ systemLighthouse ] ++ editors;
-  "nebulaCaKey.age".publicKeys = [ systemLighthouse ] ++ editors;
+  "nebulaCaKey.age".publicKeys = editors;
+  "nebulaCaCert.age".publicKeys = systems ++ editors;
   "nebulaLighthouseCert.age".publicKeys = [ systemLighthouse ] ++ editors;
   "nebulaLighthouseKey.age".publicKeys = [ systemLighthouse ] ++ editors;
+  "nebulaServerCert.age".publicKeys = [ systemServer ] ++ editors;
+  "nebulaServerKey.age".publicKeys = [ systemServer ] ++ editors;
 }

@@ -4,8 +4,8 @@ let
   systemSurface = builtins.readFile ../hosts/surface/ssh_host_ed25519_key.pub;
   systemServer = builtins.readFile ../hosts/server/ssh_host_ed25519_key.pub;
 
-  guiSystems = [ systemDesktop systemSurface ];
   headlessSystems = [ systemServer systemLighthouse ];
+  guiSystems = [ systemDesktop systemSurface ];
   systems = guiSystems ++ headlessSystems;
 
   userWill = builtins.readFile ../home/id_ed25519.pub;
@@ -32,4 +32,6 @@ in
   "nebulaLighthouseKey.age".publicKeys = [ systemLighthouse ] ++ editors;
   "nebulaServerCert.age".publicKeys = [ systemServer ] ++ editors;
   "nebulaServerKey.age".publicKeys = [ systemServer ] ++ editors;
+
+  "radicaleHtpasswd.age".publicKeys = [ systemServer ] ++ editors;
 }

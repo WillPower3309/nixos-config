@@ -7,10 +7,11 @@ let
 in
 {
   imports = [
-    impermanence.nixosModules.impermanence
     agenix.nixosModules.default
+    impermanence.nixosModules.impermanence
     ./hardware-configuration.nix
     ../../modules/nix.nix
+    ../../modules/radicale.nix
     ../../modules/plex.nix
     ../../modules/syncthing-server.nix
   ];
@@ -103,8 +104,11 @@ in
     key = config.age.secrets.nebulaServerKey.path; # server.key
     ca = config.age.secrets.nebulaCaCert.path; # ca.crt
     lighthouses = [ "192.168.100.1" ];
-    relays = [ "192.168.100.1" ];
     staticHostMap = { "192.168.100.1" = [ "143.110.232.34:4242" ]; };
+    settings = {
+      punchy = true;
+      punch_back = true;
+    };
     firewall = {
       inbound = [{
         host = "any";
@@ -118,7 +122,6 @@ in
       }];
     };
   };
-  networking.firewall.allowedUDPPorts = [ 4242 ];
 
   users.users.root.openssh.authorizedKeys.keys = [ authorizedKey ];
 

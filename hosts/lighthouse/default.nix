@@ -24,13 +24,13 @@
       owner = "nebula-home";
       group = "nebula-home";
     };
-    nebulaLighthouseCert = {
-      file = ../../secrets/nebulaLighthouseCert.age;
+    lighthouseNebulaCert = {
+      file = ../../secrets/lighthouseNebulaCert.age;
       owner = "nebula-home";
       group = "nebula-home";
     };
-    nebulaLighthouseKey = {
-      file = ../../secrets/nebulaLighthouseKey.age;
+    lighthouseNebulaKey = {
+      file = ../../secrets/lighthouseNebulaKey.age;
       owner = "nebula-home";
       group = "nebula-home";
     };
@@ -40,9 +40,8 @@
   services.nebula.networks.home = {
     enable = true;
     isLighthouse = true;
-    isRelay = true;
-    cert = config.age.secrets.nebulaLighthouseCert.path; # lighthouse.crt
-    key = config.age.secrets.nebulaLighthouseKey.path; # lighthouse.key
+    cert = config.age.secrets.lighthouseNebulaCert.path; # lighthouse.crt
+    key = config.age.secrets.lighthouseNebulaKey.path; # lighthouse.key
     ca = config.age.secrets.nebulaCaCert.path; # ca.crt
   };
 

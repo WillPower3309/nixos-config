@@ -28,10 +28,10 @@ in
 
   "nebulaCaKey.age".publicKeys = editors;
   "nebulaCaCert.age".publicKeys = systems ++ editors;
-  "nebulaLighthouseCert.age".publicKeys = [ systemLighthouse ] ++ editors;
-  "nebulaLighthouseKey.age".publicKeys = [ systemLighthouse ] ++ editors;
-  "nebulaServerCert.age".publicKeys = [ systemServer ] ++ editors;
-  "nebulaServerKey.age".publicKeys = [ systemServer ] ++ editors;
+  "lighthouseNebulaCert.age".publicKeys = [ systemLighthouse ] ++ editors;
+  "lighthouseNebulaKey.age".publicKeys = [ systemLighthouse ] ++ editors;
+  "serverNebulaCert.age".publicKeys = [ systemServer ] ++ editors;
+  "serverNebulaKey.age".publicKeys = [ systemServer ] ++ editors;
 
   "radicaleHtpasswd.age".publicKeys = [ systemServer ] ++ editors;
 }

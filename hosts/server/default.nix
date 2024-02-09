@@ -10,6 +10,7 @@ in
     agenix.nixosModules.default
     impermanence.nixosModules.impermanence
     ./hardware-configuration.nix
+    ../../modules/nebula.nix
     ../../modules/nix.nix
     ../../modules/radicale.nix
     ../../modules/plex.nix
@@ -76,51 +77,6 @@ in
       path = "/persist/${(toString hostKeyPath)}";
       type = "ed25519";
     }];
-  };
-
-  age.secrets = {
-    nebulaCaCert = {
-      file = ../../secrets/nebulaCaCert.age;
-      owner = "nebula-home";
-      group = "nebula-home";
-    };
-    nebulaServerCert = {
-      file = ../../secrets/nebulaServerCert.age;
-      owner = "nebula-home";
-      group = "nebula-home";
-    };
-    nebulaServerKey = {
-      file = ../../secrets/nebulaServerKey.age;
-      owner = "nebula-home";
-      group = "nebula-home";
-    };
-  };
-
-  # TODO: preferred_ranges: https://nebula.defined.net/docs/config/preferred-ranges/
-  services.nebula.networks.home = {
-    enable = true;
-    isLighthouse = false;
-    cert = config.age.secrets.nebulaServerCert.path; # server.crt
-    key = config.age.secrets.nebulaServerKey.path; # server.key
-    ca = config.age.secrets.nebulaCaCert.path; # ca.crt
-    lighthouses = [ "192.168.100.1" ];
-    staticHostMap = { "192.168.100.1" = [ "143.110.232.34:4242" ]; };
-    settings = {
-      punchy = true;
-      punch_back = true;
-    };
-    firewall = {
-      inbound = [{
-        host = "any";
-        port = "any";
-        proto = "any";
-      }];
-      outbound = [{
-        host = "any";
-        port = "any";
-        proto = "any";
-      }];
-    };
   };
 
   users.users.root.openssh.authorizedKeys.keys = [ authorizedKey ];

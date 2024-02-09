@@ -5,17 +5,17 @@ with config.networking;
 {
   age.secrets = {
     nebulaCaCert = {
-      file = ../../secrets/nebulaCaCert.age;
+      file = ../secrets/nebulaCaCert.age;
       owner = "nebula-home";
       group = "nebula-home";
     };
     nebulaDeviceCert = {
-      file = ../.. + builtins.toPath "/secrets/nebula${hostName}Cert.age";
+      file = ./.. + builtins.toPath "/secrets/${hostName}NebulaCert.age";
       owner = "nebula-home";
       group = "nebula-home";
     };
     nebulaDeviceKey = {
-      file = ../.. + builtins.toPath "/secrets/nebula${hostName}Key.age";
+      file = ./.. + builtins.toPath "/secrets/${hostName}NebulaKey.age";
       owner = "nebula-home";
       group = "nebula-home";
     };

@@ -1,9 +1,7 @@
-{ pkgs, config, home-manager, impermanence, agenix, ... }:
+{ pkgs, config, home-manager, impermanence, agenix, ags, ... }:
 
 {
-  imports = [
-    home-manager.nixosModules.home-manager
-  ];
+  imports = [ home-manager.nixosModules.home-manager ];
 
   programs.zsh.enable = true;
 
@@ -29,7 +27,7 @@
 
   home-manager = {
     useUserPackages = true;
-    extraSpecialArgs = { inherit impermanence agenix; };
+    extraSpecialArgs = { inherit impermanence agenix ags; };
     users.will = import ../home;
   };
 }

@@ -21,19 +21,21 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
+
+    ags.url = "github:Aylur/ags";
   };
 
-  outputs = { self, nixpkgs, home-manager, impermanence, deploy-rs, agenix, ... }:
+  outputs = { self, nixpkgs, home-manager, impermanence, deploy-rs, agenix, ags, ... }:
   let
     mkNixos = modules: nixpkgs.lib.nixosSystem {
       inherit modules;
       system = "x86_64-linux";
-      specialArgs = { inherit nixpkgs impermanence home-manager agenix; };
+      specialArgs = { inherit nixpkgs impermanence home-manager agenix ags; };
     };
 
     mkHome = modules: pkgs: home-manager.lib.homeManagerConfiguration {
       inherit modules pkgs;
-      extraSpecialArgs = { inherit impermanence; };
+      extraSpecialArgs = { inherit impermanence ags; };
     };
 
   in {

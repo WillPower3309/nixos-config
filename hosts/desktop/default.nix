@@ -6,7 +6,8 @@
     agenix.nixosModules.default
     ./hardware-configuration.nix
     ../../modules/boot.nix
-    #../../modules/containerization.nix
+    ../../modules/containerization.nix
+    ../../modules/evolution.nix
     ../../modules/file-management.nix
     ../../modules/fonts.nix
     ../../modules/greetd.nix
@@ -16,7 +17,7 @@
     ../../modules/polkit.nix # needed for sway
     ../../modules/screen-record.nix
     ../../modules/sound.nix
-    ../../modules/syncthing-client.nix
+    ../../modules/syncthing.nix
     ../../modules/users.nix
   ];
 
@@ -50,16 +51,6 @@
     deploy-rs
     agenix.packages.x86_64-linux.default
   ];
-
-  age.secrets = {
-    desktopSyncthingKey.file = ../../secrets/desktopSyncthingKey.age;
-    desktopSyncthingCert.file = ../../secrets/desktopSyncthingCert.age;
-  };
-
-  services.syncthing = {
-    key = config.age.secrets.desktopSyncthingKey.path;
-    cert = config.age.secrets.desktopSyncthingCert.path;
-  };
 
   environment = {
     persistence."/nix/persist" = {

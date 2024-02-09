@@ -1,50 +1,63 @@
 { pkgs, config, ... }:
 
+with config.networking;
+
 let
   desktopDevice = "desktop";
+  serverDevice = "server";
   surfaceDevice = "surface";
   phoneDevice = "phone";
 
-  allDevices = [ desktopDevice surfaceDevice phoneDevice ];
+  allDevices = [ desktopDevice serverDevice surfaceDevice phoneDevice ];
 
+  syncthingUser = if hostName == "server" then "root" else "will";
+  folderDir = if hostName == "server" then "/data" else "/nix/persist/home/${syncthingUser}";
+  dataDir = if hostName == "server" then "/persist/syncthing" else folderDir;
+
+# TODO: disable web gui?
 in
 {
   age.secrets = {
-    serverSyncthingKey.file = ../secrets/serverSyncthingKey.age;
-    serverSyncthingCert.file = ../secrets/serverSyncthingCert.age;
+    syncthingKey.file = ./.. + builtins.toPath "/secrets/${hostName}SyncthingKey.age";
+    syncthingCert.file = ./.. + builtins.toPath "/secrets/${hostName}SyncthingCert.age";
   };
 
   services.syncthing = {
     enable = true;
-    dataDir = "/syncthing";
     openDefaultPorts = true;
     overrideDevices = true; # overrides any devices added or deleted through the WebUI
     overrideFolders = true; # overrides any folders added or deleted through the WebUI
+    user = syncthingUser;
+    dataDir = dataDir;
     guiAddress = "0.0.0.0:8384";
-    user = "root"; # TODO: proper perms for /data
-    key = config.age.secrets.serverSyncthingKey.path;
-    cert = config.age.secrets.serverSyncthingCert.path;
+    key = config.age.secrets.syncthingKey.path;
+    cert = config.age.secrets.syncthingCert.path;
 
     settings = {
-      options.urAccepted = -1;
+      options = {
+        urAccepted = -1;
+        relaysEnabled = false;
+      };
 
       devices = {
         ${desktopDevice}.id = "QPGKBDU-6S4XWKH-DLNIZLR-RBRUSQ2-7RMMZS3-G2QB7RJ-ANZS36W-KTTAIQM";
+        ${serverDevice}.id = "V5AV6D5-5ITLYTL-35UHX6S-LKMFZ6U-FVGLEZP-EFGGR3R-O6AVGG7-ONT5MQE";
         ${surfaceDevice}.id = "M5ENPZ2-OHBNDZO-XGUI444-LDR5VBD-ELEOO4H-JSCI35U-VHHSNDL-HBUMFAF";
         ${phoneDevice}.id = "73BNDKD-TZUEVZE-TLCRORI-Y4MV2ZR-M4IRLSR-TR4L6GQ-TGXQ4K7-XW5UUQN";
       };
 
       folders = {
         "keepass" = {
-          path = "/data/keepass";
+          path = "${folderDir}/keepass";
           devices = allDevices;
         };
         "notes" = {
-          path = "/data/notes";
+          path = "${folderDir}/notes";
           devices = allDevices;
         };
       };
     };
   };
+
   networking.firewall.allowedTCPPorts = [ 8384 ];
 }

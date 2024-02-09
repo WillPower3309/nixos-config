@@ -13,7 +13,7 @@ in
     ../../modules/nix.nix
     ../../modules/radicale.nix
     ../../modules/plex.nix
-    ../../modules/syncthing-server.nix
+    ../../modules/syncthing.nix
   ];
 
   boot = {

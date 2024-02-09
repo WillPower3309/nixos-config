@@ -8,6 +8,7 @@
     ../../modules/bluetooth.nix
     ../../modules/boot.nix
     ../../modules/containerization.nix
+    ../../modules/evolution.nix
     ../../modules/file-management.nix
     ../../modules/fonts.nix
     ../../modules/greetd.nix
@@ -17,7 +18,7 @@
     ../../modules/polkit.nix # needed for sway
     ../../modules/screen-record.nix
     ../../modules/sound.nix
-    ../../modules/syncthing-client.nix
+    ../../modules/syncthing.nix
     ../../modules/users.nix
     ../../modules/wifi.nix
   ];
@@ -50,16 +51,6 @@
     deploy-rs
     agenix.packages.x86_64-linux.default
   ];
-
-  age.secrets = {
-    surfaceSyncthingKey.file = ../../secrets/surfaceSyncthingKey.age;
-    surfaceSyncthingCert.file = ../../secrets/surfaceSyncthingCert.age;
-  };
-
-  services.syncthing = {
-    key = config.age.secrets.surfaceSyncthingKey.path;
-    cert = config.age.secrets.surfaceSyncthingCert.path;
-  };
 
   environment = {
     persistence."/nix/persist" = {

@@ -1,9 +1,6 @@
 { pkgs, lib, ... }:
 
 {
-  # TODO: why does this not work?
-  age.secrets.keyfile.file = ../../secrets/keepassKeyFile.age;
-
   home = {
     packages = with pkgs; [ keepassxc ];
 
@@ -25,7 +22,10 @@
 
     persistence."/nix/persist/home/will" = {
       directories = [ "keepass" ];
-      files = [ "~/.cache/keepassxc/keepassxc.ini" ];
+      files = [ ".cache/keepassxc/keepassxc.ini" ];
     };
   };
 }
+
+# https://askubuntu.com/questions/1210158/start-keepassxc-on-boot/1210421#1210421
+# echo "<password>" | keepassxc --pw-stdin keepass/vault.kdbx

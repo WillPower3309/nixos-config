@@ -2,7 +2,7 @@ import App from "resource:///com/github/Aylur/ags/app.js";
 
 const v = {
   ags: `v${pkg.version}`,
-  expected: `v1.6.3`,
+  expected: `v1.7.4`,
 };
 
 function mismatch() {

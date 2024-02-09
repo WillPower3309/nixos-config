@@ -1,9 +1,11 @@
-{ pkgs, impermanence, agenix, ... }:
+{ pkgs, impermanence, agenix, ags, ... }:
 
 {
   imports = [
-    impermanence.nixosModules.home-manager.impermanence
     agenix.homeManagerModules.age
+    ags.homeManagerModules.default
+    impermanence.nixosModules.home-manager.impermanence
+    ./modules/ags.nix
     ./modules/discord.nix
     ./modules/emacs.nix
     ./modules/foot.nix

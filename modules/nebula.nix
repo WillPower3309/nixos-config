@@ -1,4 +1,4 @@
-{ config, ... }:
+{ config, lib, ... }:
 
 with config.networking;
 
@@ -22,6 +22,7 @@ with config.networking;
   };
 
   # TODO: preferred_ranges: https://nebula.defined.net/docs/config/preferred-ranges/
+  # TODO: set port to 0 for laptop?
   services.nebula.networks.home = {
     enable = true;
     isLighthouse = false;
@@ -31,15 +32,23 @@ with config.networking;
     lighthouses = [ "192.168.100.1" ];
     staticHostMap = { "192.168.100.1" = [ "143.110.232.34:4242" ]; };
     settings = {
-      punchy = true;
-      punch_back = true;
+      punchy = {
+        punch = true;
+        respond = true;
+        delay = "1s";
+        respond_delay = "5s";
+      };
     };
     firewall = {
-      inbound = [{
+      inbound = lib.lists.forEach firewall.allowedTCPPorts (port: {
         host = "any";
-        port = "any";
-        proto = "any";
-      }];
+        port = port;
+        proto = "tcp";
+      }) ++ lib.lists.forEach firewall.allowedUDPPorts (port: {
+        host = "any";
+        port = port;
+        proto = "udp";
+      });
       outbound = [{
         host = "any";
         port = "any";

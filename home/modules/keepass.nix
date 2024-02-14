@@ -4,26 +4,25 @@
   home = {
     packages = with pkgs; [ keepassxc ];
 
-    file.".config/keepassxc/keepassxc.ini".text = lib.generators.toINI { } {
-      General = {
-        ConfigVersion = 2;
-        MinimizeAfterUnlock = true;
-      };
-      Browser.Enabled = true;
-      GUI = {
-        MinimizeOnClose = true;
-        MinimizeToTray = true;
-        ShowTrayIcon = true;
-        TrayIconAppearance = "monochrome-dark";
-      };
+    file.".cache/keepassxc/keepassxc.ini".text = lib.generators.toINI { } {
+      General.LastActiveDatabase = "/nix/persist/home/will/keepass/vault.kbdx";
+    };
+  };
 
-      Security.IconDownloadFallback = true;
+  xdg.configFile."keepassxc/keepassxc.ini".text = lib.generators.toINI { } {
+    General = {
+      ConfigVersion = 2;
+      MinimizeAfterUnlock = true;
+    };
+    Browser.Enabled = true;
+    GUI = {
+      MinimizeOnClose = true;
+      MinimizeToTray = true;
+      ShowTrayIcon = true;
+      TrayIconAppearance = "monochrome-dark";
     };
 
-    persistence."/nix/persist/home/will" = {
-      directories = [ "keepass" ];
-      files = [ ".cache/keepassxc/keepassxc.ini" ];
-    };
+    Security.IconDownloadFallback = true;
   };
 }
 

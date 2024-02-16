@@ -9,9 +9,9 @@
     autotiling
     slurp
     grim
+    wlsunset
 
     # TODO: use the below!
-    # gammastep
     # swayidle
     # kanshi
   ];
@@ -69,6 +69,7 @@
       startup = [
         { command = "foot --server"; }
         { command = "autotiling"; }
+        { command = "wlsunset -l 43.7 -L -79.3"; }
       ];
 
       keybindings = let

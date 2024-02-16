@@ -10,6 +10,7 @@ let
 
   allDevices = [ desktopDevice serverDevice surfaceDevice phoneDevice ];
 
+  # TODO: do not run as root
   syncthingUser = if hostName == "server" then "root" else "will";
   folderDir = if hostName == "server" then "/data" else "/nix/persist/home/${syncthingUser}";
   dataDir = if hostName == "server" then "/persist/syncthing" else folderDir;
@@ -37,8 +38,10 @@ in
       options = {
         urAccepted = -1;
         relaysEnabled = false;
+        localAccounceEnabled = false;
       };
 
+      # TODO: static addresses via nebula
       devices = {
         ${desktopDevice}.id = "QPGKBDU-6S4XWKH-DLNIZLR-RBRUSQ2-7RMMZS3-G2QB7RJ-ANZS36W-KTTAIQM";
         ${serverDevice}.id = "V5AV6D5-5ITLYTL-35UHX6S-LKMFZ6U-FVGLEZP-EFGGR3R-O6AVGG7-ONT5MQE";

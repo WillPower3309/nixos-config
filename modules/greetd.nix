@@ -7,7 +7,7 @@
     enable = true;
     settings = rec {
       initial_session = {
-        command = "${pkgs.swayfx}/bin/sway";
+        command = "dbus-run-session ${pkgs.swayfx}/bin/sway";
         user = "will";
       };
       default_session = initial_session;

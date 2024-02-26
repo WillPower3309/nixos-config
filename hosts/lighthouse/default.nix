@@ -40,6 +40,7 @@
   services.nebula.networks.home = {
     enable = true;
     isLighthouse = true;
+    isRelay = true;
     cert = config.age.secrets.lighthouseNebulaCert.path; # lighthouse.crt
     key = config.age.secrets.lighthouseNebulaKey.path; # lighthouse.key
     ca = config.age.secrets.nebulaCaCert.path; # ca.crt

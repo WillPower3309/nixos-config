@@ -22,7 +22,6 @@ with config.networking;
   };
 
   # TODO: preferred_ranges: https://nebula.defined.net/docs/config/preferred-ranges/
-  # TODO: set port to 0 for laptop?
   services.nebula.networks.home = {
     enable = true;
     isLighthouse = false;
@@ -30,7 +29,9 @@ with config.networking;
     key = config.age.secrets.nebulaDeviceKey.path; # <device>.key
     ca = config.age.secrets.nebulaCaCert.path; # ca.crt
     lighthouses = [ "192.168.100.1" ];
+    relays = [ "192.168.100.1" ];
     staticHostMap = { "192.168.100.1" = [ "143.110.232.34:4242" ]; };
+    # listen.port = 0; # TODO: set port to 0 for laptop? I THINK THIS IS BROKEN ON NIX
     settings = {
       punchy = {
         punch = true;
@@ -57,3 +58,4 @@ with config.networking;
     };
   };
 }
+

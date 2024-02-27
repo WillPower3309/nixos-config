@@ -37,6 +37,12 @@
     # lazy mount, disconnect after 10 minutes
     options = [ "x-systemd.automount" "noauto" "x-systemd.idle-timeout=600" ];
   };
+  fileSystems."/mnt/music" = {
+    device = "10.27.27.3:/music";
+    fsType = "nfs";
+    # lazy mount, disconnect after 10 minutes
+    options = [ "x-systemd.automount" "noauto" "x-systemd.idle-timeout=600" ];
+  };
 
   swapDevices = [ ];
 

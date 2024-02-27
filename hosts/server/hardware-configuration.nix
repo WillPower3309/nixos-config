@@ -56,6 +56,16 @@
       options = [ "zfsutil" ];
     };
 
+  # it is expected that nfs mounts are owned by nobody:nogroup
+  fileSystems."/export/music" =
+    { device = "/data/media/Music";
+      options = [ "bind" ];
+    };
+  fileSystems."/export/photos" =
+    { device = "/data/photos";
+      options = [ "bind" ];
+    };
+
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
   # (the default) this is the recommended approach. When using systemd-networkd it's
   # still possible to use this option, but it's recommended to use it in conjunction

@@ -15,6 +15,7 @@ in
     ../../modules/radicale.nix
     ../../modules/plex.nix
     ../../modules/syncthing.nix
+    ../../modules/torrents.nix
   ];
 
   boot = {
@@ -83,14 +84,14 @@ in
 
   zramSwap.enable = true;
 
-#  services.nfs.server = {
-#    enable = true;
-#    exports = ''
-#      /export        10.27.27.5(rw,fsid=0,no_subtree_check)
-#      /export/photos 10.27.27.5(rw,insecure,no_subtree_check,all_squash,anonuid=65534,anongid=65534)
-#      /export/music  10.27.27.5(rw,insecure,no_subtree_check,all_squash,anonuid=65534,anongid=65534)
-#    '';
-#  };
+  services.nfs.server = {
+    enable = true;
+    exports = ''
+      /export        10.27.27.5(rw,fsid=0,no_subtree_check)
+      /export/photos 10.27.27.5(rw,insecure,no_subtree_check,all_squash,anonuid=65534,anongid=65534)
+      /export/music  10.27.27.5(ro,insecure,no_subtree_check,all_squash,anonuid=65534,anongid=65534)
+    '';
+  };
   # open nfs ports
   networking.firewall.allowedTCPPorts = [ 2049 ];
 

@@ -38,6 +38,15 @@
       extraSpecialArgs = { inherit impermanence ags; };
     };
 
+    mkDeployTarget = hostname: configPath: {
+      hostname = hostname;
+      profiles.system = {
+        user = "root";
+        sshUser = "root";
+        path = deploy-rs.lib.x86_64-linux.activate.nixos configPath;
+      };
+    };
+
   in {
     nixosConfigurations = {
       desktop = mkNixos [ ./hosts/desktop ];
@@ -50,22 +59,8 @@
 
     # TODO: ex https://github.com/disassembler/network/blob/18e4d34b3d09826f1239772dc3c2e8c6376d5df6/nixos/deploy.nix
     deploy.nodes = {
-      server = {
-        hostname = "10.27.27.3";
-        profiles.system = {
-          user = "root";
-          sshUser = "root";
-          path = deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.server;
-        };
-      };
-      lighthouse = {
-        hostname = "143.110.232.34";
-        profiles.system = {
-          user = "root";
-          sshUser = "root";
-          path = deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.lighthouse;
-        };
-      };
+      server = mkDeployTarget "10.27.27.3" self.nixosConfigurations.server;
+      lighthouse = mkDeployTarget "143.110.232.34" self.nixosConfigurations.lighthouse;
     };
   };
 }

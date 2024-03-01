@@ -6,10 +6,12 @@
     # TODO: server.enable
 
     settings = {
+      /*
       main = {
         font = "MesloLGS NF:size=10";
         dpi-aware = "yes";
       };
+*/
 
       cursor = {
         style = "block";
@@ -19,6 +21,7 @@
 
       mouse.hide-when-typing = "yes";
 
+      /*
       colors = {
         alpha = "0.8";
         foreground = "eceff4";
@@ -40,6 +43,7 @@
         bright6 = "8fbcbb";   # bright cyan
         bright7 = "eceff4";   # bright white
       };
+      */
     };
   };
 }

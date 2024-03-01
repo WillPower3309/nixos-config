@@ -1,4 +1,4 @@
-{ pkgs, config, home-manager, impermanence, agenix, ags, ... }:
+{ pkgs, config, home-manager, impermanence, agenix, ags, stylix, ... }:
 
 {
   imports = [ home-manager.nixosModules.home-manager ];
@@ -27,7 +27,7 @@
 
   home-manager = {
     useUserPackages = true;
-    extraSpecialArgs = { inherit impermanence agenix ags; };
+    extraSpecialArgs = { inherit impermanence agenix ags stylix; };
     users.will = import ../home;
   };
 }

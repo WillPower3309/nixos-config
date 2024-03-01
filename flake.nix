@@ -23,19 +23,20 @@
     };
 
     ags.url = "github:Aylur/ags";
+    stylix.url = "github:danth/stylix";
   };
 
-  outputs = { self, nixpkgs, home-manager, impermanence, deploy-rs, agenix, ags, ... }:
+  outputs = { self, nixpkgs, home-manager, impermanence, deploy-rs, agenix, ags, stylix, ... }:
   let
     mkNixos = modules: nixpkgs.lib.nixosSystem {
       inherit modules;
       system = "x86_64-linux";
-      specialArgs = { inherit nixpkgs impermanence home-manager agenix ags; };
+      specialArgs = { inherit nixpkgs impermanence home-manager agenix ags stylix; };
     };
 
     mkHome = modules: pkgs: home-manager.lib.homeManagerConfiguration {
       inherit modules pkgs;
-      extraSpecialArgs = { inherit impermanence ags; };
+      extraSpecialArgs = { inherit impermanence ags stylix; };
     };
 
     mkDeployTarget = hostname: configPath: {

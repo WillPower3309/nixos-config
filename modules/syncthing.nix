@@ -15,6 +15,8 @@ let
   folderDir = if hostName == "server" then "/data" else "/nix/persist/home/${syncthingUser}";
   dataDir = if hostName == "server" then "/persist/syncthing" else folderDir;
 
+  genDevice = hostName: id: { id = id; addresses = [ "tcp://${hostName}.willmckinnon.com:22000" ]; };
+
 # TODO: disable web gui?
 in
 {
@@ -37,15 +39,14 @@ in
     settings = {
       options = {
         urAccepted = -1;
-        relaysEnabled = false;
         localAccounceEnabled = false;
+        relaysEnabled = true; # needed for connecting to phone
       };
 
-      # TODO: static addresses via nebula
       devices = {
-        ${desktopDevice}.id = "QPGKBDU-6S4XWKH-DLNIZLR-RBRUSQ2-7RMMZS3-G2QB7RJ-ANZS36W-KTTAIQM";
-        ${serverDevice}.id = "V5AV6D5-5ITLYTL-35UHX6S-LKMFZ6U-FVGLEZP-EFGGR3R-O6AVGG7-ONT5MQE";
-        ${surfaceDevice}.id = "M5ENPZ2-OHBNDZO-XGUI444-LDR5VBD-ELEOO4H-JSCI35U-VHHSNDL-HBUMFAF";
+        ${desktopDevice} = genDevice desktopDevice "QPGKBDU-6S4XWKH-DLNIZLR-RBRUSQ2-7RMMZS3-G2QB7RJ-ANZS36W-KTTAIQM";
+        ${serverDevice} = genDevice serverDevice "V5AV6D5-5ITLYTL-35UHX6S-LKMFZ6U-FVGLEZP-EFGGR3R-O6AVGG7-ONT5MQE";
+        ${surfaceDevice} = genDevice surfaceDevice "M5ENPZ2-OHBNDZO-XGUI444-LDR5VBD-ELEOO4H-JSCI35U-VHHSNDL-HBUMFAF";
         ${phoneDevice}.id = "73BNDKD-TZUEVZE-TLCRORI-Y4MV2ZR-M4IRLSR-TR4L6GQ-TGXQ4K7-XW5UUQN";
       };
 

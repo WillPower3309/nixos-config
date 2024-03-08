@@ -21,22 +21,26 @@ in
 
     # TODO: fix me
     nginx.virtualHosts."${address}" = {
-#      useACMEHost = address;
-#      forceSSL = true;
-#      kTLS = true;
-      locations."${config.services.transmission.settings.rpc-url}" = {
-        proxyPass = "http://${config.services.transmission.settings.rpc-bind-address}:${toString config.services.transmission.settings.rpc-port}";
-        extraConfig = ''
-          proxy_read_timeout 300;
-          proxy_set_header Host $host;
-          proxy_set_header X-Forwarded-Proto $scheme;
-          proxy_set_header X-Forwarded-Protocol $scheme;
-          proxy_set_header X-Real-IP $remote_addr;
-          proxy_pass_header X-Transmission-Session-Id;
-          proxy_set_header X-Forwarded-Host $host;
-          proxy_set_header X-Forwarded-Server $host;
-          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        '';
+ #     useACMEHost = address;
+ #     forceSSL = true;
+ #     kTLS = true;
+      locations = {
+        "/".return = "301 http://${address}/transmission/web/"; # TODO: htttps instead of http
+
+        "${config.services.transmission.settings.rpc-url}" = {
+          proxyPass = "http://${config.services.transmission.settings.rpc-bind-address}:${toString config.services.transmission.settings.rpc-port}";
+          extraConfig = ''
+            proxy_read_timeout 300;
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-Protocol $scheme;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-Host $host;
+            proxy_set_header X-Forwarded-Server $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_pass_header X-Transmission-Session-Id;
+          '';
+        };
       };
 
       # allow iframe

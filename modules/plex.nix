@@ -15,9 +15,9 @@ in
 
     # https://toxicfrog.github.io/reverse-proxying-plex-with-nginx-on-nixos/
     nginx.virtualHosts."${address}" = {
-#      useACMEHost = address;
-#      forceSSL = true;
-#      kTLS = true;
+      useACMEHost = address;
+      forceSSL = true;
+      kTLS = true;
       locations."/".proxyPass = "http://${localAddress}";
 
       # add config to:
@@ -42,10 +42,10 @@ in
     };
   };
 
-  #security.acme.certs."${address}" = {};
+  security.acme.certs."${address}" = {};
 
   networking.firewall = {
-    allowedTCPPorts = [ 3005 8324 32469 ];
+    allowedTCPPorts = [ 3005 8324 32400 32469 ]; # TODO: remove 32400 once tv working through nebula
     allowedUDPPorts = [ 1900 5353 32410 32412 32413 32414 ];
   };
 }

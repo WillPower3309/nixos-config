@@ -12,6 +12,7 @@
     ../../modules/fonts.nix
     ../../modules/greetd.nix
     ../../modules/kernel.nix
+    ../../modules/nebula.nix
     ../../modules/nix.nix
     ../../modules/packages.nix
     ../../modules/polkit.nix # needed for sway

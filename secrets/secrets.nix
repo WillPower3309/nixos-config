@@ -19,6 +19,7 @@ in
 
   "keepassKeyFile.age".publicKeys = guiSystems ++ editors;
 
+  # syncthing certs and keys
   "desktopSyncthingKey.age".publicKeys = [ systemDesktop ] ++ editors;
   "desktopSyncthingCert.age".publicKeys = [ systemDesktop ] ++ editors;
   "surfaceSyncthingKey.age".publicKeys = [ systemSurface ] ++ editors;
@@ -26,12 +27,15 @@ in
   "serverSyncthingKey.age".publicKeys = [ systemServer ] ++ editors;
   "serverSyncthingCert.age".publicKeys = [ systemServer ] ++ editors;
 
+  # nebula certs and keys
   "nebulaCaKey.age".publicKeys = editors;
   "nebulaCaCert.age".publicKeys = systems ++ editors;
   "lighthouseNebulaCert.age".publicKeys = [ systemLighthouse ] ++ editors;
   "lighthouseNebulaKey.age".publicKeys = [ systemLighthouse ] ++ editors;
   "serverNebulaCert.age".publicKeys = [ systemServer ] ++ editors;
   "serverNebulaKey.age".publicKeys = [ systemServer ] ++ editors;
+  "desktopNebulaCert.age".publicKeys = [ systemDesktop ] ++ editors;
+  "desktopNebulaKey.age".publicKeys = [ systemDesktop ] ++ editors;
 
   "radicaleHtpasswd.age".publicKeys = [ systemServer ] ++ editors;
 }

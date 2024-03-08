@@ -38,4 +38,6 @@ in
   "desktopNebulaKey.age".publicKeys = [ systemDesktop ] ++ editors;
 
   "radicaleHtpasswd.age".publicKeys = [ systemServer ] ++ editors;
+
+  "acme.age".publicKeys = [ systemServer ] ++ editors;
 }

@@ -1,5 +1,10 @@
-{ pkgs, lib, ... }:
+{ nixosConfig, pkgs, ... }:
 
+let
+  nixosConfigPath = "~/Projects/nixos-config";
+  powerlevel10kFilePath = "share/zsh-powerlevel10k/powerlevel10k.zsh-theme";
+
+in
 {
   programs.zsh = {
     # TODO: already enabled system wide?
@@ -12,19 +17,17 @@
     syntaxHighlighting.enable = true;
 
     initExtraBeforeCompInit = ''
-      source ${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k/powerlevel10k.zsh-theme
+      source ${pkgs.zsh-powerlevel10k}/${powerlevel10kFilePath}
     '';
     initExtra = ''
       source ${./config/.p10k.zsh}
     '';
 
-    plugins = [
-      {
-         name = "powerlevel10k";
-         src = pkgs.zsh-powerlevel10k;
-         file = "share/zsh-powerlevel10k/powerlevel10k.zsh-theme";
-      }
-    ];
+    plugins = [{
+     name = "powerlevel10k";
+     src = pkgs.zsh-powerlevel10k;
+     file = powerlevel10kFilePath;
+    }];
 
     sessionVariables = {
       TERM="xterm-256color";
@@ -32,7 +35,7 @@
 
     shellAliases = {
       ls = "colorls";
-      # TODO = nixos-rebuild boot --flake ~/Projects/nixos-config/<$HOSTNAME>";
+      os-rebuild = "nixos-rebuild switch --flake ${nixosConfigPath}#${nixosConfig.networking.hostName}";
     };
   };
 }

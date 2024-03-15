@@ -9,7 +9,7 @@
   home = {
     packages = with pkgs; [
       # Language Servers
-      rnix-lsp # nix
+      nil # nix
       clang-tools # c / cpp
       yaml-language-server
       vscode-langservers-extracted # HTML/CSS/JSON/ESLint language servers extracted from vscode

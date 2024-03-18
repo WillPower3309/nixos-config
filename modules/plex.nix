@@ -2,7 +2,8 @@
 
 let
   localAddress = "127.0.0.1:32400";
-  address = "plex.${config.networking.hostName}.willmckinnon.com";
+  baseDomain = "${config.networking.hostName}.willmckinnon.com";
+  address = "plex.${baseDomain}";
 
 in
 {
@@ -15,7 +16,7 @@ in
 
     # https://toxicfrog.github.io/reverse-proxying-plex-with-nginx-on-nixos/
     nginx.virtualHosts."${address}" = {
-      useACMEHost = address;
+      useACMEHost = baseDomain;
       forceSSL = true;
       kTLS = true;
       locations."/".proxyPass = "http://${localAddress}";
@@ -41,8 +42,6 @@ in
       '';
     };
   };
-
-  security.acme.certs."${address}" = {};
 
   networking.firewall = {
     allowedTCPPorts = [ 3005 8324 32400 32469 ]; # TODO: remove 32400 once tv working through nebula

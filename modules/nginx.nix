@@ -1,7 +1,11 @@
 { config, ... }:
 
+let
+  domainName = "${config.networking.hostName}.willmckinnon.com";
+  acmeDataDir = "/var/lib/acme";
+
+in
 {
-  # https://www.cyberciti.biz/faq/issue-lets-encrypt-wildcard-certificate-with-acme-sh-and-cloudflare-dns/#Getting_Cloudflare_API_key
   age.secrets.acme.file = ../secrets/acme.age;
 
   security.acme = {
@@ -9,8 +13,10 @@
     defaults = {
       email = "contact@willmckinnon.com";
       credentialsFile = config.age.secrets.acme.path;
-      dnsProvider = "digitalocean";
+      dnsProvider = "cloudflare";
     };
+
+    certs."${domainName}".domain = "*.${domainName}"; # wildcard cert
   };
 
   services.nginx = {
@@ -21,13 +27,13 @@
     recommendedGzipSettings = true;
 
     # restrict base domain
-    virtualHosts."${config.networking.hostName}.willmckinnon.com" = {
+    virtualHosts."${domainName}" = {
       locations."/".return = 403;
       default = true;
     };
   };
 
-  environment.persistence."/persist".directories = [{ directory = "/var/lib/acme"; user = "acme"; group = "acme"; }];
+  environment.persistence."/persist".directories = [{ directory = acmeDataDir; user = "acme"; group = "acme"; }];
 
   users.groups.acme.members = [ "nginx" ];
 

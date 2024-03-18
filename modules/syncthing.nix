@@ -17,7 +17,8 @@ let
 
   genDevice = hostName: id: { id = id; addresses = [ "tcp://${hostName}.willmckinnon.com:22000" ]; };
 
-  address = "syncthing.${config.networking.hostName}.willmckinnon.com";
+  baseDomain = "${config.networking.hostName}.willmckinnon.com";
+  address = "syncthing.${baseDomain}";
 
 # TODO: disable web gui?
 in
@@ -67,12 +68,10 @@ in
     };
 
     nginx.virtualHosts."${address}" = {
-#      useACMEHost = address;
-#      forceSSL = true;
-#      kTLS = true;
+      useACMEHost = baseDomain;
+      forceSSL = true;
+      kTLS = true;
       locations."/".proxyPass = "http://localhost:8384";
     };
   };
-
-#  security.acme.certs."${address}" = {};
 }

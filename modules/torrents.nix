@@ -1,7 +1,8 @@
 { config, pkgs, ... }:
 
 let
-  address = "transmission.${config.networking.hostName}.willmckinnon.com";
+  baseDomain = "${config.networking.hostName}.willmckinnon.com";
+  address = "transmission.${baseDomain}";
 
 in
 {
@@ -19,13 +20,12 @@ in
       };
     };
 
-    # TODO: fix me
     nginx.virtualHosts."${address}" = {
- #     useACMEHost = address;
- #     forceSSL = true;
- #     kTLS = true;
+      useACMEHost = baseDomain;
+      forceSSL = true;
+      kTLS = true;
       locations = {
-        "/".return = "301 http://${address}/transmission/web/"; # TODO: htttps instead of http
+        "/".return = "301 http://${address}/transmission/web/";
 
         "${config.services.transmission.settings.rpc-url}" = {
           proxyPass = "http://${config.services.transmission.settings.rpc-bind-address}:${toString config.services.transmission.settings.rpc-port}";
@@ -49,7 +49,4 @@ in
       '';
     };
   };
-
-#  security.acme.certs."${address}" = {};
 }
-

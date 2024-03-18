@@ -2,7 +2,8 @@
 
 let
   port = "5232";
-  address = "radicale.${config.networking.hostName}.willmckinnon.com";
+  baseDomain = "${config.networking.hostName}.willmckinnon.com";
+  address = "radicale.${baseDomain}";
 
 in
 {
@@ -16,27 +17,21 @@ in
     radicale = {
       enable = true;
       settings = {
-        server = {
-          hosts = [ "0.0.0.0:${port}" "[::]:${port}" ];
-        };
         auth = {
           type = "htpasswd";
           htpasswd_filename = config.age.secrets.radicaleHtpasswd.path;
           htpasswd_encryption = "plain";
         };
-        storage = {
-          filesystem_folder = "/data/radicale";
-        };
+        server.hosts = [ "0.0.0.0:${port}" "[::]:${port}" ];
+        storage.filesystem_folder = "/data/radicale";
       };
     };
 
     nginx.virtualHosts."${address}" = {
-#      useACMEHost = address;
-#      forceSSL = true;
-#      kTLS = true;
+      useACMEHost = baseDomain;
+      forceSSL = true;
+      kTLS = true;
       locations."/".proxyPass = "http://localhost:${port}";
     };
   };
-
-#  security.acme.certs."${address}" = {};
 }

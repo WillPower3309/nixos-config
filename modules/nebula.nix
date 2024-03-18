@@ -2,6 +2,9 @@
 
 with config.networking;
 
+let lighthouseNebulaAddress = "192.168.100.1";
+
+in
 {
   age.secrets = {
     nebulaCaCert = {
@@ -21,17 +24,20 @@ with config.networking;
     };
   };
 
-  # TODO: preferred_ranges: https://nebula.defined.net/docs/config/preferred-ranges/
+  # lighthouse: 192.168.100.1
+  # server: 192.168.100.2
+  # desktop: 192.168.100.3
+  # phone: 192.168.100.4
   services.nebula.networks.home = {
     enable = true;
     isLighthouse = false;
     cert = config.age.secrets.nebulaDeviceCert.path; # <device>.crt
     key = config.age.secrets.nebulaDeviceKey.path; # <device>.key
     ca = config.age.secrets.nebulaCaCert.path; # ca.crt
-    lighthouses = [ "192.168.100.1" ];
-    relays = [ "192.168.100.1" ];
-    staticHostMap = { "192.168.100.1" = [ "143.110.232.34:4242" ]; };
-    # listen.port = 0; # TODO: set port to 0 for laptop? I THINK THIS IS BROKEN ON NIX
+    lighthouses = [ lighthouseNebulaAddress ];
+    relays = [ lighthouseNebulaAddress ];
+    staticHostMap = { ${lighthouseNebulaAddress} = [ "143.110.232.34:4242" ]; };
+    listen.port = if hostName == "server" then 4242 else 0; # TODO: fix me so server can have value of 0
     settings = {
       punchy = {
         punch = true;
@@ -39,21 +45,22 @@ with config.networking;
         delay = "1s";
         respond_delay = "5s";
       };
+      preferred_ranges = [ "10.27.27.0/24" ]; # prefer local network
     };
     firewall = {
       inbound = lib.lists.forEach firewall.allowedTCPPorts (port: {
-        host = "any";
         port = port;
         proto = "tcp";
-      }) ++ lib.lists.forEach firewall.allowedUDPPorts (port: {
         host = "any";
+      }) ++ lib.lists.forEach firewall.allowedUDPPorts (port: {
         port = port;
         proto = "udp";
+        host = "any";
       });
       outbound = [{
-        host = "any";
         port = "any";
         proto = "any";
+        host = "any";
       }];
     };
   };

@@ -36,6 +36,8 @@ in
   "serverNebulaKey.age".publicKeys = [ systemServer ] ++ editors;
   "desktopNebulaCert.age".publicKeys = [ systemDesktop ] ++ editors;
   "desktopNebulaKey.age".publicKeys = [ systemDesktop ] ++ editors;
+  "surfaceNebulaCert.age".publicKeys = [ systemSurface ] ++ editors;
+  "surfaceNebulaKey.age".publicKeys = [ systemSurface ] ++ editors;
 
   "radicaleHtpasswd.age".publicKeys = [ systemServer ] ++ editors;
 

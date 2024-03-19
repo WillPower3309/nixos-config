@@ -1,4 +1,4 @@
-{ pkgs, config, ... }:
+{ config, ... }:
 
 with config.networking;
 
@@ -67,7 +67,7 @@ in
       };
     };
 
-    nginx.virtualHosts."${address}" = {
+    nginx.virtualHosts."${address}" = mkIf hostName == "server" {
       useACMEHost = baseDomain;
       forceSSL = true;
       kTLS = true;

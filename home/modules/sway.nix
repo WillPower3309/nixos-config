@@ -1,5 +1,9 @@
-{ pkgs, lib, ... }:
+{ lib, nixosConfig, pkgs, ... }:
 
+let
+  isDesktop = nixosConfig.networking.hostName == "desktop";
+
+in
 {
   home.packages = with pkgs; [
     swaybg
@@ -58,6 +62,12 @@
 
       output = {
         "*".background = "~/Pictures/wallpaper.png fill";
+        "DP-3" = lib.mkIf isDesktop {
+          pos = "0 1080";
+        };
+        "HDMI-A-1" = lib.mkIf isDesktop {
+          pos = "1280 0";
+        };
       };
 
       seat.seat0 = {

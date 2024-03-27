@@ -62,11 +62,12 @@ in
   age.secrets.hashedRootPassword.file = ../../secrets/hashedRootPassword.age;
 
   users = {
-    users.root.hashedPasswordFile = config.age.secrets.hashedRootPassword.path;
+    users.root = {
+      hashedPasswordFile = config.age.secrets.hashedRootPassword.path;
+      openssh.authorizedKeys.keys = [ authorizedKey ];
+    }
     mutableUsers = false;
   };
-
-  # TODO use zramswap instad of swap partition (from zfs guide in README)
 
   services.openssh = {
     enable = true;
@@ -80,8 +81,6 @@ in
       type = "ed25519";
     }];
   };
-
-  users.users.root.openssh.authorizedKeys.keys = [ authorizedKey ];
 
   zramSwap.enable = true;
 

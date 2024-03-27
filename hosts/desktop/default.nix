@@ -41,9 +41,7 @@
   xdg.portal = {
     enable = true;
     wlr.enable = true; # provides screen share
-#    extraPortals = with pkgs; [
-#      xdg-desktop-portal-gtk # provides file chooser
-#    ];
+    config.common.default = [ "wlr" ];
   };
 
   # TODO: make this across all hosts, remove agenix import here

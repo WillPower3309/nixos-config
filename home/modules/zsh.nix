@@ -12,7 +12,7 @@ in
 
     defaultKeymap = "viins";
 
-    enableAutosuggestions = true;
+    autosuggestion.enable = true;
     enableCompletion = true;
     syntaxHighlighting.enable = true;
 
@@ -20,7 +20,7 @@ in
       source ${pkgs.zsh-powerlevel10k}/${powerlevel10kFilePath}
     '';
     initExtra = ''
-      source ${./config/.p10k.zsh}
+      source ${./config/p10k.zsh}
     '';
 
     plugins = [{

@@ -7,14 +7,15 @@
     impermanence.nixosModules.home-manager.impermanence
     ./modules/ags.nix
     ./modules/discord.nix
+    ./modules/document-viewer.nix
     ./modules/emacs.nix
     ./modules/foot.nix
     ./modules/games.nix
     ./modules/git.nix
-    ./modules/keepass.nix
-    ./modules/kde-connect.nix
     ./modules/music.nix
-    #./modules/notetaking.nix
+    ./modules/kde-connect.nix
+    ./modules/keepass.nix
+    ./modules/notetaking.nix
     ./modules/photography.nix
     ./modules/ssh-client.nix
     ./modules/theme.nix

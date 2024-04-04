@@ -9,6 +9,7 @@
     ./modules/discord.nix
     ./modules/document-viewer.nix
     ./modules/emacs.nix
+    ./modules/evolution-clients.nix
     ./modules/foot.nix
     ./modules/games.nix
     ./modules/git.nix

@@ -65,7 +65,7 @@ in
     users.root = {
       hashedPasswordFile = config.age.secrets.hashedRootPassword.path;
       openssh.authorizedKeys.keys = [ authorizedKey ];
-    }
+    };
     mutableUsers = false;
   };
 

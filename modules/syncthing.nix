@@ -1,4 +1,4 @@
-{ config, ... }:
+{ config, lib, ... }:
 
 with config.networking;
 
@@ -15,10 +15,10 @@ let
   folderDir = if hostName == "server" then "/data" else "/nix/persist/home/${syncthingUser}";
   dataDir = if hostName == "server" then "/persist/syncthing" else folderDir;
 
-  genDevice = hostName: id: { id = id; addresses = [ "tcp://${hostName}.willmckinnon.com:22000" ]; };
-
-  baseDomain = "${config.networking.hostName}.willmckinnon.com";
+  baseDomain = "${hostName}.willmckinnon.com";
   address = "syncthing.${baseDomain}";
+
+  genDevice = hostName: id: { id = id; addresses = [ "tcp://${baseDomain}:22000" ]; };
 
 # TODO: disable web gui?
 in
@@ -51,7 +51,7 @@ in
           ${desktopDevice} = genDevice desktopDevice "QPGKBDU-6S4XWKH-DLNIZLR-RBRUSQ2-7RMMZS3-G2QB7RJ-ANZS36W-KTTAIQM";
           ${serverDevice} = genDevice serverDevice "V5AV6D5-5ITLYTL-35UHX6S-LKMFZ6U-FVGLEZP-EFGGR3R-O6AVGG7-ONT5MQE";
           ${surfaceDevice} = genDevice surfaceDevice "M5ENPZ2-OHBNDZO-XGUI444-LDR5VBD-ELEOO4H-JSCI35U-VHHSNDL-HBUMFAF";
-          ${phoneDevice}.id = "73BNDKD-TZUEVZE-TLCRORI-Y4MV2ZR-M4IRLSR-TR4L6GQ-TGXQ4K7-XW5UUQN";
+          ${phoneDevice}.id = "F6DBZ2M-62WCNA7-GYD3LP3-4ODIDAQ-W6FMTHG-QN32HWG-AW4UXI5-6T6R6AP";
         };
 
         folders = {
@@ -67,7 +67,7 @@ in
       };
     };
 
-    nginx.virtualHosts."${address}" = mkIf hostName == "server" {
+    nginx.virtualHosts."${address}" = lib.mkIf (hostName == "server") {
       useACMEHost = baseDomain;
       forceSSL = true;
       kTLS = true;

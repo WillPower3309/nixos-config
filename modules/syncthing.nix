@@ -1,7 +1,5 @@
 { config, lib, ... }:
 
-with config.networking;
-
 let
   desktopDevice = "desktop";
   serverDevice = "server";
@@ -11,21 +9,20 @@ let
   allDevices = [ desktopDevice serverDevice surfaceDevice phoneDevice ];
 
   # TODO: do not run as root
-  syncthingUser = if hostName == "server" then "root" else "will";
-  folderDir = if hostName == "server" then "/data" else "/nix/persist/home/${syncthingUser}";
-  dataDir = if hostName == "server" then "/persist/syncthing" else folderDir;
+  syncthingUser = if config.networking.hostName == "server" then "root" else "will";
+  folderDir = if config.networking.hostName == "server" then "/data" else "/nix/persist/home/${syncthingUser}";
+  dataDir = if config.networking.hostName == "server" then "/persist/syncthing" else folderDir;
 
-  baseDomain = "${hostName}.willmckinnon.com";
-  address = "syncthing.${baseDomain}";
+  baseDomain = "willmckinnon.com";
 
-  genDevice = hostName: id: { id = id; addresses = [ "tcp://${baseDomain}:22000" ]; };
+  genDevice = hostName: id: { id = id; addresses = [ "tcp://${hostName}.${baseDomain}:22000" ]; };
 
 # TODO: disable web gui?
 in
 {
   age.secrets = {
-    syncthingKey.file = ./.. + builtins.toPath "/secrets/${hostName}SyncthingKey.age";
-    syncthingCert.file = ./.. + builtins.toPath "/secrets/${hostName}SyncthingCert.age";
+    syncthingKey.file = ./.. + builtins.toPath "/secrets/${config.networking.hostName}SyncthingKey.age";
+    syncthingCert.file = ./.. + builtins.toPath "/secrets/${config.networking.hostName}SyncthingCert.age";
   };
 
   services = {
@@ -67,8 +64,8 @@ in
       };
     };
 
-    nginx.virtualHosts."${address}" = lib.mkIf (hostName == "server") {
-      useACMEHost = baseDomain;
+    nginx.virtualHosts."syncthing.${config.networking.hostName}.${baseDomain}" = lib.mkIf (config.networking.hostName == "server") {
+      useACMEHost = "${config.networking.hostName}.${baseDomain}";
       forceSSL = true;
       kTLS = true;
       locations."/".proxyPass = "http://localhost:8384";

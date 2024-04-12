@@ -1,4 +1,4 @@
-{ config, pkgs, impermanence, agenix, ... }:
+{ pkgs, impermanence, agenix, ... }:
 
 {
   imports = [
@@ -30,6 +30,8 @@
   networking.hostName = "surface";
 
   age.identityPaths = [ "/nix/persist/etc/ssh/ssh_host_ed25519_key" ];
+
+  boot.kernelParams = [ "i915.modeset=1" "i915.enable_fbc=1" "i915.enable_guc=3" "i915.enable_psr=1" ];
 
   programs = {
     dconf.enable = true; # needed for sway

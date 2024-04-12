@@ -7,7 +7,6 @@ in
 {
   home.packages = with pkgs; [
     swaybg
-    waybar
     mako
     nwg-launchers
     autotiling
@@ -36,7 +35,7 @@ in
       # super key
       modifier = "Mod4";
 
-      bars = [{ command = "waybar"; }];
+      bars = [];
 
       gaps = {
         outer = 0;

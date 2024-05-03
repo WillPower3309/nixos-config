@@ -22,12 +22,17 @@
       inputs.home-manager.follows = "home-manager";
     };
 
+    nixos-generators = {
+      url = "github:nix-community/nixos-generators";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     ags.url = "github:Aylur/ags";
     stylix.url = "github:danth/stylix";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
   };
 
-  outputs = { self, nixpkgs, home-manager, impermanence, deploy-rs, agenix, ags, stylix, nixos-hardware, ... }:
+  outputs = { self, nixpkgs, home-manager, impermanence, deploy-rs, agenix, nixos-generators, ags, stylix, nixos-hardware, ... }:
   let
     mkNixos = modules: nixpkgs.lib.nixosSystem {
       inherit modules;
@@ -38,6 +43,11 @@
     mkHome = modules: pkgs: home-manager.lib.homeManagerConfiguration {
       inherit modules pkgs;
       extraSpecialArgs = { inherit impermanence ags stylix; };
+    };
+
+    mkImage = format: modules: nixos-generators.nixosGenerate {
+      inherit format modules;
+      system = "x86_64-linux";
     };
 
     mkDeployTarget = hostname: configPath: {
@@ -59,6 +69,8 @@
     };
 
     homeConfigurations."will" = mkHome [ ./home ] nixpkgs.legacyPackages."x86_64-linux";
+
+    packages.x86_64-linux.installationMedia = mkImage "install-iso" [ ./images/installation-media.nix ];
 
     # TODO: ex https://github.com/disassembler/network/blob/18e4d34b3d09826f1239772dc3c2e8c6376d5df6/nixos/deploy.nix
     deploy.nodes = {

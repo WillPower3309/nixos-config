@@ -63,7 +63,6 @@
     nixosConfigurations = {
       desktop = mkNixos [ ./hosts/desktop ];
       lighthouse = mkNixos [ ./hosts/lighthouse ];
-      media-center = mkNixos [ ./hosts/media-center ];
       server = mkNixos [ ./hosts/server ];
       surface = mkNixos [ ./hosts/surface ];
     };

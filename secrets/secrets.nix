@@ -1,11 +1,12 @@
 let
   systemDesktop = builtins.readFile ../hosts/desktop/ssh_host_ed25519_key.pub;
+  systemLaptop = builtins.readFile ../hosts/laptop/ssh_host_ed25519_key.pub;
   systemLighthouse = builtins.readFile ../hosts/lighthouse/ssh_host_ed25519_key.pub;
   systemSurface = builtins.readFile ../hosts/surface/ssh_host_ed25519_key.pub;
   systemServer = builtins.readFile ../hosts/server/ssh_host_ed25519_key.pub;
 
   headlessSystems = [ systemServer systemLighthouse ];
-  guiSystems = [ systemDesktop systemSurface ];
+  guiSystems = [ systemDesktop systemLaptop systemSurface ];
   systems = guiSystems ++ headlessSystems;
 
   userWill = builtins.readFile ../home/id_ed25519.pub;
@@ -22,6 +23,8 @@ in
   # syncthing certs and keys
   "desktopSyncthingKey.age".publicKeys = [ systemDesktop ] ++ editors;
   "desktopSyncthingCert.age".publicKeys = [ systemDesktop ] ++ editors;
+  "laptopSyncthingKey.age".publicKeys = [ systemLaptop ] ++ editors;
+  "laptopSyncthingCert.age".publicKeys = [ systemLaptop ] ++ editors;
   "surfaceSyncthingKey.age".publicKeys = [ systemSurface ] ++ editors;
   "surfaceSyncthingCert.age".publicKeys = [ systemSurface ] ++ editors;
   "serverSyncthingKey.age".publicKeys = [ systemServer ] ++ editors;
@@ -36,6 +39,8 @@ in
   "serverNebulaKey.age".publicKeys = [ systemServer ] ++ editors;
   "desktopNebulaCert.age".publicKeys = [ systemDesktop ] ++ editors;
   "desktopNebulaKey.age".publicKeys = [ systemDesktop ] ++ editors;
+  "laptopNebulaCert.age".publicKeys = [ systemLaptop ] ++ editors;
+  "laptopNebulaKey.age".publicKeys = [ systemLaptop ] ++ editors;
   "surfaceNebulaCert.age".publicKeys = [ systemSurface ] ++ editors;
   "surfaceNebulaKey.age".publicKeys = [ systemSurface ] ++ editors;
 

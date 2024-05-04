@@ -22,6 +22,11 @@
       inputs.home-manager.follows = "home-manager";
     };
 
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     nixos-generators = {
       url = "github:nix-community/nixos-generators";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -32,12 +37,12 @@
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
   };
 
-  outputs = { self, nixpkgs, home-manager, impermanence, deploy-rs, agenix, nixos-generators, ags, stylix, nixos-hardware, ... }:
+  outputs = { self, nixpkgs, home-manager, impermanence, deploy-rs, agenix, disko, nixos-generators, ags, stylix, nixos-hardware, ... }:
   let
     mkNixos = modules: nixpkgs.lib.nixosSystem {
       inherit modules;
       system = "x86_64-linux";
-      specialArgs = { inherit nixpkgs impermanence home-manager agenix ags stylix nixos-hardware; };
+      specialArgs = { inherit nixpkgs impermanence home-manager agenix disko ags stylix nixos-hardware; };
     };
 
     mkHome = modules: pkgs: home-manager.lib.homeManagerConfiguration {
@@ -62,6 +67,7 @@
   in {
     nixosConfigurations = {
       desktop = mkNixos [ ./hosts/desktop ];
+      laptop = mkNixos [ ./hosts/laptop ];
       lighthouse = mkNixos [ ./hosts/lighthouse ];
       server = mkNixos [ ./hosts/server ];
       surface = mkNixos [ ./hosts/surface ];

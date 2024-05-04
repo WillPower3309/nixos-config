@@ -29,6 +29,7 @@ in
   # desktop: 192.168.100.3
   # phone: 192.168.100.4
   # surface: 192.168.100.5
+  # laptop: 192.168.100.6
   services.nebula.networks.home = {
     enable = true;
     isLighthouse = false;

@@ -25,6 +25,15 @@
     ../../modules/wifi.nix
   ];
 
+  boot = {
+    initrd = {
+      availableKernelModules = [ "nvme" "xhci_pci" "thunderbolt" "usb_storage" "usbhid" "sd_mod" ];
+      kernelModules = [ "dm-snapshot" "amdgpu" ];
+    };
+    kernelModules = [ "kvm-amd" ];
+  };
+  hardware.enableAllFirmware = true;
+
   # Set your time zone.
   time.timeZone = "America/Toronto";
 
@@ -65,3 +74,4 @@
 
   system.stateVersion = "23.11";
 }
+

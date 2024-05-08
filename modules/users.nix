@@ -28,6 +28,7 @@
   home-manager = {
     useUserPackages = true;
     extraSpecialArgs = { inherit impermanence agenix ags stylix; };
+    backupFileExtension = "backup";
     users.will = import ../home;
   };
 }

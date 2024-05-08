@@ -62,7 +62,10 @@ in
       };
 
       output = {
-        "*".background = "~/Pictures/wallpaper.png fill";
+        "*" = {
+          background = "~/Pictures/wallpaper.png fill";
+          scale = if isDesktop then "1" else "1.5";
+        };
         "DP-3" = lib.mkIf isDesktop {
           pos = "0 1080";
         };

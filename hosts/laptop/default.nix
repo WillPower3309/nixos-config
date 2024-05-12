@@ -18,6 +18,7 @@
     ../../modules/nix.nix
     ../../modules/packages.nix
     ../../modules/polkit.nix # needed for sway
+    ../../modules/power.nix
     ../../modules/screen-record.nix
     ../../modules/sound.nix
     ../../modules/syncthing.nix

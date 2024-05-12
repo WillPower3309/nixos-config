@@ -83,14 +83,16 @@ in
       startup = [
         { command = "foot --server"; }
         { command = "autotiling"; }
+        { command = "ags"; }
         { command = "wlsunset -l 43.7 -L -79.3"; }
       ];
 
       keybindings = let
         mod = "Mod4";
         term = "footclient";
-        app-menu = "nwggrid";
+        app-menu = "ags -t app-launcher";
         power-menu = "nwgbar";
+
       in {
         "${mod}+Return" = "exec ${term}";
         "${mod}+d" = "exec ${app-menu}";
@@ -180,17 +182,16 @@ in
         "${mod}+r" = "mode \"resize\"";
 
         # Audio
-        #"XF86AudioRaiseVolume" = "exec set-volume inc 1";
-        #"XF86AudioLowerVolume" = "exec set-volume dec 1";
-        #"XF86AudioMute" = "exec set-volume toggle-mute";
-        #"XF86AudioStop" = "exec ${pkgs.playerctl}/bin/playerctl stop";
-        #"XF86AudioPrev" = "exec ${pkgs.playerctl}/bin/playerctl previous";
-        #"XF86AudioNext" = "exec ${pkgs.playerctl}/bin/playerctl next";
-        #"XF86AudioPlay" = "exec ${pkgs.playerctl}/bin/playerctl play-pause";
+        "XF86AudioRaiseVolume" = "exec set-volume inc 1";
+        "XF86AudioLowerVolume" = "exec set-volume dec 1";
+        "XF86AudioMute" = "exec set-volume toggle-mute";
+        "XF86AudioStop" = "exec ${pkgs.playerctl}/bin/playerctl stop";
+        "XF86AudioPrev" = "exec ${pkgs.playerctl}/bin/playerctl previous";
+        "XF86AudioNext" = "exec ${pkgs.playerctl}/bin/playerctl next";
+        "XF86AudioPlay" = "exec ${pkgs.playerctl}/bin/playerctl play-pause";
 
-        # TODO: IF LAPTOP
-        #"XF86MonBrightnessDown" = "exec brightnessctl set 15%-";
-        #"XF86MonBrightnessUp" =  "exec brightnessctl set +15%";
+        "XF86MonBrightnessDown" = "exec light -U 5";
+        "XF86MonBrightnessUp" =  "exec light -A 5";
       };
     };
 

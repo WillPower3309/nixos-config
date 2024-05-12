@@ -1,4 +1,7 @@
-import { bar } from "./bar.js"
+import { applauncher } from "./widgets/app-launcher.js";
 
-export default { windows: [bar] }
-
+App.config({
+    windows: [
+        applauncher,
+    ],
+})

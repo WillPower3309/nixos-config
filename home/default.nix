@@ -23,7 +23,6 @@
     ./modules/sway.nix
     ./modules/video.nix
     ./modules/vim.nix
-    ./modules/waybar.nix
     ./modules/web-browsers.nix
     ./modules/zsh.nix
   ];

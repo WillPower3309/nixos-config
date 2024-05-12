@@ -7,7 +7,6 @@ in
 {
   home.packages = with pkgs; [
     swaybg
-    mako
     nwg-launchers
     autotiling
     slurp

@@ -20,7 +20,7 @@
     ../../modules/polkit.nix # needed for sway
     ../../modules/screen-record.nix
     ../../modules/sound.nix
-    #../../modules/syncthing.nix
+    ../../modules/syncthing.nix
     ../../modules/users.nix
     ../../modules/wifi.nix
   ];
@@ -43,6 +43,7 @@
 
   programs = {
     dconf.enable = true; # needed for sway
+    light.enable = true; # laptop needs backlight
     fuse.userAllowOther = true; # persistence (TODO: make one file)
   };
 

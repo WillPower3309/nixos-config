@@ -32,4 +32,9 @@ in
 
     targets.sway.enable = false;
   };
+
+  gtk.iconTheme = {
+    name = "Tela";
+    package = pkgs.tela-icon-theme;
+  };
 }

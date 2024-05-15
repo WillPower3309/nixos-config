@@ -2,8 +2,8 @@ const WINDOW_NAME = "power-menu"
 
 const SysButton = (title, icon, command) => Widget.Button({
     on_clicked: () => {
-        App.closeWindow(WINDOW_NAME)
         Utils.execAsync(command)
+        App.closeWindow(WINDOW_NAME)
     },
     child: Widget.Box({
         vertical: true,
@@ -25,8 +25,8 @@ export function PowerMenu() {
         keymode: "exclusive",
         child: Widget.Box({
             children: [
-                SysButton("Shutdown", "system-shutdown-symbolic", "shutdown"),
-                SysButton("Reboot", "system-reboot-symbolic", "reboot"),
+                SysButton("Shutdown", "system-shutdown-symbolic", "systemctl poweroff"),
+                SysButton("Reboot", "system-reboot-symbolic", "systemctl reboot"),
                 SysButton("Sleep", "weather-clear-night-symbolic", "systemctl suspend"),
             ],
         }),

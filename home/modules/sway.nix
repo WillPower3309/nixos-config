@@ -7,7 +7,6 @@ in
 {
   home.packages = with pkgs; [
     swaybg
-    nwg-launchers
     autotiling
     slurp
     grim
@@ -90,7 +89,7 @@ in
         mod = "Mod4";
         term = "footclient";
         app-menu = "ags -t app-launcher";
-        power-menu = "nwgbar";
+        power-menu = "ags -t power-menu";
 
       in {
         "${mod}+Return" = "exec ${term}";

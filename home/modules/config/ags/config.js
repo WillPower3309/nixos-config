@@ -4,6 +4,7 @@ import { PowerMenu } from "./widgets/power-menu.js"
 import { TopBar } from "./widgets/top-bar.js"
 
 App.config({
+    style: App.configDir + "/style.css",
     windows: [
         applauncher,
         NotificationPopups(),

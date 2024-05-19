@@ -1,4 +1,5 @@
 const { query } = await Service.import("applications")
+
 const WINDOW_NAME = "app-launcher"
 
 /** @param {import('resource:///com/github/Aylur/ags/service/applications.js').Application} app */
@@ -91,6 +92,21 @@ const AppLauncher = ({ width = 500, height = 500, spacing = 12 }) => {
     })
 }
 
+const AppLauncherRevealer = () => {
+    return Widget.Revealer({
+        transition: "crossfade",
+        transitionDuration: 1000,
+        child: AppLauncher({
+            width: 500,
+            height: 500,
+            spacing: 12,
+        }),
+        setup: self => self.hook(App, (_, wname, visible) => {
+            self.reveal_child = visible;
+        }),
+    })
+}
+
 // there needs to be only one instance
 export const applauncher = Widget.Window({
     name: WINDOW_NAME,
@@ -99,9 +115,6 @@ export const applauncher = Widget.Window({
     }),
     visible: false,
     keymode: "exclusive",
-    child: AppLauncher({
-        width: 500,
-        height: 500,
-        spacing: 12,
-    }),
+    child: AppLauncherRevealer(),
 })
+

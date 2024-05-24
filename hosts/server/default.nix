@@ -57,6 +57,15 @@ in
     hostName = "server";
     hostId = "7347e9d6";
     wireless.enable = false;
+    nameservers = [ "194.242.2.4#base.dns.mullvad.net" ]; # TODO: across all hosts, use var
+  };
+
+  services.resolved = {
+    enable = true;
+    dnssec = "true";
+    domains = [ "~." ];
+    fallbackDns = [ "194.242.2.4#base.dns.mullvad.net" ]; # TODO: across all hosts, use var
+    dnsovertls = "true";
   };
 
   age.secrets.hashedRootPassword.file = ../../secrets/hashedRootPassword.age;

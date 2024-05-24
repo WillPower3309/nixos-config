@@ -27,7 +27,18 @@
   # Set your time zone.
   time.timeZone = "America/Toronto";
 
-  networking.hostName = "surface";
+  networking = {
+    hostName = "surface";
+    nameservers = [ "194.242.2.4#base.dns.mullvad.net" ]; # TODO: across all hosts, use var
+  };
+
+  services.resolved = {
+    enable = true;
+    dnssec = "true";
+    domains = [ "~." ];
+    fallbackDns = [ "194.242.2.4#base.dns.mullvad.net" ]; # TODO: across all hosts, use var
+    dnsovertls = "true";
+  };
 
   age.identityPaths = [ "/nix/persist/etc/ssh/ssh_host_ed25519_key" ];
 

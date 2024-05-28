@@ -1,6 +1,8 @@
-const notifications = await Service.import("notifications")
 const audio = await Service.import("audio")
 const battery = await Service.import("battery")
+const bluetooth = await Service.import("bluetooth")
+const network = await Service.import("network");
+const notifications = await Service.import("notifications")
 const systemtray = await Service.import("systemtray")
 
 const date = Variable("", {
@@ -14,35 +16,45 @@ function Clock() {
     })
 }
 
-function Volume() {
-    const icons = {
-        101: "overamplified",
-        67: "high",
-        34: "medium",
-        1: "low",
-        0: "muted",
+const VolumeIcon = () => Widget.Icon().hook(audio.speaker, self => {
+    const audioIcons = {
+        muted: "audio-volume-muted-symbolic",
+        low: "audio-volume-low-symbolic",
+        medium: "audio-volume-medium-symbolic",
+        high: "audio-volume-high-symbolic",
+        overamplified: "audio-volume-overamplified-symbolic",
     }
-    function getIcon() {
-        const icon = audio.speaker.is_muted ? 0 : [101, 67, 34, 1, 0].find(
-            threshold => threshold <= audio.speaker.volume * 100)
-        return `audio-volume-${icons[icon]}-symbolic`
-    }
+    const vol = audio.speaker.is_muted ? 0 : audio.speaker.volume
+    const { muted, low, medium, high, overamplified } = audioIcons
+    const cons = [[101, overamplified], [67, high], [34, medium], [1, low], [0, muted]]
+    self.icon = cons.find(([n]) => n <= vol * 100)?.[1] || ""
+})
 
-    return Widget.Icon({
-        icon: Utils.watch(getIcon(), audio.speaker, getIcon),
-    })
-}
+const BluetoothIcon = () => Widget.Overlay({
+    class_name: "bluetooth",
+    passThrough: true,
+    visible: bluetooth.bind("enabled"),
+    child: Widget.Icon({
+        icon: "bluetooth-active-symbolic",
+    }),
+    overlay: Widget.Label({
+        hpack: "end",
+        vpack: "start",
+        label: bluetooth.bind("connected_devices").as(c => `${c.length}`),
+        visible: bluetooth.bind("connected_devices").as(c => c.length > 0),
+    }),
+})
 
+const NetworkIcon = () => Widget.Icon().hook(audio.speaker, self => {
+    const icon = network[network.primary || "wifi"]?.icon_name
+    self.icon = icon || ""
+    self.visible = !!icon
+})
 
-function BatteryLabel() {
-    const icon = battery.bind("percent").as(p =>
-        `battery-level-${Math.floor(p / 10) * 10}-symbolic`)
-    return Widget.Box({
-        class_name: "battery",
-        visible: battery.bind("available"),
-        child: Widget.Icon({ icon }),
-    })
-}
+const BatteryIcon = () => Widget.Icon().hook(battery, self => {
+    self.icon = battery.charging || battery.charged
+            ? icons.battery.charging : battery.icon_name
+})
 
 function SysTray() {
     const items = systemtray.bind("items")
@@ -79,8 +91,10 @@ function Right() {
         spacing: 8,
         children: [
             SysTray(),
-            Volume(),
-            BatteryLabel(),
+            VolumeIcon(),
+            BluetoothIcon(),
+            NetworkIcon(),
+            BatteryIcon(),
         ],
     })
 }

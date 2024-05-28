@@ -1,19 +1,38 @@
 const WINDOW_NAME = "power-menu"
 
-const SysButton = (title, icon, command) => Widget.Button({
+const SysButton = (icon, command) => Widget.Button({
     on_clicked: () => {
         Utils.execAsync(command)
         App.closeWindow(WINDOW_NAME)
     },
-    child: Widget.Box({
-        vertical: true,
-        class_name: "system-button",
-        children: [
-            Widget.Icon(icon),
-            Widget.Label({ label: title }),
-        ],
+    child: Widget.Icon({
+        icon,
+        size: 42,
     }),
+    css: `padding: 12px`,
 })
+
+const PowerMenuContainer = () => Widget.Box({
+    children: [
+        SysButton("system-shutdown-symbolic", "systemctl poweroff"),
+        SysButton("system-reboot-symbolic", "systemctl reboot"),
+        SysButton("weather-clear-night-symbolic", "systemctl suspend"),
+    ],
+    vertical: true,
+    spacing: 24,
+    css: `padding: 24px 12px 24px 24px`,
+})
+
+const PowerMenuRevealer = () => {
+    return Widget.Revealer({
+        transition: "crossfade",
+        transitionDuration: 1000,
+        child: PowerMenuContainer(),
+        setup: self => self.hook(App, (_, wname, visible) => {
+            self.reveal_child = visible;
+        })
+    })
+}
 
 export function PowerMenu() {
     return Widget.Window({
@@ -23,12 +42,7 @@ export function PowerMenu() {
         }),
         visible: false,
         keymode: "exclusive",
-        child: Widget.Box({
-            children: [
-                SysButton("Shutdown", "system-shutdown-symbolic", "systemctl poweroff"),
-                SysButton("Reboot", "system-reboot-symbolic", "systemctl reboot"),
-                SysButton("Sleep", "weather-clear-night-symbolic", "systemctl suspend"),
-            ],
-        }),
+        anchor: ["right"],
+        child: PowerMenuRevealer(),
     })
 }

@@ -2,25 +2,16 @@ const notifications = await Service.import("notifications")
 
 /** @param {import('resource:///com/github/Aylur/ags/service/notifications.js').Notification} n */
 function NotificationIcon({ app_entry, app_icon, image }) {
-    if (image) {
-        return Widget.Box({
-            css: `background-image: url("${image}");`
-                + "background-size: contain;"
-                + "background-repeat: no-repeat;"
-                + "background-position: center;",
-        })
-    }
-
     let icon = "dialog-information-symbolic"
-    if (Utils.lookUpIcon(app_icon))
+
+    if (image)
+        icon = image
+    else if (app_entry && Utils.lookUpIcon(app_entry))
+        icon = app_entry
+    else if (Utils.lookUpIcon(app_icon))
         icon = app_icon
 
-    if (app_entry && Utils.lookUpIcon(app_entry))
-        icon = app_entry
-
-    return Widget.Box({
-        child: Widget.Icon(icon),
-    })
+    return Widget.Icon(icon)
 }
 
 /** @param {import('resource:///com/github/Aylur/ags/service/notifications.js').Notification} n */
@@ -118,13 +109,6 @@ export function NotificationPopups(monitor = 0) {
             class_name: "notifications",
             vertical: true,
             child: list,
-
-            /** this is a simple one liner that could be used instead of
-                hooking into the 'notified' and 'dismissed' signals.
-                but its not very optimized becuase it will recreate
-                the whole list everytime a notification is added or dismissed */
-            // children: notifications.bind('popups')
-            //     .as(popups => popups.map(Notification))
         }),
     })
 }

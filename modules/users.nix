@@ -25,6 +25,11 @@
     };
   };
 
+  # create persistent home directory owned by user
+  system.activationScripts.persistent-user-dir-creation.text = ''
+    install -d -o will -g users /nix/persist/home/will
+  '';
+
   home-manager = {
     useUserPackages = true;
     extraSpecialArgs = { inherit impermanence agenix ags stylix; };

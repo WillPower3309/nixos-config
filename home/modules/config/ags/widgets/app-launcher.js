@@ -2,7 +2,6 @@ const { query } = await Service.import("applications")
 
 const WINDOW_NAME = "app-launcher"
 
-/** @param {import('resource:///com/github/Aylur/ags/service/applications.js').Application} app */
 const AppItem = app => Widget.Button({
     on_clicked: () => {
         App.closeWindow(WINDOW_NAME)
@@ -10,15 +9,16 @@ const AppItem = app => Widget.Button({
     },
     attribute: { app },
     child: Widget.Box({
+        vertical: true,
+        spacing: 6,
         children: [
             Widget.Icon({
                 icon: app.icon_name || "",
-                size: 42,
+                size: 96,
             }),
             Widget.Label({
                 class_name: "title",
                 label: app.name,
-                xalign: 0,
                 vpack: "center",
                 truncate: "end",
             }),
@@ -26,15 +26,14 @@ const AppItem = app => Widget.Button({
     }),
 })
 
-const AppLauncher = ({ width = 500, height = 500, spacing = 12 }) => {
+const AppLauncher = () => {
     // list of application buttons
     let applications = query("").map(AppItem)
 
-    // container holding the buttons
-    const list = Widget.Box({
-        vertical: true,
-        children: applications,
-        spacing,
+    // container holding the application buttons
+    const list = Widget.FlowBox({})
+    applications.forEach(app => {
+        list.add(app)
     })
 
     // repopulate the box, so the most frequent apps are on top of the list
@@ -46,7 +45,7 @@ const AppLauncher = ({ width = 500, height = 500, spacing = 12 }) => {
     // search entry
     const entry = Widget.Entry({
         hexpand: true,
-        css: `margin-bottom: ${spacing}px;`,
+        css: "margin-bottom: 32px;",
 
         // to launch the first item on Enter
         on_accept: () => {
@@ -66,16 +65,14 @@ const AppLauncher = ({ width = 500, height = 500, spacing = 12 }) => {
 
     return Widget.Box({
         vertical: true,
-        css: `margin: ${spacing * 2}px;`,
+        css: "margin: 128px;",
         children: [
             entry,
-
             // wrap the list in a scrollable
             Widget.Scrollable({
                 hscroll: "never",
-                css: `min-width: ${width}px;`
-                    + `min-height: ${height}px;`,
                 child: list,
+                vexpand: true,
             }),
         ],
         setup: self => self.hook(App, (_, windowName, visible) => {
@@ -96,11 +93,7 @@ const AppLauncherRevealer = () => {
     return Widget.Revealer({
         transition: "crossfade",
         transitionDuration: 1000,
-        child: AppLauncher({
-            width: 500,
-            height: 500,
-            spacing: 12,
-        }),
+        child: AppLauncher(),
         setup: self => self.hook(App, (_, wname, visible) => {
             self.reveal_child = visible;
         }),
@@ -111,10 +104,12 @@ const AppLauncherRevealer = () => {
 export const applauncher = Widget.Window({
     name: WINDOW_NAME,
     setup: self => self.keybind("Escape", () => {
-        App.closeWindow(WINDOW_NAME)
+        App.closeWindow(WINDOW_NAME) // TODO: close animation
     }),
     visible: false,
     keymode: "exclusive",
+    anchor: ["top", "left", "right", "bottom"],
+    exclusivity: "ignore",
+    layer: "overlay",
     child: AppLauncherRevealer(),
 })
-

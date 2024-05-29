@@ -19,7 +19,7 @@ const Clock = () => Widget.Label({
 const QuickSettingsWindow = () => {
     const Settings = () => Widget.Box({
         vertical: true,
-        css: "min-width: 12px",
+        css: "min-width: 12px;",
         children: [],
     })
 
@@ -94,10 +94,12 @@ const SysTray = () => {
             on_primary_click: (_, event) => item.activate(event),
             on_secondary_click: (_, event) => item.openMenu(event),
             tooltip_markup: item.bind("tooltip_markup"),
+            css: "padding: 0; background-color: transparent;",
         })))
 
     return Widget.Box({
         children: items,
+        spacing: 8,
     })
 }
 

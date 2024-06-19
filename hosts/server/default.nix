@@ -10,6 +10,7 @@ in
     agenix.nixosModules.default
     impermanence.nixosModules.impermanence
     ./hardware-configuration.nix
+    ../../modules/arr.nix
     ../../modules/nebula.nix
     ../../modules/nginx.nix
     ../../modules/nix.nix

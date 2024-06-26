@@ -44,6 +44,9 @@ in
   "surfaceNebulaCert.age".publicKeys = [ systemSurface ] ++ editors;
   "surfaceNebulaKey.age".publicKeys = [ systemSurface ] ++ editors;
 
+  # wireguard keys
+  "serverWireguardPrivateKey.age".publicKeys = [ systemServer ] ++ editors;
+
   "radicaleHtpasswd.age".publicKeys = [ systemServer ] ++ editors;
 
   "acme.age".publicKeys = [ systemServer ] ++ editors;

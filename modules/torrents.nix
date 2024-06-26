@@ -3,6 +3,7 @@
 let
   baseDomain = "${config.networking.hostName}.willmckinnon.com";
   address = "transmission.${baseDomain}";
+  wgNamespace = "wg";
 
 in
 {
@@ -49,4 +50,31 @@ in
       '';
     };
   };
+
+  # add transmission to the wireguard network namespace defined below
+  systemd.services.transmission = {
+    requires = [ "wireguard-wg0.service" ];
+    serviceConfig.NetworkNamespacePath = "/var/run/netns/${wgNamespace}";
+  };
+
+  age.secrets.wireguardPrivateKey.file = ./.. + builtins.toPath "/secrets/${config.networking.hostName}WireguardPrivateKey.age";
+
+  networking.wireguard.interfaces = {
+    wg0 = {
+      ips = [ "10.0.0.1/32" ];
+      privateKeyFile = config.age.secrets.wireguardPrivateKey.path;
+      interfaceNamespace = wgNamespace;
+      peers = [{
+        endpoint = "se-got-wg-001.relays.mullvad.net:51820";
+        publicKey = "5JMPeO7gXIbR5CnUa/NPNK4L5GqUnreF0/Bozai4pl4=";
+        persistentKeepalive = 15;
+        # Forward all traffic via VPN.
+        allowedIPs = [ "0.0.0.0/0" "::/0" ];
+      }];
+
+      preSetup = [ "${pkgs.iproute2}/bin/ip netns add ${wgNamespace}" ];
+      postShutdown = [ "${pkgs.iproute2}/bin/ip netns del ${wgNamespace}" ];
+    };
+  };
 }
+

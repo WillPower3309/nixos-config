@@ -10,7 +10,6 @@ in
   services = {
     transmission = {
       enable = true;
-      openRPCPort = true;
       settings = {
         download-dir = "/persist/transmission/download"; # TODO
         incomplete-dir = "/persist/transmission/incomplete"; # TODO
@@ -51,7 +50,7 @@ in
     };
   };
 
-  # add transmission to the wireguard network namespace defined below
+  # add transmission to the wireguard network namespace
   systemd.services.transmission = {
     requires = [ "wireguard-wg0.service" ];
     serviceConfig.NetworkNamespacePath = "/var/run/netns/${wgNamespace}";
@@ -72,7 +71,12 @@ in
         allowedIPs = [ "0.0.0.0/0" "::/0" ];
       }];
 
-      preSetup = [ "${pkgs.iproute2}/bin/ip netns add ${wgNamespace}" ];
+      # TODO:
+      #${pkgs.socat}/bin/socat tcp-listen:${toString config.services.transmission.settings.rpc-port},fork,reuseaddr exec:'${pkgs.iproute2}/bin/ip netns exec ${wgNamespace} ${pkgs.socat}/bin/socat STDIO "tcp-connect:${config.services.transmission.settings.rpc-bind-address}:${toString config.services.transmission.settings.rpc-port}"',nofork
+      preSetup = ''
+        ${pkgs.iproute2}/bin/ip netns add ${wgNamespace} || true
+        ${pkgs.iproute2}/bin/ip netns exec ${wgNamespace} ${pkgs.nettools}/bin/ifconfig lo up
+      '';
       postShutdown = [ "${pkgs.iproute2}/bin/ip netns del ${wgNamespace}" ];
     };
   };

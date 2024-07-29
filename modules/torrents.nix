@@ -17,6 +17,13 @@ in {
         rpc-url = "/transmission/";
         rpc-host-whitelist-enabled = true;
         rpc-host-whitelist = address;
+
+        # auto extract rar
+        script-torrent-done-enabled = true;
+        script-torrent-done-filename = pkgs.writeText "extract.sh" ''
+          #!/bin/bash
+          find /$TR_TORRENT_DIR/$TR_TORRENT_NAME -name "*.rar" -execdir ${pkgs.unrar}/bin/unrar e -o- "{}" \;
+        '';
       };
     };
 
@@ -93,7 +100,7 @@ in {
       persistentKeepalive = 15;
     }];
     preSetup = [ "${pkgs.iproute2}/bin/ip netns add ${wgNamespace} || true" ];
-#    postSetup = [ "${pkgs.iproute2}/bin/ip -n ${wgNamespace} link set lo up" ];
+    postSetup = [ "${pkgs.iproute2}/bin/ip -n ${wgNamespace} link set lo up" ];
     postShutdown = [ "${pkgs.iproute2}/bin/ip netns del ${wgNamespace}" ];
   };
 }

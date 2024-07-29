@@ -4,9 +4,9 @@ let
   baseDomain = "${config.networking.hostName}.willmckinnon.com";
   address = "transmission.${baseDomain}";
   wgNamespace = "wg";
+  wgInterface = "wg0";
 
-in
-{
+in {
   services = {
     transmission = {
       enable = true;
@@ -51,34 +51,50 @@ in
   };
 
   # add transmission to the wireguard network namespace
-  systemd.services.transmission = {
-    requires = [ "wireguard-wg0.service" ];
-    serviceConfig.NetworkNamespacePath = "/var/run/netns/${wgNamespace}";
+  systemd.services = {
+    transmission = {
+      after = [ "wireguard-${wgInterface}.service" ];
+      serviceConfig.NetworkNamespacePath = "/var/run/netns/${wgNamespace}";
+    };
+
+    # TODO: systemd socket based approach https://www.man7.org/linux/man-pages/man8/systemd-socket-proxyd.8.html
+    transmission-namespace-forward = {
+      after = [ "wireguard-${wgInterface}.service" "transmission.service" ];
+      wantedBy = [ "transmission.service" ];
+      serviceConfig = {
+        Restart = "on-failure";
+        ExecStart = let
+          socatBin = "${pkgs.socat}/bin/socat";
+          transmissionAddress = config.services.transmission.settings.rpc-bind-address;
+          transmissionPort = toString config.services.transmission.settings.rpc-port;
+        in ''
+          ${socatBin} tcp-listen:${transmissionPort},fork,reuseaddr \
+            exec:'${pkgs.iproute2}/bin/ip netns exec ${wgNamespace} ${socatBin} STDIO "tcp-connect:${transmissionAddress}:${transmissionPort}"',nofork
+        '';
+      };
+    };
   };
 
-  age.secrets.wireguardPrivateKey.file = ./.. + builtins.toPath "/secrets/${config.networking.hostName}WireguardPrivateKey.age";
+  age.secrets = {
+    wireguardPrivateKey.file = ./.. + builtins.toPath "/secrets/${config.networking.hostName}WireguardPrivateKey.age";
+    wireguardPeerPresharedKey.file = ./.. + builtins.toPath "/secrets/${config.networking.hostName}WireguardPeerPresharedKey.age";
+  };
 
-  networking.wireguard.interfaces = {
-    wg0 = {
-      ips = [ "10.0.0.1/32" ];
-      privateKeyFile = config.age.secrets.wireguardPrivateKey.path;
-      interfaceNamespace = wgNamespace;
-      peers = [{
-        endpoint = "se-got-wg-001.relays.mullvad.net:51820";
-        publicKey = "5JMPeO7gXIbR5CnUa/NPNK4L5GqUnreF0/Bozai4pl4=";
-        persistentKeepalive = 15;
-        # Forward all traffic via VPN.
-        allowedIPs = [ "0.0.0.0/0" "::/0" ];
-      }];
-
-      # TODO:
-      #${pkgs.socat}/bin/socat tcp-listen:${toString config.services.transmission.settings.rpc-port},fork,reuseaddr exec:'${pkgs.iproute2}/bin/ip netns exec ${wgNamespace} ${pkgs.socat}/bin/socat STDIO "tcp-connect:${config.services.transmission.settings.rpc-bind-address}:${toString config.services.transmission.settings.rpc-port}"',nofork
-      preSetup = ''
-        ${pkgs.iproute2}/bin/ip netns add ${wgNamespace} || true
-        ${pkgs.iproute2}/bin/ip netns exec ${wgNamespace} ${pkgs.nettools}/bin/ifconfig lo up
-      '';
-      postShutdown = [ "${pkgs.iproute2}/bin/ip netns del ${wgNamespace}" ];
-    };
+  networking.wireguard.interfaces.${wgInterface} = {
+    ips = [ "10.149.207.226/32" ];
+    privateKeyFile = config.age.secrets.wireguardPrivateKey.path;
+    interfaceNamespace = wgNamespace;
+    mtu = 1320;
+    peers = [{
+      endpoint = "america3.vpn.airdns.org:1637";
+      publicKey = "PyLCXAQT8KkM4T+dUsOQfn+Ub3pGxfGlxkIApuig+hk=";
+      presharedKeyFile = config.age.secrets.wireguardPeerPresharedKey.path;
+      allowedIPs = [ "0.0.0.0/0" "::/0" ];
+      persistentKeepalive = 15;
+    }];
+    preSetup = [ "${pkgs.iproute2}/bin/ip netns add ${wgNamespace} || true" ];
+#    postSetup = [ "${pkgs.iproute2}/bin/ip -n ${wgNamespace} link set lo up" ];
+    postShutdown = [ "${pkgs.iproute2}/bin/ip netns del ${wgNamespace}" ];
   };
 }
 

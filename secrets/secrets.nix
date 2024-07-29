@@ -46,6 +46,7 @@ in
 
   # wireguard keys
   "serverWireguardPrivateKey.age".publicKeys = [ systemServer ] ++ editors;
+  "serverWireguardPeerPresharedKey.age".publicKeys = [ systemServer ] ++ editors;
 
   "radicaleHtpasswd.age".publicKeys = [ systemServer ] ++ editors;
 

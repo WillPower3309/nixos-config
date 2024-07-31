@@ -17,6 +17,7 @@ in
     ../../modules/radicale.nix
     ../../modules/plex.nix
     ../../modules/syncthing.nix
+    ../../modules/tandoor-recipes.nix
     ../../modules/torrents.nix
   ];
 
@@ -61,13 +62,13 @@ in
     nameservers = [ "194.242.2.4#base.dns.mullvad.net" ]; # TODO: across all hosts, use var
   };
 
-  services.resolved = {
-    enable = true;
-    dnssec = "true";
-    domains = [ "~." ];
-    fallbackDns = [ "194.242.2.4#base.dns.mullvad.net" ]; # TODO: across all hosts, use var
-    dnsovertls = "true";
-  };
+#  services.resolved = {
+#    enable = true;
+#    dnssec = "true";
+#    domains = [ "~." ];
+#    fallbackDns = [ "194.242.2.4#base.dns.mullvad.net" ]; # TODO: across all hosts, use var
+#    dnsovertls = "true";
+#  };
 
   age.secrets.hashedRootPassword.file = ../../secrets/hashedRootPassword.age;
 

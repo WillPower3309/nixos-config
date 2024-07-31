@@ -49,6 +49,8 @@ in
   "serverWireguardPeerPresharedKey.age".publicKeys = [ systemServer ] ++ editors;
 
   "radicaleHtpasswd.age".publicKeys = [ systemServer ] ++ editors;
+  "tandoorSecretKey.age".publicKeys = [ systemServer ] ++ editors;
 
   "acme.age".publicKeys = [ systemServer ] ++ editors;
 }
+

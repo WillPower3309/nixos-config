@@ -9,6 +9,7 @@ in
   imports = [ stylix.homeManagerModules.stylix ];
 
   stylix = {
+    enable = true;
     image = ../assets/wallpaper.png;
     base16Scheme = "${pkgs.base16-schemes}/share/themes/nord.yaml";
     polarity = "dark";
@@ -38,3 +39,4 @@ in
     package = pkgs.tela-icon-theme;
   };
 }
+

@@ -4,7 +4,7 @@
   home = {
     packages = with pkgs; [
       gnome.gnome-contacts
-      gnome.gnome-calendar
+      gnome-calendar
     ];
     
     persistence."/nix/persist/home/will".directories = [

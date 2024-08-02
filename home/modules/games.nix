@@ -6,7 +6,6 @@
     packages = with pkgs; [
       lutris
       gamemode
-      minecraft
     ];
 
     persistence."/nix/persist/home/will".directories = [

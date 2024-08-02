@@ -35,6 +35,9 @@
   };
   hardware.enableAllFirmware = true;
 
+  # enable opencl
+  hardware.graphics.extraPackages = [ pkgs.rocmPackages.clr.icd ];
+
   # Set your time zone.
   time.timeZone = "America/Toronto";
 

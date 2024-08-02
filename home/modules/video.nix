@@ -12,6 +12,6 @@
     ffmpeg
     ani-cli
     # TODO: replace youtube-dl with mpv.youtubeSupport = true (unless defaults to true)
-    youtube-dl
+    yt-dlp
   ];
 }

@@ -3,7 +3,7 @@
 {
   environment.systemPackages = with pkgs; [
     ripgrep
-    gnome3.nautilus
+    nautilus
     unzip
     udiskie
   ];

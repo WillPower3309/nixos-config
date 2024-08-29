@@ -11,6 +11,7 @@ in
     impermanence.nixosModules.impermanence
     ./hardware-configuration.nix
     ../../modules/arr.nix
+    ../../modules/calibre.nix
     ../../modules/nebula.nix
     ../../modules/nginx.nix
     ../../modules/nix.nix

@@ -50,6 +50,7 @@ in
 
   "radicaleHtpasswd.age".publicKeys = [ systemServer ] ++ editors;
   "tandoorSecretKey.age".publicKeys = [ systemServer ] ++ editors;
+  "calibrePassword.age".publicKeys = [ systemServer ] ++ editors;
 
   "acme.age".publicKeys = [ systemServer ] ++ editors;
 }

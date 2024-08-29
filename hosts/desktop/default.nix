@@ -31,13 +31,14 @@
     nameservers = [ "194.242.2.4#base.dns.mullvad.net" ]; # TODO: across all hosts, use var
   };
 
-  services.resolved = {
-    enable = true;
-    dnssec = "true";
-    domains = [ "~." ];
-    fallbackDns = [ "194.242.2.4#base.dns.mullvad.net" ]; # TODO: across all hosts, use var
-    dnsovertls = "true";
-  };
+# TODO: reenable once I figure out how to make <service>.server.willmckinnon.com links work with this
+#  services.resolved = {
+#    enable = true;
+#    dnssec = "true";
+#    domains = [ "~." ];
+#    fallbackDns = [ "194.242.2.4#base.dns.mullvad.net" ]; # TODO: across all hosts, use var
+#    dnsovertls = "true";
+#  };
 
   age.identityPaths = [ "/nix/persist/etc/ssh/ssh_host_ed25519_key" ];
 
@@ -47,6 +48,9 @@
   };
 
   hardware.opengl.enable = true;
+  # enable opencl
+  hardware.graphics.extraPackages = [ pkgs.rocmPackages.clr.icd ];
+
   xdg.portal = {
     enable = true;
     wlr.enable = true; # provides screen share

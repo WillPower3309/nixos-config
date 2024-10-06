@@ -11,6 +11,7 @@
     ./modules/emacs.nix
     ./modules/evolution-clients.nix
     ./modules/foot.nix
+    ./modules/gamedev.nix
     ./modules/games.nix
     ./modules/git.nix
     ./modules/music.nix

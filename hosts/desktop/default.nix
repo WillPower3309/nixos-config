@@ -64,6 +64,14 @@
     agenix.packages.x86_64-linux.default
   ];
 
+  environment.variables = {
+    _JAVA_AWT_WM_NONREPARENTING = "1";
+    QT_QPA_PLATFORM = "wayland";
+    XDG_CURRENT_DESKTOP = "sway";
+    NIXOS_OZONE_WL = "1";
+    GDK_BACKEND = "wayland";
+  };
+
   environment = {
     persistence."/nix/persist" = {
       hideMounts = true;

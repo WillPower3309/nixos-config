@@ -11,11 +11,11 @@ in
     slurp
     grim
     wlsunset
-
     # TODO: use the below!
     # swayidle
     # kanshi
   ];
+      # Disable mouse acceleration on desktop for all inputs
 
   wayland.windowManager.sway = {
     enable = true;
@@ -24,12 +24,6 @@ in
     checkConfig = false;
 
     wrapperFeatures.gtk = true;
-
-    extraSessionCommands = ''
-      export _JAVA_AWT_WM_NONREPARENTING=1
-      export QT_QPA_PLATFORM=wayland
-      export XDG_CURRENT_DESKTOP=sway
-    '';
 
     config = {
       # super key
@@ -42,7 +36,6 @@ in
         inner = 15;
       };
 
-      # Disable mouse acceleration on desktop for all inputs
       # TODO: enable mouse acceleration for trackball
       # TODO if laptop: "input type:touchpad tap enabled"
       input = {

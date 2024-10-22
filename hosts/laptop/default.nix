@@ -43,7 +43,7 @@
 
   networking = {
     hostName = "laptop";
-    nameservers = [ "194.242.2.4#base.dns.mullvad.net" ]; # TODO: across all hosts, use var
+#    nameservers = [ "194.242.2.4#base.dns.mullvad.net" ]; # TODO: across all hosts, use var
   };
 
 # TODO: reenable once I figure out how to make <service>.server.willmckinnon.com links work with this
@@ -75,6 +75,14 @@
     deploy-rs
     agenix.packages.x86_64-linux.default
   ];
+
+  environment.variables = {
+    _JAVA_AWT_WM_NONREPARENTING = "1";
+    QT_QPA_PLATFORM = "wayland";
+    XDG_CURRENT_DESKTOP = "sway";
+    NIXOS_OZONE_WL = "1";
+    GDK_BACKEND = "wayland";
+  };
 
   environment = {
     persistence."/nix/persist" = {

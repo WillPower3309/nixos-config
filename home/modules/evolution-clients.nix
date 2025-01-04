@@ -3,7 +3,7 @@
 {
   home = {
     packages = with pkgs; [
-      gnome.gnome-contacts
+      gnome-contacts
       gnome-calendar
     ];
     

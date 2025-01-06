@@ -5,6 +5,10 @@ let
   address = "transmission.${baseDomain}";
   wgNamespace = "wg";
   wgInterface = "wg0";
+  wgDns = "10.128.0.1";
+  wgIp = "10.180.78.240/32";
+  wgEndpoint = "america3.vpn.airdns.org:1637";
+  wgPublicKey = "PyLCXAQT8KkM4T+dUsOQfn+Ub3pGxfGlxkIApuig+hk=";
 
 in {
   services = {
@@ -17,6 +21,9 @@ in {
         rpc-url = "/transmission/";
         rpc-host-whitelist-enabled = true;
         rpc-host-whitelist = address;
+
+        peer-port = 39894;
+        openPeerPorts = true;
 
         # auto extract rar
         script-torrent-done-enabled = true;
@@ -88,13 +95,13 @@ in {
   };
 
   networking.wireguard.interfaces.${wgInterface} = {
-    ips = [ "10.149.207.226/32" ];
+    ips = [ wgIp ];
     privateKeyFile = config.age.secrets.wireguardPrivateKey.path;
     interfaceNamespace = wgNamespace;
     mtu = 1320;
     peers = [{
-      endpoint = "america3.vpn.airdns.org:1637";
-      publicKey = "PyLCXAQT8KkM4T+dUsOQfn+Ub3pGxfGlxkIApuig+hk=";
+      endpoint = wgEndpoint;
+      publicKey = wgPublicKey;
       presharedKeyFile = config.age.secrets.wireguardPeerPresharedKey.path;
       allowedIPs = [ "0.0.0.0/0" "::/0" ];
       persistentKeepalive = 15;
@@ -103,5 +110,10 @@ in {
     postSetup = [ "${pkgs.iproute2}/bin/ip -n ${wgNamespace} link set lo up" ];
     postShutdown = [ "${pkgs.iproute2}/bin/ip netns del ${wgNamespace}" ];
   };
+
+  environment.etc."netns/${wgNamespace}/resolv.conf".text = ''
+    nameserver ${wgDns}
+    options edns0 trust-ad ndots:0
+  '';
 }
 

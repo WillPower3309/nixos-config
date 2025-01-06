@@ -1,72 +1,50 @@
-{ config, lib, pkgs, ... }:
+{ config, ... }:
 
 let
-  immichDir = "/data/immich";
-  directories = {
-    config = "${immichDir}/config";
-    photos = "${immichDir}/photos";
-    postgres = "${immichDir}/postgres";
-  };
-  dirCreationCommandList = lib.attrsets.mapAttrsToList(_: dir: "install -d ${dir}") directories;
-
-  dbUser = "postgres";
-  dbPassword = "postgres";
-  dbName = "immich";
+  loopbackIp = "127.0.0.1";
+  baseDomain = "${config.networking.hostName}.willmckinnon.com";
 
 in {
-  # TODO owner / perms?
-  system.activationScripts.immich-dirs-creation.text = lib.strings.concatMapStrings (cmd: "${cmd}\n") dirCreationCommandList;
+  imports = [ ./postgresql.nix ];
 
-  networking.firewall.allowedTCPPorts = [ 8080 ];
-
-  environment.persistence."/persist".directories = ["/var/lib/containers"];
-  virtualisation.podman = {
-    enable = true;
-    dockerCompat = true;
-  };
-  
-  # Immich
-  virtualisation.oci-containers.containers = {
+  services = {
     immich = {
-      autoStart = true;
-      image = "ghcr.io/imagegenius/immich:latest";
-      volumes = [
-        "${directories.config}:/config"
-        "${directories.photos}:/photos"
-      ];
-      ports = [ "8080:8080" ];
-      environment = {
-        PUID = "1000";
-        PGID = "1000";
-        TZ = "America/Toronto";
-        DB_HOSTNAME = "postgres14";
-        DB_USERNAME = dbUser;
-        DB_PASSWORD = dbPassword;
-        DB_DATABASE_NAME = dbName;
-        REDIS_HOSTNAME = "redis";
-      };
-      extraOptions = [ "--network=host" ];
+      enable = true;
+      mediaLocation = "/data/immich";
+      host = "0.0.0.0";
+      machine-learning.enable = false;
     };
 
-    redis = {
-      autoStart = true;
-      image = "redis";
-      ports = [ "6379:6379" ];
-      extraOptions = [ "--network=host" ];
-    };
+    nginx.virtualHosts."immich.${baseDomain}" = {
+      useACMEHost = baseDomain;
+      forceSSL = true;
+      kTLS = true;
+      locations."/".proxyPass = "http://${loopbackIp}:${toString config.services.immich.port}";
 
-    postgres14 = {
-      autoStart = true;
-      image = "tensorchord/pgvecto-rs:pg14-v0.2.0";
-      ports = [ "5432:5432" ];
-      volumes = [ "${directories.postgres}:/var/lib/postgresql/data" ];
-      environment = {
-        POSTGRES_USER = dbUser;
-        POSTGRES_PASSWORD = dbPassword;
-        POSTGRES_DB = dbName;
-      };
-      extraOptions = [ "--network=host" ];
+      extraConfig = ''
+        # allow large file uploads
+        client_max_body_size 50000M;
+
+        # Set headers
+        proxy_set_header Host "${loopbackIp}";
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # enable websockets: http://nginx.org/en/docs/http/websocket.html
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+        proxy_redirect off;
+
+        # set timeout
+        proxy_read_timeout 600s;
+        proxy_send_timeout 600s;
+        send_timeout       600s;
+      '';
     };
   };
 
+  system.activationScripts.immich-dir-creation.text = "install -o ${config.services.immich.user} -g ${config.services.immich.group} -d ${config.services.immich.mediaLocation}";
 }
+

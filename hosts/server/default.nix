@@ -12,11 +12,13 @@ in
     ./hardware-configuration.nix
     ../../modules/arr.nix
     ../../modules/calibre.nix
+    ../../modules/immich.nix
     ../../modules/nebula.nix
     ../../modules/nginx.nix
     ../../modules/nix.nix
     ../../modules/radicale.nix
     ../../modules/plex.nix
+    ../../modules/synapse.nix
     ../../modules/syncthing.nix
     ../../modules/tandoor-recipes.nix
     ../../modules/torrents.nix
@@ -60,9 +62,10 @@ in
     hostName = "server";
     hostId = "7347e9d6";
     wireless.enable = false;
-    nameservers = [ "194.242.2.4#base.dns.mullvad.net" ]; # TODO: across all hosts, use var
+    #nameservers = [ "194.242.2.4#base.dns.mullvad.net" ];
   };
 
+# TODO: reenable once i figure out how to not break netns and local addresses (see modules / wifi.nix)
 #  services.resolved = {
 #    enable = true;
 #    dnssec = "true";

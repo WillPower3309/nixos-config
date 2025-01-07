@@ -4,6 +4,7 @@ let
   port = "5232";
   baseDomain = "${config.networking.hostName}.willmckinnon.com";
   address = "radicale.${baseDomain}";
+  dataDir = "/data/radicale";
 
 in
 {
@@ -23,7 +24,7 @@ in
           htpasswd_encryption = "plain";
         };
         server.hosts = [ "0.0.0.0:${port}" "[::]:${port}" ];
-        storage.filesystem_folder = "/data/radicale";
+        storage.filesystem_folder = dataDir;
       };
     };
 
@@ -34,4 +35,10 @@ in
       locations."/".proxyPass = "http://localhost:${port}";
     };
   };
+
+  # create persistent data directory for radicale
+  system.activationScripts.radicale-dir-creation.text = ''
+    install -d -o radicale -g radicale ${dataDir}
+  '';
 }
+

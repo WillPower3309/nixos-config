@@ -1,7 +1,8 @@
 { config, lib, pkgs, ... }:
 
 let
-  localAddress = "127.0.0.1:32400";
+  plexPort = 32400;
+  localAddress = "127.0.0.1:${toString plexPort}";
   baseDomain = "${config.networking.hostName}.willmckinnon.com";
   address = "plex.${baseDomain}";
 
@@ -41,10 +42,18 @@ in
         proxy_buffering off;
       '';
     };
+
+    autossh.sessions = [{
+      # TODO: don't use root user, user diff key?
+      # TODO: have ~/.ssh/known_hosts generated for the tunnel remote, and remove `-o StrictHostKeyChecking=no`
+      extraArguments = "-N -R ${toString plexPort}:localhost:${toString plexPort} -o StrictHostKeyChecking=no root@159.89.118.241 -i /persist/etc/ssh/ssh_host_ed25519_key";
+      name = "plex-tunnel";
+      user = "root"; # TODO: use a new user when this module is fixed: https://github.com/NixOS/nixpkgs/issues/373024
+    }];
   };
 
   networking.firewall = {
-    allowedTCPPorts = [ 3005 8324 32400 32469 ]; # TODO: remove 32400 once tv working through nebula
+    allowedTCPPorts = [ 3005 8324 32469 plexPort ];
     allowedUDPPorts = [ 1900 5353 32410 32412 32413 32414 ];
   };
 }

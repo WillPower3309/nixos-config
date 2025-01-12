@@ -13,6 +13,7 @@ in
     ../../modules/arr.nix
     ../../modules/calibre.nix
     ../../modules/immich.nix
+    ../../modules/monitoring.nix
     ../../modules/nebula.nix
     ../../modules/nginx.nix
     ../../modules/nix.nix

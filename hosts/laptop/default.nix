@@ -88,10 +88,7 @@
     persistence."/nix/persist" = {
       hideMounts = true;
       directories = [ "/var/log" ];
-      files = [
-        "/etc/machine-id" # used by systemd for journalctl
-        "/etc/ssh/ssh_host_ed25519_key"
-      ];
+      files = [ "/etc/ssh/ssh_host_ed25519_key" ];
     };
 
     etc."ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;

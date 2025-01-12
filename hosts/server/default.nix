@@ -118,10 +118,7 @@ in
     persistence."/persist" = {
       hideMounts = true;
       directories = [ "/var/log" ];
-      files = [
-        "/etc/machine-id" # used by systemd for journalctl
-        (toString hostKeyPath)
-      ];
+      files = [ (toString hostKeyPath) ];
     };
 
     etc."ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;

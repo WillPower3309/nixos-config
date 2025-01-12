@@ -32,31 +32,28 @@ in {
           admin_user = "admin";
           admin_password = "$__file{${config.age.secrets.grafanaAdminPassword.path}}";
         };
+      };
 
-# TODO
-#        provision = {
-#          enable = true;
-#          datasources.settings = {
-#            apiVersion = 1;
-#            datasources = [
-#              {
-#                name = "Prometheus";
-#                url = "http://localhost:${toString config.services.prometheus.port}";
-#                access = "direct";
-#                type = "prometheus";
-#                isDefault = true;
-#              }
-#              {
-#                name = "Loki";
-#                url = "http://localhost:${toString config.services.loki.configuration.server.http_listen_port}";
-#                access = "direct";
-#                type = "loki";
-#              }
-#            ];
-#          };
-          # TODO: dashboards
-          # TODO: alerting
-#        };
+      provision = {
+        enable = true;
+        datasources.settings = {
+          apiVersion = 1;
+          datasources = [
+            {
+              name = "Prometheus";
+              url = "http://localhost:${toString config.services.prometheus.port}";
+              type = "prometheus";
+              isDefault = true;
+            }
+            {
+              name = "Loki";
+              url = "http://localhost:${toString config.services.loki.configuration.server.http_listen_port}";
+              type = "loki";
+            }
+          ];
+        # TODO: dashboards
+        # TODO: alerting
+        };
       };
     };
 
@@ -180,12 +177,12 @@ in {
       };
     };
 
-    nginx.virtualHosts.${config.services.grafana.domain} = {
+    nginx.virtualHosts.${config.services.grafana.settings.server.domain} = {
       useACMEHost = baseDomain;
       forceSSL = true;
       kTLS = true;
       locations."/" = {
-        proxyPass = "http://${config.services.grafana.addr}:${toString config.services.grafana.port}";
+        proxyPass = "http://${config.services.grafana.settings.server.http_addr}:${toString config.services.grafana.settings.server.http_port}";
         proxyWebsockets = true;
       };
     };

@@ -19,7 +19,5 @@
     # winetricks and other programs depending on wine need to use the same wine version
     winetricks
     mono
-
-    python39Packages.psutil
   ];
 }

@@ -14,6 +14,9 @@ in {
   services = {
     transmission = {
       enable = true;
+      # TODO: try on just wg interface
+      openPeerPorts = true;
+
       settings = {
         download-dir = "/persist/transmission/download"; # TODO
         incomplete-dir = "/persist/transmission/incomplete"; # TODO
@@ -23,7 +26,6 @@ in {
         rpc-host-whitelist = address;
 
         peer-port = 39894;
-        openPeerPorts = true;
 
         # auto extract rar
         script-torrent-done-enabled = true;
@@ -80,10 +82,11 @@ in {
         ExecStart = let
           socatBin = "${pkgs.socat}/bin/socat";
           transmissionAddress = config.services.transmission.settings.rpc-bind-address;
-          transmissionPort = toString config.services.transmission.settings.rpc-port;
+          transmissionRPCPort = toString config.services.transmission.settings.rpc-port;
+
         in ''
-          ${socatBin} tcp-listen:${transmissionPort},fork,reuseaddr \
-            exec:'${pkgs.iproute2}/bin/ip netns exec ${wgNamespace} ${socatBin} STDIO "tcp-connect:${transmissionAddress}:${transmissionPort}"',nofork
+          ${socatBin} tcp-listen:${transmissionRPCPort},fork,reuseaddr \
+            exec:'${pkgs.iproute2}/bin/ip netns exec ${wgNamespace} ${socatBin} STDIO "tcp-connect:${transmissionAddress}:${transmissionRPCPort}"',nofork
         '';
       };
     };

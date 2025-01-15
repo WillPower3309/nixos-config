@@ -32,6 +32,12 @@ in {
           admin_user = "admin";
           admin_password = "$__file{${config.age.secrets.grafanaAdminPassword.path}}";
         };
+
+        anayltics = {
+          reporting_enabled = false;
+          feedback_links_enabled = false;
+
+        };
       };
 
       provision = {
@@ -82,6 +88,7 @@ in {
 
       configuration = {
         server.http_listen_port = 3100;
+
         auth_enabled = false;
 
         ingester = {
@@ -156,9 +163,9 @@ in {
           filename = "/tmp/positions.yaml";
         };
 
-        clients = {
+        clients = [{
           url = "http://${loopbackAddr}:${toString config.services.loki.configuration.server.http_listen_port}/loki/api/v1/push";
-        };
+        }];
 
         scrape_configs = [{
           job_name = "journal";
@@ -169,10 +176,10 @@ in {
               host = config.networking.hostName;
             };
           };
-          relabel_configs = {
+          relabel_configs = [{
             source_labels = ["__journal__systemd_unit"];
             target_label = "unit";
-          };
+          }];
         }];
       };
     };

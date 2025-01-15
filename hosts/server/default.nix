@@ -117,7 +117,10 @@ in
   environment = {
     persistence."/persist" = {
       hideMounts = true;
-      directories = [ "/var/log" ];
+      directories = [
+        "/var/log"
+        "/var/lib/nixos"
+      ];
       files = [ (toString hostKeyPath) ];
     };
 

@@ -75,7 +75,10 @@
   environment = {
     persistence."/nix/persist" = {
       hideMounts = true;
-      directories = [ "/var/log" ];
+      directories = [
+        "/var/log"
+        "/var/lib/nixos"
+      ];
       files = [ "/etc/ssh/ssh_host_ed25519_key" ];
     };
 

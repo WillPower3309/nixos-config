@@ -26,6 +26,10 @@ in {
       useACMEHost = baseDomain;
       forceSSL = true;
       kTLS = true;
+
+      extraConfig = ''
+        client_max_body_size 128M;
+      '';
     };
   };
 

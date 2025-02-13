@@ -47,9 +47,10 @@
     fuse.userAllowOther = true; # persistence (TODO: make one file)
   };
 
-  hardware.opengl.enable = true;
-  # enable opencl
-  hardware.graphics.extraPackages = [ pkgs.rocmPackages.clr.icd ];
+  hardware.graphics = {
+    enable = true;
+    extraPackages = [ pkgs.rocmPackages.clr.icd ]; # enable opencl
+  };
 
   xdg.portal = {
     enable = true;

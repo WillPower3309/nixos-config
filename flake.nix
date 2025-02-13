@@ -32,7 +32,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    ags.url = "github:Aylur/ags";
+    ags.url = "github:Aylur/ags/v1";
     stylix.url = "github:danth/stylix";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
   };
@@ -70,7 +70,6 @@
       laptop = mkNixos [ ./hosts/laptop ];
       lighthouse = mkNixos [ ./hosts/lighthouse ];
       server = mkNixos [ ./hosts/server ];
-      surface = mkNixos [ ./hosts/surface ];
     };
 
     homeConfigurations."will" = mkHome [ ./home ] nixpkgs.legacyPackages."x86_64-linux";
@@ -80,7 +79,7 @@
     # TODO: ex https://github.com/disassembler/network/blob/18e4d34b3d09826f1239772dc3c2e8c6376d5df6/nixos/deploy.nix
     deploy.nodes = {
       lighthouse = mkDeployTarget "143.110.232.34" self.nixosConfigurations.lighthouse;
-      server = mkDeployTarget "192.168.100.2" self.nixosConfigurations.server;
+      server = mkDeployTarget "10.27.27.3" self.nixosConfigurations.server;
     };
   };
 }

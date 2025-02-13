@@ -6,6 +6,7 @@
     ags.homeManagerModules.default
     impermanence.nixosModules.home-manager.impermanence
     ./modules/ags.nix
+    ./modules/cad.nix
     ./modules/discord.nix
     ./modules/document-viewer.nix
     ./modules/emacs.nix

@@ -27,9 +27,8 @@ in
   # lighthouse: 192.168.100.1
   # server: 192.168.100.2
   # desktop: 192.168.100.3
-  # phone: 192.168.100.4
-  # surface: 192.168.100.5
-  # laptop: 192.168.100.6
+  # laptop: 192.168.100.4
+  # phone: 192.168.100.5
   services.nebula.networks.home = {
     enable = true;
     isLighthouse = false;
@@ -48,6 +47,7 @@ in
         respond_delay = "5s";
       };
       preferred_ranges = [ "10.27.27.0/24" ]; # prefer local network
+      pki.disconnect_invalid = true; # close tunnels to hosts which are no longer trusted
     };
     firewall = {
       inbound = lib.lists.forEach firewall.allowedTCPPorts (port: {

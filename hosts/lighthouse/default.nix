@@ -25,7 +25,11 @@
       group = "nebula-home";
     };
   };
-  networking.firewall.allowedUDPPorts = [ 4242 ];
+
+  networking.firewall = {
+    allowedUDPPorts = [ 4242 ];
+    allowedTCPPorts = [ 32400 ];
+  };
 
   services = {
      # the ssh keys are set up on the digitalocean web ui
@@ -35,6 +39,7 @@
       settings = {
         PasswordAuthentication = false;
         KbdInteractiveAuthentication = false;
+        GatewayPorts = "yes";
       };
     };
 

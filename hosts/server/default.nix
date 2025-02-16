@@ -28,7 +28,6 @@ in
   boot = {
     loader.systemd-boot.enable = true;
     supportedFilesystems = [ "zfs" ];
-    kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
 
     initrd = {
       kernelModules = [ "igc" ];

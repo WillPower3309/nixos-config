@@ -18,16 +18,15 @@ in {
       declarativePlugins = [];
       settings = {
         server = {
-          domain = "grafana.${baseDomain}";
           http_port = 2342;
           http_addr = loopbackAddr;
+          domain = "grafana.${baseDomain}";
         };
 
         security = { # TODO: add more
           content_security_policy = true;
           cookie_secure = true;
           disable_gravatar = true;
-          disable_initial_admin_creation = true;
 
           admin_user = "admin";
           admin_password = "$__file{${config.age.secrets.grafanaAdminPassword.path}}";
@@ -36,7 +35,6 @@ in {
         anayltics = {
           reporting_enabled = false;
           feedback_links_enabled = false;
-
         };
       };
 
@@ -87,7 +85,10 @@ in {
       enable = true;
 
       configuration = {
-        server.http_listen_port = 3100;
+        server = {
+          http_listen_port = 3100;
+          grpc_listen_port = 9096;
+        };
 
         auth_enabled = false;
 
@@ -157,7 +158,10 @@ in {
       enable = true;
 
       configuration = {
-        server.http_listen_port = 28183;
+        server = {
+          http_listen_port = 28183;
+          grpc_listen_port = 0; # dynamically assinged by system
+        };
 
         positions = {
           filename = "/tmp/positions.yaml";

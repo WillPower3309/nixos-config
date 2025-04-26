@@ -70,6 +70,12 @@
       laptop = mkNixos [ ./hosts/laptop ];
       lighthouse = mkNixos [ ./hosts/lighthouse ];
       server = mkNixos [ ./hosts/server ];
+      # TODO: support arm in mkNixos
+      tv = nixpkgs.lib.nixosSystem {
+        modules = [ ./hosts/tv ];
+        system = "aarch64-linux";
+        specialArgs = { inherit nixpkgs nixos-hardware impermanence disko; };
+      };
     };
 
     homeConfigurations."will" = mkHome [ ./home ] nixpkgs.legacyPackages."x86_64-linux";
@@ -79,7 +85,15 @@
     # TODO: ex https://github.com/disassembler/network/blob/18e4d34b3d09826f1239772dc3c2e8c6376d5df6/nixos/deploy.nix
     deploy.nodes = {
       lighthouse = mkDeployTarget "143.110.232.34" self.nixosConfigurations.lighthouse;
-      server = mkDeployTarget "10.27.27.3" self.nixosConfigurations.server;
+      server = mkDeployTarget "192.168.100.2" self.nixosConfigurations.server;
+      tv = {
+        hostname = "10.27.27.6";
+        profiles.system = {
+          user = "root";
+          sshUser = "root";
+          path = deploy-rs.lib.aarch64-linux.activate.nixos self.nixosConfigurations.tv;
+        };
+      };
     };
   };
 }

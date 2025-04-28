@@ -1,5 +1,3 @@
-{ config, ... }:
-
 {
   boot = {
     loader = {
@@ -18,6 +16,5 @@
 
     kernelParams = [ "quiet" "udev.log_level=3" ];
     consoleLogLevel = 0;
-    binfmt.emulatedSystems = lib.mkIf (nixpkgs.hostPlatfrom == "x86_64-linux") [ "aarch64-linux" ];
   };
 }

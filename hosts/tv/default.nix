@@ -1,15 +1,6 @@
 { pkgs, lib, nixos-hardware, impermanence, ... }:
 
 # TODO: remove what is already done in the nixos-hardware module
-# TODO: fix
-#       error: Package ‘flirc-3.27.15’ in /nix/store/p08jvcw823dpbc6rf5d65axaf4akzj4f-source/pkgs/applications/video/flirc/default.nix:46 is not available on the requested hostPlatform:
-#         hostPlatform.config = "aarch64-unknown-linux-gnu"
-#         package.meta.platforms = [
-#           "x86_64-linux"
-#         ]
-#         package.meta.badPlatforms = [ ]
-#       , refusing to evaluate.
-
 let
   hostKeyPath = /etc/ssh/ssh_host_ed25519_key;
 
@@ -64,28 +55,20 @@ in
       KbdInteractiveAuthentication = false;
     };
     hostKeys = [{
-      path = "/persist/${(toString hostKeyPath)}";
+      path = "/nix/persist/${(toString hostKeyPath)}";
       type = "ed25519";
     }];
   };
 
   hardware = {
-    flirc.enable = true;
+    #flirc.enable = true;
+    graphics.enable = true;
     bluetooth.enable = false;
     raspberry-pi."4" = {
       i2c1.enable = true;
       fkms-3d.enable = true;
     };
   };
-
-  # Kodi
-  # TODO: widevine CDM and plugins: https://nixos.wiki/wiki/Kodi
-  #users.extraUsers.kodi.isNormalUser = true;
-  #services.cage = {
-  #  user = "kodi";
-  #  program = "${pkgs.kodi-wayland}/bin/kodi-standalone";
-  #  enable = true;
-  #};
 
   # an overlay to enable raspberrypi support in libcec, and thus cec-client
   nixpkgs.overlays = [
@@ -124,12 +107,23 @@ in
     };
   };
 
+  # Kodi
+  # TODO: widevine CDM and plugins: https://nixos.wiki/wiki/Kodi
+  nixpkgs.config.kodi.enableAdvancedLauncher = true;
+  users.extraUsers.kodi.isNormalUser = true;
+  services.cage = {
+    user = "kodi";
+    program = "${pkgs.kodi-wayland}/bin/kodi-standalone";
+    enable = true;
+  };
+
   environment = {
     persistence."/nix/persist" = {
       hideMounts = true;
       directories = [
         "/var/log"
         "/var/lib/nixos"
+        { directory = "/home/kodi/.kodi"; user = "kodi"; group = "users"; }
       ];
       files = [ (toString hostKeyPath) ];
     };

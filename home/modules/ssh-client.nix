@@ -18,6 +18,11 @@
         hostname = "143.110.232.34";
         user = "root";
       };
+
+      "tv" = {
+        hostname = "10.27.27.6";
+        user = "root";
+      };
     };
   };
 

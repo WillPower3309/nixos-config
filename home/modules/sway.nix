@@ -78,6 +78,8 @@ in
         { command = "wlsunset -l 43.7 -L -79.3"; }
       ];
 
+      defaultWorkspace = "workspace number 1";
+
       keybindings = let
         mod = "Mod4";
         term = "footclient";

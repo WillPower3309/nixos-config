@@ -29,6 +29,7 @@ in
   # desktop: 192.168.100.3
   # laptop: 192.168.100.4
   # phone: 192.168.100.5
+  # pikvm: 192.168.100.6
   services.nebula.networks.home = {
     enable = true;
     isLighthouse = false;

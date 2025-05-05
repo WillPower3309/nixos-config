@@ -40,9 +40,12 @@ in
 
   # TODO: use keys like server - turn into ssh-server module?
   users = {
-    users.root = {
-      password = "pi";
-      openssh.authorizedKeys.keys = [ (builtins.readFile ../../home/id_ed25519.pub) ];
+    users = {
+      root = {
+        password = "pi";
+        openssh.authorizedKeys.keys = [ (builtins.readFile ../../home/id_ed25519.pub) ];
+      };
+      kodi.extraGroups = [ "video" ]; # TODO: do I need any more groups? https://forums.raspberrypi.com/viewtopic.php?t=251645
     };
     mutableUsers = false;
   };
@@ -61,7 +64,6 @@ in
   };
 
   hardware = {
-    #flirc.enable = true;
     graphics.enable = true;
     bluetooth.enable = false;
     raspberry-pi."4" = {
@@ -74,16 +76,14 @@ in
   nixpkgs.overlays = [
     (self: super: { libcec = super.libcec.override { withLibraspberrypi = true; }; })
   ];
+
   environment.systemPackages = with pkgs; [ libcec ];
 
+  # allow access to raspi cec device for video group
   services.udev.extraRules = ''
-    # allow access to raspi cec device for video group (and optionally register it as a systemd device, used below)
     KERNEL=="vchiq", GROUP="video", MODE="0660", TAG+="systemd", ENV{SYSTEMD_ALIAS}="/dev/vchiq"
   '';
 
-  # optional: attach a persisted cec-client to `/run/cec.fifo`, to avoid the CEC ~1s startup delay per command
-  # scan for devices: `echo 'scan' > /run/cec.fifo ; journalctl -u cec-client.service`
-  # set pi as active source: `echo 'as' > /run/cec.fifo`
   systemd.sockets."cec-client" = {
     after = [ "dev-vchiq.device" ];
     bindsTo = [ "dev-vchiq.device" ];
@@ -115,6 +115,7 @@ in
     user = "kodi";
     program = "${pkgs.kodi-wayland}/bin/kodi-standalone";
     enable = true;
+    environment = { WLR_LIBINPUT_NO_DEVICES = "1"; }; # use tv remote instead of input device
   };
 
   environment = {
@@ -123,7 +124,7 @@ in
       directories = [
         "/var/log"
         "/var/lib/nixos"
-        { directory = "/home/kodi/.kodi"; user = "kodi"; group = "users"; }
+        { directory = "/home/kodi"; user = "kodi"; group = "users"; }
       ];
       files = [ (toString hostKeyPath) ];
     };

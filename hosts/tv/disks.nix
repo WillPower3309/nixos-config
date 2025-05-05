@@ -1,5 +1,6 @@
 { disko, nixpkgs, pkgs, ... }:
 
+# TODO: resize /nix to fill space in excess of the 6G image size as hook
 # https://github.com/nix-community/disko/blob/master/docs/disko-images.md
 
 let
@@ -29,14 +30,13 @@ let
     avoid_warnings=1
 
     dtparam=audio=on
-    gpu_mem=128
+    gpu_mem=320
   '';
 
 in {
   imports = [ disko.nixosModules.disko ];
 
   disko = {
-    #memSize = 6144;
     imageBuilder = {
       enableBinfmt = true;
       pkgs = nixpkgs.legacyPackages.x86_64-linux;

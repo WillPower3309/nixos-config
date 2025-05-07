@@ -74,7 +74,7 @@
       tv = nixpkgs.lib.nixosSystem {
         modules = [ ./hosts/tv ];
         system = "aarch64-linux";
-        specialArgs = { inherit nixpkgs nixos-hardware impermanence disko; };
+        specialArgs = { inherit nixpkgs nixos-hardware impermanence home-manager disko; };
       };
     };
 

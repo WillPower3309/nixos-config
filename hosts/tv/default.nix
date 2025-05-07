@@ -1,4 +1,4 @@
-{ pkgs, lib, nixos-hardware, impermanence, ... }:
+{ pkgs, lib, nixos-hardware, impermanence, home-manager, ... }:
 
 # TODO: remove what is already done in the nixos-hardware module
 let
@@ -9,12 +9,13 @@ in
   imports = [
     nixos-hardware.nixosModules.raspberry-pi-4
     impermanence.nixosModules.impermanence
+    home-manager.nixosModules.home-manager
     ./disks.nix
     ../../modules/nix.nix
     ../../modules/sound.nix
   ];
 
-  #powerManagement.cpuFreqGovernor = "powersave";
+  powerManagement.cpuFreqGovernor = "powersave";
 
   # Avoiding some heavy IO
   nix.settings.auto-optimise-store = false;
@@ -38,14 +39,16 @@ in
     wireless.enable = false;
   };
 
-  # TODO: use keys like server - turn into ssh-server module?
   users = {
     users = {
       root = {
         password = "pi";
         openssh.authorizedKeys.keys = [ (builtins.readFile ../../home/id_ed25519.pub) ];
       };
-      kodi.extraGroups = [ "video" ]; # TODO: do I need any more groups? https://forums.raspberrypi.com/viewtopic.php?t=251645
+      kodi = {
+        isNormalUser = true;
+        extraGroups = [ "video" "audio" ]; # TODO: do I need any more groups? https://forums.raspberrypi.com/viewtopic.php?t=251645
+      };
     };
     mutableUsers = false;
   };
@@ -75,6 +78,7 @@ in
   # an overlay to enable raspberrypi support in libcec, and thus cec-client
   nixpkgs.overlays = [
     (self: super: { libcec = super.libcec.override { withLibraspberrypi = true; }; })
+    (self: super: { kodi-wayland = super.kodi-wayland.override { withLibraspberrypi = true; }; })
   ];
 
   environment.systemPackages = with pkgs; [ libcec ];
@@ -84,38 +88,81 @@ in
     KERNEL=="vchiq", GROUP="video", MODE="0660", TAG+="systemd", ENV{SYSTEMD_ALIAS}="/dev/vchiq"
   '';
 
-  systemd.sockets."cec-client" = {
-    after = [ "dev-vchiq.device" ];
-    bindsTo = [ "dev-vchiq.device" ];
-    wantedBy = [ "sockets.target" ];
-    socketConfig = {
-      ListenFIFO = "/run/cec.fifo";
-      SocketGroup = "video";
-      SocketMode = "0660";
+  nixpkgs.config.kodi.enableAdvancedLauncher = true;
+  systemd = {
+    sockets.cec-client = {
+      after = [ "dev-vchiq.device" ];
+      bindsTo = [ "dev-vchiq.device" ];
+      wantedBy = [ "sockets.target" ];
+      socketConfig = {
+        ListenFIFO = "/run/cec.fifo";
+        SocketGroup = "video";
+        SocketMode = "0660";
+      };
     };
-  };
-  systemd.services."cec-client" = {
-    after = [ "dev-vchiq.device" ];
-    bindsTo = [ "dev-vchiq.device" ];
-    wantedBy = [ "multi-user.target" ];
-    serviceConfig = {
-      ExecStart = ''${pkgs.libcec}/bin/cec-client -d 1'';
-      ExecStop = ''/bin/sh -c "echo q > /run/cec.fifo"'';
-      StandardInput = "socket";
-      StandardOutput = "journal";
-      Restart="no";
+
+    # TODO: custom plugins https://discourse.nixos.org/t/how-to-add-custom-kodi-plugins-yet-another-how-to-use-a-custom-derivation-in-my-flake-post/46238
+      # remove nixpkgs.config.kodi.enableAdvancedLauncher = true
+    # TODO: hardening
+    services = {
+      kodi = let kodi-package = pkgs.kodi-gbm.withPackages(kodiPkgs: with kodiPkgs; [
+        inputstream-adaptive
+        youtube
+      ]);
+      in {
+        description = "Kodi media center";
+        wantedBy = ["multi-user.target"];
+        after = [
+          "network-online.target"
+          "sound.target"
+          "systemd-user-sessions.service"
+        ];
+        wants = [ "network-online.target" ];
+        serviceConfig = {
+          Type = "simple";
+          User = "kodi";
+          ExecStart = "${kodi-package}/bin/kodi-standalone";
+          Restart = "always";
+          TimeoutStopSec = "15s";
+          TimeoutStopFailureMode = "kill";
+        };
+      };
+
+      cec-client = {
+        after = [ "dev-vchiq.device" ];
+        bindsTo = [ "dev-vchiq.device" ];
+        wantedBy = [ "multi-user.target" ];
+        serviceConfig = {
+          ExecStart = ''${pkgs.libcec}/bin/cec-client -d 1'';
+          ExecStop = ''/bin/sh -c "echo q > /run/cec.fifo"'';
+          StandardInput = "socket";
+          StandardOutput = "journal";
+          Restart="no";
+        };
+      };
     };
   };
 
-  # Kodi
-  # TODO: widevine CDM and plugins: https://nixos.wiki/wiki/Kodi
-  nixpkgs.config.kodi.enableAdvancedLauncher = true;
   users.extraUsers.kodi.isNormalUser = true;
-  services.cage = {
-    user = "kodi";
-    program = "${pkgs.kodi-wayland}/bin/kodi-standalone";
-    enable = true;
-    environment = { WLR_LIBINPUT_NO_DEVICES = "1"; }; # use tv remote instead of input device
+
+  home-manager.users.kodi = {
+    nixpkgs.config.allowUnfree = true;
+    home = {
+      username = "kodi";
+      homeDirectory = "/home/kodi";
+      stateVersion = "22.05";
+
+      file = {
+        widevine-lib = {
+          source = "${pkgs.widevine-cdm}/share/google/chrome/WidevineCdm/_platform_specific/linux_x64/libwidevinecdm.so";
+          target = ".kodi/cdm/libwidevinecdm.so";
+        };
+        widevine-manifest= {
+          source = "${pkgs.widevine-cdm}/share/google/chrome/WidevineCdm/manifest.json";
+          target = ".kodi/cdm/manifest.json";
+        };
+      };
+    };
   };
 
   environment = {

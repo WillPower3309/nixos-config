@@ -48,6 +48,7 @@ in
   "calibrePassword.age".publicKeys = [ systemServer ] ++ editors;
   "synapseSharedSecret.age".publicKeys = [ systemServer ] ++ editors;
   "grafanaAdminPassword.age".publicKeys = [ systemServer ] ++ editors;
+  "freshrssAdminPassword.age".publicKeys = [ systemServer ] ++ editors;
 
   "acme.age".publicKeys = [ systemServer ] ++ editors;
 }

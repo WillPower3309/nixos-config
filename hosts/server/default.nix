@@ -12,6 +12,7 @@ in
     ./hardware-configuration.nix
     ../../modules/arr.nix
     ../../modules/calibre.nix
+    ../../modules/freshrss.nix
     ../../modules/immich.nix
     ../../modules/monitoring.nix
     ../../modules/nebula.nix

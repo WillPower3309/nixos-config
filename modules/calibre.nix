@@ -11,8 +11,9 @@ in {
     calibre-server = {
       enable = true;
       port = 8181; # 8080 likely used by immich
-      host = "127.0.0.1";
+      host = "0.0.0.0";
       libraries = [ libraryDir ];
+      openFirewall = true; # koreader needs port + IP address to connect to calibre
 
       auth = {
         enable = true;

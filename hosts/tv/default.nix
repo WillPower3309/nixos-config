@@ -47,7 +47,7 @@ in
       };
       kodi = {
         isNormalUser = true;
-        extraGroups = [ "video" "audio" ]; # TODO: do I need any more groups? https://forums.raspberrypi.com/viewtopic.php?t=251645
+        extraGroups = [ "video" "audio" "input" ]; # TODO: do I need any more groups? https://forums.raspberrypi.com/viewtopic.php?t=251645
       };
     };
     mutableUsers = false;
@@ -78,10 +78,9 @@ in
   # an overlay to enable raspberrypi support in libcec, and thus cec-client
   nixpkgs.overlays = [
     (self: super: { libcec = super.libcec.override { withLibraspberrypi = true; }; })
-    (self: super: { kodi-wayland = super.kodi-wayland.override { withLibraspberrypi = true; }; })
   ];
 
-  environment.systemPackages = with pkgs; [ libcec ];
+  environment.systemPackages = with pkgs; [ libcec moonlight-qt polkit ];
 
   # allow access to raspi cec device for video group
   services.udev.extraRules = ''
@@ -108,6 +107,7 @@ in
       kodi = let kodi-package = pkgs.kodi-gbm.withPackages(kodiPkgs: with kodiPkgs; [
         inputstream-adaptive
         youtube
+        joystick
       ]);
       in {
         description = "Kodi media center";

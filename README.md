@@ -17,3 +17,8 @@ My personal nixos config
 3. Execute the disko image script, and add the host's private key: `sudo ./result --post-format-files <PATH_TO_PRIVATE_KEY> persist/etc/ssh/ssh_host_ed25519_key`
 4. Flash the image to an SD card, and insert the SD card into the pi
 
+#### TV
+Haven't yet had the patience to set up addons and settings with nix. Addons used include:
++ https://github.com/croneter/PlexKodiConnect
+  + will likely need to `chmod +w` the `.kodi/userdata/library/video/` directory
+

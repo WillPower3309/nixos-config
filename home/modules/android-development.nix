@@ -6,7 +6,6 @@
 
     persistence."/nix/persist/home/will".directories = [
       ".android"
-      ".gradle"
       ".java"
       "Android"
       ".cache/Google"

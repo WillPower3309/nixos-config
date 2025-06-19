@@ -16,5 +16,12 @@
 
     kernelParams = [ "quiet" "udev.log_level=3" ];
     consoleLogLevel = 0;
+
+    binfmt.emulatedSystems = [ "aarch64-linux" ];
+
+    tmp = {
+      useTmpfs = true; # true lets us configure the size below
+      tmpfsSize = "50%";
+    };
   };
 }

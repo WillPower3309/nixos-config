@@ -5,6 +5,7 @@
     agenix.homeManagerModules.age
     ags.homeManagerModules.default
     impermanence.nixosModules.home-manager.impermanence
+    ./modules/android-development.nix
     ./modules/ags.nix
     ./modules/cad.nix
     ./modules/discord.nix

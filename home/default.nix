@@ -1,4 +1,4 @@
-{ pkgs, impermanence, agenix, ags, ... }:
+{ pkgs, impermanence, agenix, ags, nixosConfig, ... }:
 
 {
   imports = [
@@ -26,7 +26,6 @@
     ./modules/sway.nix
     ./modules/video.nix
     ./modules/vim.nix
-    ./modules/web-browsers.nix
     ./modules/zsh.nix
   ];
 
@@ -54,6 +53,6 @@
 
     file.".config/pipewire/pipewire.conf".source = ./modules/config/pipewire/pipewire.conf;
 
-    stateVersion = "22.05";
+    stateVersion = nixosConfig.system.nixos.release;
   };
 }

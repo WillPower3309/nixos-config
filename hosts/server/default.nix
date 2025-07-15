@@ -127,5 +127,5 @@ in
     etc."ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;
   };
 
-  system.stateVersion = "22.11";
+  system.stateVersion = config.system.nixos.release;
 }

@@ -20,6 +20,7 @@
     ../../modules/sound.nix
     ../../modules/syncthing.nix
     ../../modules/users.nix
+    ../../modules/web-browsers.nix
   ];
 
   # Set your time zone.
@@ -86,5 +87,5 @@
     etc."ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;
   };
 
-  system.stateVersion = "22.05";
+  system.stateVersion = config.system.nixos.release;
 }

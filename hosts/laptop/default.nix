@@ -1,4 +1,4 @@
-{ pkgs, impermanence, agenix, nixos-hardware, ... }:
+{ config, pkgs, impermanence, agenix, nixos-hardware, ... }:
 
 {
   imports = [
@@ -6,6 +6,7 @@
     agenix.nixosModules.default
     nixos-hardware.nixosModules.framework-16-7040-amd
     ./disks.nix
+    ../../modules/android-dev.nix
     ../../modules/bluetooth.nix
     ../../modules/boot.nix
     ../../modules/containerization.nix
@@ -23,6 +24,7 @@
     ../../modules/sound.nix
     ../../modules/syncthing.nix
     ../../modules/users.nix
+    ../../modules/web-browsers.nix
     ../../modules/wifi.nix
   ];
 
@@ -99,6 +101,6 @@
     etc."ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;
   };
 
-  system.stateVersion = "23.11";
+  system.stateVersion = config.system.nixos.release;
 }
 

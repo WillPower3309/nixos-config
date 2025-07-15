@@ -39,7 +39,7 @@
       settings = {
         PasswordAuthentication = false;
         KbdInteractiveAuthentication = false;
-        GatewayPorts = "yes";
+        GatewayPorts = "yes"; # for plex ssh tunnel
       };
     };
 
@@ -64,5 +64,5 @@
     };
   };
 
-  system.stateVersion = "23.05";
+  system.stateVersion = config.system.nixos.release;
 }

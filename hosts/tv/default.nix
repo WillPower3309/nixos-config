@@ -1,4 +1,4 @@
-{ pkgs, lib, nixos-hardware, impermanence, home-manager, ... }:
+{ config, pkgs, lib, nixos-hardware, impermanence, home-manager, ... }:
 
 # TODO: remove what is already done in the nixos-hardware module
 let
@@ -150,7 +150,7 @@ in
     home = {
       username = "kodi";
       homeDirectory = "/home/kodi";
-      stateVersion = "22.05";
+      stateVersion = config.system.nixos.release;
 
       file = {
         widevine-lib = {
@@ -179,5 +179,5 @@ in
   };
 
   nixpkgs.hostPlatform = "aarch64-linux"; # TODO: auto define in modules/nix.nix?
-  system.stateVersion = "22.11";
+  system.stateVersion = config.system.nixos.release;
 }

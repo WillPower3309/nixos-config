@@ -78,6 +78,11 @@ in
         { command = "wlsunset -l 43.7 -L -79.3"; }
       ];
 
+      window = {
+        border = 2;
+        titlebar = false;
+      };
+
       defaultWorkspace = "workspace number 1";
 
       keybindings = let

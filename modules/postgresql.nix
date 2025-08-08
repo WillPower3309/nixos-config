@@ -1,4 +1,4 @@
-{ config, ...}:
+{ config, pkgs, ...}:
 
 {
   # TODO: only have this do things if postgresql.enable = true?
@@ -7,6 +7,7 @@
   services.postgresql = {
     enable = true;
     dataDir = "/data/postgresql";
+    package = pkgs.postgresql_16;
     ensureUsers = [{
       name = "root";
       ensureClauses.superuser = true;

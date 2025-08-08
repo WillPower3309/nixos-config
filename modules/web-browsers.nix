@@ -1,15 +1,19 @@
+{ pkgs, ... }:
+
 {
+  environment.systemPackages = [ pkgs.ungoogled-chromium ];
+
   programs.chromium = {
     enable = true;
     extensions = [
-      { id = "cjpalhdlnbpafiamejdnhcphjbkeiagm"; } # ublock origin
-      { id = "oboonakemofpalcgghocfoadofidjkkk"; } # keepassxc-browser
-      { id = "eimadpbcbfnmbkopoojfekhnkhdbieeh"; } # dark reader
+      "cjpalhdlnbpafiamejdnhcphjbkeiagm" # ublock origin
+      "oboonakemofpalcgghocfoadofidjkkk" # keepassxc-browser
+      "eimadpbcbfnmbkopoojfekhnkhdbieeh" # dark reader
     ];
     
     defaultSearchProviderEnabled = true;
-    defaultSearchProviderSearchUrl = "https://duckduckgo.com/?q={searchTerms}";
-    defaultSearchProviderSuggestUrl = "https://duckduckgo.com/ac/?q={searchTerms}&type=list";
+    defaultSearchProviderSearchURL = "https://duckduckgo.com/?q={searchTerms}";
+    defaultSearchProviderSuggestURL = "https://duckduckgo.com/ac/?q={searchTerms}&type=list";
   };
 }
 

@@ -27,7 +27,7 @@ in
 
     cursor = {
       name = "breeze_cursors";
-      package = pkgs.breeze-gtk;
+      package = pkgs.kdePackages.breeze-gtk;
       size = 10;
     };
 

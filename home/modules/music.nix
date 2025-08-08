@@ -39,7 +39,6 @@ in
   home = {
     packages = with pkgs; [
       mpc_cli
-      soulseekqt
     ];
 
     persistence."/nix/persist/home/will".directories = if hostName == "desktop" then [] else [ "Music" ];

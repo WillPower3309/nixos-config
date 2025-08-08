@@ -70,6 +70,7 @@
       laptop = mkNixos [ ./hosts/laptop ];
       lighthouse = mkNixos [ ./hosts/lighthouse ];
       server = mkNixos [ ./hosts/server ];
+      router = mkNixos [ ./hosts/router ];
       # TODO: support arm in mkNixos
       tv = nixpkgs.lib.nixosSystem {
         modules = [ ./hosts/tv ];
@@ -86,8 +87,9 @@
     deploy.nodes = {
       lighthouse = mkDeployTarget "143.110.232.34" self.nixosConfigurations.lighthouse;
       server = mkDeployTarget "192.168.100.2" self.nixosConfigurations.server;
+      router = mkDeployTarget "10.27.27.1" self.nixosConfigurations.router;
       tv = {
-        hostname = "10.27.27.6";
+        hostname = "192.168.1.172";
         profiles.system = {
           user = "root";
           sshUser = "root";

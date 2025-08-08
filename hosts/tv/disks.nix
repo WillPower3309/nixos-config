@@ -16,6 +16,8 @@ let
     # Supported in newer board revisions
     arm_boost=1
 
+    hdmi_enable_4kp60=1
+
     [all]
     # Boot in 64-bit mode.
     arm_64bit=1
@@ -30,7 +32,6 @@ let
     avoid_warnings=1
 
     dtparam=audio=on
-    gpu_mem=320
   '';
 
 in {

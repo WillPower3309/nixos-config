@@ -171,7 +171,8 @@ in
       directories = [
         "/var/log"
         "/var/lib/nixos"
-        { directory = "/home/kodi"; user = "kodi"; group = "users"; }
+        { directory = "/home/kodi/.kodi"; user = "kodi"; group = "users"; }
+        { directory = "/home/kodi/.cache"; user = "kodi"; group = "users"; }
       ];
       files = [ (toString hostKeyPath) ];
     };

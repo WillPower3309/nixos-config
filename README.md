@@ -8,8 +8,17 @@ My personal nixos config
 1. Build the nixos installation image: `nix build .#packages.x86_64-linux.installationMedia`
 2. Flash the image to a USB stick
 3. Boot nixos through the installation media and note its IP address
-4. Generate a key pair for the given host, and move the public key to the host's folder
-5. Remotely install nixos and send the private key to the new host via: ``
+4. Generate a key pair for the given host, and move the public key to a tmp directory:
+```
+root=$(mktemp -d)
+mkdir -p ${root}/nix/persist/etc/ssh
+cp <PATH TO PRIVATE KEY> ${root}/nix/persist/etc/ssh
+```
+5. Remotely install nixos and send the private key to the new host:
+```
+nix run github:nix-community/nixos-anywhere -- --generate-hardware-config nixos-generate-con
+fig ./<PATH_TO_CONFIG>/hardware-configuration.nix --extra-files ${root} --flake .#{CONFIG_NAME} --target-host root@<INSTALLATION_TARGET_IP_ADDRESS>
+```
 
 ### Raspberry Pi
 1. Generate a key pair for the given host, and move the public key to the host's folder
@@ -17,7 +26,7 @@ My personal nixos config
 3. Execute the disko image script, and add the host's private key: `sudo ./result --post-format-files <PATH_TO_PRIVATE_KEY> persist/etc/ssh/ssh_host_ed25519_key`
 4. Flash the image to an SD card, and insert the SD card into the pi
 
-#### TV
+### TV
 Haven't yet had the patience to set up addons and settings with nix. Addons used include:
 + https://github.com/croneter/PlexKodiConnect
   + will likely need to `chmod +w` the `.kodi/userdata/library/video/` directory

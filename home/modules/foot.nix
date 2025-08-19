@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 
 {
   programs.foot = {
@@ -6,24 +6,21 @@
     # TODO: server.enable
 
     settings = {
-      /*
       main = {
-        font = "MesloLGS NF:size=10";
-        dpi-aware = "yes";
+        font = lib.mkForce "MesloLGS NF:size=10";
+        dpi-aware = lib.mkForce "yes";
       };
-*/
 
       cursor = {
         style = "block";
-        color = "2e3440 d8dee9";
         blink = "no";
       };
 
       mouse.hide-when-typing = "yes";
 
-      /*
       colors = {
-        alpha = "0.8";
+        alpha = lib.mkForce "0.8";
+        cursor = "2e3440 d8dee9";
         foreground = "eceff4";
         background = "2e3440";
         regular0 = "3b4252";  # black
@@ -43,7 +40,6 @@
         bright6 = "8fbcbb";   # bright cyan
         bright7 = "eceff4";   # bright white
       };
-      */
     };
   };
 }

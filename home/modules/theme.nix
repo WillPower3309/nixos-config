@@ -6,7 +6,7 @@ let
 
 in
 {
-  imports = [ stylix.homeManagerModules.stylix ];
+  imports = [ stylix.homeModules.stylix ];
 
   stylix = {
     enable = true;

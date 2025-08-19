@@ -1,4 +1,4 @@
-{ nixosConfig, pkgs, ... }:
+{ nixosConfig, pkgs, lib, ... }:
 
 let
   nixosConfigPath = "~/Projects/nixos-config";
@@ -16,10 +16,8 @@ in
     enableCompletion = true;
     syntaxHighlighting.enable = true;
 
-    initExtraBeforeCompInit = ''
+    initContent = lib.mkOrder 550 ''
       source ${pkgs.zsh-powerlevel10k}/${powerlevel10kFilePath}
-    '';
-    initExtra = ''
       source ${./config/p10k.zsh}
     '';
 

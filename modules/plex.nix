@@ -44,9 +44,9 @@ in
     };
 
     autossh.sessions = [{
-      # TODO: don't use root user, user diff key?
+      # TODO: don't use root user, use diff key?
       # TODO: have ~/.ssh/known_hosts generated for the tunnel remote, and remove `-o StrictHostKeyChecking=no`
-      extraArguments = "-N -R ${toString plexPort}:localhost:${toString plexPort} -o StrictHostKeyChecking=no root@159.89.118.241 -i /persist/etc/ssh/ssh_host_ed25519_key";
+      extraArguments = "-N -R ${toString plexPort}:localhost:${toString plexPort} -o StrictHostKeyChecking=no root@159.203.59.54 -i /persist/etc/ssh/ssh_host_ed25519_key";
       name = "plex-tunnel";
       user = "root"; # TODO: use a new user when this module is fixed: https://github.com/NixOS/nixpkgs/issues/373024
     }];

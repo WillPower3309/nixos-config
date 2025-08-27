@@ -106,7 +106,10 @@ in
   };
 
   users = {
-    users.root.openssh.authorizedKeys.keys = [ authorizedKey ];
+    users.root.openssh.authorizedKeys.keys = [
+      authorizedKey
+      (builtins.readFile ../server/ssh_host_ed25519_key.pub)
+    ];
     mutableUsers = false;
   };
 

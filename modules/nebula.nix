@@ -38,7 +38,7 @@ in
     ca = config.age.secrets.nebulaCaCert.path; # ca.crt
     lighthouses = [ lighthouseNebulaAddress ];
     relays = [ lighthouseNebulaAddress ];
-    staticHostMap = { ${lighthouseNebulaAddress} = [ "159.203.59.54:4242" ]; };
+    staticHostMap = { ${lighthouseNebulaAddress} = [ "lighthouse.willmckinnon.com:4242" ]; };
     listen.port = if hostName == "server" then 4242 else 0; # TODO: fix me so server can have value of 0
     settings = {
       punchy = {

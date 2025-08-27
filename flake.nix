@@ -85,7 +85,7 @@
 
     # TODO: ex https://github.com/disassembler/network/blob/18e4d34b3d09826f1239772dc3c2e8c6376d5df6/nixos/deploy.nix
     deploy.nodes = {
-      lighthouse = mkDeployTarget "143.110.232.34" self.nixosConfigurations.lighthouse;
+      lighthouse = mkDeployTarget "lighthouse.willmckinnon.com" self.nixosConfigurations.lighthouse;
       server = mkDeployTarget "192.168.100.2" self.nixosConfigurations.server;
       router = mkDeployTarget "10.27.27.1" self.nixosConfigurations.router;
       tv = {

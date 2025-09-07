@@ -8,6 +8,7 @@ let
   lanInterface = "lan0";
 
   lanAddress = "10.27.27.1";
+  lanCidr = "10.27.27.0/24";
 
 in
 # TODO: prometheus and grafana: https://thinglab.org/2024/12/nixos_router_software/
@@ -50,17 +51,20 @@ in
     initrd.systemd.enable = true;
   };
 
-  # enable IP forwarding
   boot.kernel.sysctl = {
-    "net.ipv4.conf.all.forwarding" = true;
+    # enable IP forwarding
+    "net.ipv4.conf.all.forwarding" = 1;
 
-    # TODO: deny martian packets
+    # not using IPv6 yet
+    "net.ipv6.conf.all.forwarding" = 0;
+    "net.ipv6.conf.all.accept_ra" = 0;
+    "net.ipv6.conf.all.autoconf" = 0;
+    "net.ipv6.conf.all.use_tempaddr" = 0;
 
-    # Not using IPv6 yet
-    "net.ipv6.conf.all.forwarding" = false;
-    "net.ipv6.conf.all.accept_ra" = false;
-    "net.ipv6.conf.all.autoconf" = false;
-    "net.ipv6.conf.all.use_tempaddr" = false;
+    # deny martian packets
+#    "net.ipv4.conf.default.rp_filter" = 1;
+#    "net.ipv4.conf.bond-wan.rp_filter" = 1;
+#    "net.ipv4.conf.br-lan.rp_filter" = 1;
 
     # On WAN, allow IPv6 autoconfiguration and tempory address use.
     "net.ipv6.conf.${wanInterface}.accept_ra" = 2;
@@ -83,6 +87,7 @@ in
     useDHCP = false;
     wireless.enable = false;
     networkmanager.enable = lib.mkForce false;
+    useNetworkd = true;
 
     interfaces = {
       "${wanInterface}" = {
@@ -98,60 +103,69 @@ in
       };
     };
 
-    # TODO: nftables hardware accel
-    nat.enable = false;
-    firewall.enable = false;
-    nftables = {
+    nat = {
       enable = true;
-      tables = {
-        filterV4 = {
-          family = "ip";
-          content = ''
-            chain input {
-              type filter hook input priority 0; policy drop;
-              iifname "lo" accept comment "allow loopback traffic"
-              iifname "${lanInterface}" accept comment "allow traffic from ${lanInterface}"
-              iifname "${wanInterface}" counter drop comment "drop all other traffic from ${wanInterface}"
-              ct state vmap { established : accept, related : accept, invalid : drop } comment "allow traffic from established and related packets, drop invalid"
-            }
-            chain forward {
-              type filter hook forward priority 0; policy drop;
-              ct state vmap { established : accept, related : accept, invalid : drop }
-              iifname "${lanInterface}" accept comment "allow ${lanInterface} connections to go wherever"
-              counter drop
-            }
-          '';
-        };
-
-        filterV6 = {
-          family = "ip6";
-          content = ''
-            chain input {
-              type filter hook input priority 0; policy drop;
-            }
-            chain forward {
-              type filter hook forward priority 0; policy drop;
-            }
-          '';
-        };
-
-        natV4 = {
-          family = "ip";
-          content = ''
-            chain prerouting {
-              type nat hook prerouting priority filter; policy accept;
-              iifname "${lanInterface}" udp dport 53 counter redirect to 53 comment "redirect DNS queries to the router's DNS"
-              iifname "${lanInterface}" tcp dport 53 counter redirect to 53 comment "redirect DNS queries to the router's DNS"
-            }
-
-            chain postrouting {
-              type nat hook postrouting priority 100; policy accept;
-              oifname "${wanInterface}" masquerade comment "replace source address with ${wanInterface} IP address"
-            }
-          '';
-        };
-      };
+      externalInterface = wanInterface;
+      internalInterfaces = [ lanInterface ];
+      internalIPs = [ lanCidr ];
     };
+
+    firewall.interfaces."${lanInterface}" = {
+      allowedUDPPorts = [ 53 67 ];
+      allowedTCPPorts = [ 53 67 ];
+    };
+    # TODO: nftables hardware accel
+#    nftables = {
+#      enable = true;
+#      tables = {
+#        filterV4 = {
+#          family = "ip";
+#          content = ''
+#            chain input {
+#              type filter hook input priority 0; policy drop;
+#              iifname "lo" accept comment "allow loopback traffic"
+#              iifname "${lanInterface}" accept comment "allow traffic from ${lanInterface}"
+#              iifname "${wanInterface}" counter drop comment "drop all other traffic from ${wanInterface}"
+#              ct state vmap { established : accept, related : accept, invalid : drop } comment "allow traffic from established and related packets, drop invalid"
+#            }
+#            chain forward {
+#              type filter hook forward priority 0; policy drop;
+#              ct state vmap { established : accept, related : accept, invalid : drop }
+#              iifname "${lanInterface}" accept comment "allow ${lanInterface} connections to go wherever"
+#              counter drop
+#            }
+#          '';
+#        };
+
+#        filterV6 = {
+#          family = "ip6";
+#          content = ''
+#            chain input {
+#              type filter hook input priority 0; policy drop;
+#            }
+#            chain forward {
+#              type filter hook forward priority 0; policy drop;
+#            }
+#          '';
+#        };
+
+#        natV4 = {
+#          family = "ip";
+#          content = ''
+#            chain prerouting {
+#              type nat hook prerouting priority filter; policy accept;
+#              iifname "${lanInterface}" udp dport 53 counter redirect to 53 comment "redirect DNS queries to the router's DNS"
+#              iifname "${lanInterface}" tcp dport 53 counter redirect to 53 comment "redirect DNS queries to the router's DNS"
+#            }
+#          content = ''
+#            chain postrouting {
+#              type nat hook postrouting priority 100; policy accept;
+#              oifname "${wanInterface}" masquerade comment "replace source address with ${wanInterface} IP address"
+#            }
+#          '';
+#        };
+#      };
+#    };
   };
 
   services.kea.dhcp4 = {
@@ -172,7 +186,7 @@ in
 
       subnet4 = [{
         id = 1;
-        subnet = "10.27.27.0/24";
+        subnet = lanCidr;
         pools = [{
           pool = "10.27.27.16 - 10.27.27.254";
         }];
@@ -214,24 +228,37 @@ in
 #          }
         ];
 
-        option-data = [{
-          name = "routers";
-          data = lanAddress;
-        }];
+        option-data = [
+          {
+            name = "routers";
+            data = lanAddress;
+          }
+          {
+            name = "domain-name-servers";
+            data = lanAddress;
+          }
+        ];
       }];
     };
   };
 
   # use unbound for local queries
   services.resolved.enable = false;
-
   services.unbound = {
     enable = true;
     resolveLocalQueries = true;
 
     settings = {
       server = {
-        interface = [ lanAddress ];
+        interface = [
+          "127.0.0.1"
+          lanAddress
+        ];
+        access-control = [
+          "0.0.0.0/0 refuse"
+          "127.0.0.0/8 allow"
+          "${lanCidr} allow"
+        ];
         port = 53;
         hide-identity = true;
         hide-version = true;
@@ -248,8 +275,8 @@ in
         name = ".";
         # don't fallback to recursive DNS
         forward-first = false;
-
         forward-tls-upstream = true;
+
         # TODO: use mullvad
         forward-addr = [
           "1.1.1.1@853#cloudflare-dns.com"

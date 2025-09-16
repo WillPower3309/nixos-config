@@ -226,6 +226,21 @@ in
 #            ip-address = "10.27.27.15";
 #            hostname = "nixos-install";
 #          }
+          {
+            ip-address = "10.27.27.11";
+            hw-address = "38:05:25:31:58:ad";
+            hostname = "node-1-management";
+          }
+          {
+            ip-address = "10.27.27.12";
+            hw-address = "38:05:25:31:5b:a1";
+            hostname = "node-2-management";
+          }
+          {
+            ip-address = "10.27.27.13";
+            hw-address = "38:05:25:31:5b:65";
+            hostname = "node-3-management";
+          }
         ];
 
         option-data = [
@@ -262,6 +277,7 @@ in
         port = 53;
         hide-identity = true;
         hide-version = true;
+        qname-minimisation = true;
 
         # Based on recommended settings in https://docs.pi-hole.net/guides/dns/unbound/#configure-unbound
         harden-glue = true;
@@ -269,6 +285,15 @@ in
         use-caps-for-id = false;
         prefetch = true;
         edns-buffer-size = 1232;
+
+        # allow resolving these domains to private addresses
+        private-domain = "willmckinnon.com";
+        local-zone = [
+          '' test.willmckinnon.com typetransparent ''
+        ];
+        local-data = [
+          '' "test.willmckinnon.com A 10.27.27.3" ''
+        ];
       };
 
       forward-zone = [{
@@ -302,3 +327,4 @@ in
   time.timeZone = "America/Toronto";
   system.stateVersion = config.system.nixos.release;
 }
+

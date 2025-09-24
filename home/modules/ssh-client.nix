@@ -6,7 +6,7 @@
 
     matchBlocks = {
       "server*" = {
-        hostname = "10.27.27.3";
+        hostname = "server.willmckinnon.com";
         user = "root";
       };
 
@@ -15,7 +15,12 @@
       };
 
       "lighthouse" = {
-        hostname = "143.110.232.34";
+        hostname = "lighthouse.willmckinnon.com";
+        user = "root";
+      };
+
+      "router" = {
+        hostname = "10.27.27.1";
         user = "root";
       };
 

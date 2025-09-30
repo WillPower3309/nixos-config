@@ -116,6 +116,7 @@ in
   services = {
     openssh = {
       enable = true;
+      ports = [ 2222 ];
       openFirewall = true;
       settings = {
         PasswordAuthentication = false;

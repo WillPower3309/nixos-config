@@ -46,7 +46,7 @@ in
     autossh.sessions = [{
       # TODO: don't use root user, use diff key?
       # TODO: have ~/.ssh/known_hosts generated for the tunnel remote, and remove `-o StrictHostKeyChecking=no`
-      extraArguments = "-N -R ${toString plexPort}:localhost:${toString plexPort} -o StrictHostKeyChecking=no root@lighthouse.willmckinnon.com -i /persist/etc/ssh/ssh_host_ed25519_key";
+      extraArguments = "-nNT -o ServerAliveInterval=10 -o ServerAliveCountMax=2 -R ${toString plexPort}:localhost:${toString plexPort} -o StrictHostKeyChecking=no root@lighthouse.willmckinnon.com -i /persist/etc/ssh/ssh_host_ed25519_key -p 2222";
       name = "plex-tunnel";
       user = "root"; # TODO: use a new user when this module is fixed: https://github.com/NixOS/nixpkgs/issues/373024
     }];

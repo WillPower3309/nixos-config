@@ -23,7 +23,8 @@
     ../../modules/web-browsers.nix
   ];
 
-  boot.initrd.availableKernelModules = [ "xhci_pci" "ahci" "nvme" "usbhid" ];
+  boot.initrd.availableKernelModules = [ "xhci_pci" "ahci" "nvme" "usbhid" "amdgpu" ];
+  hardware.enableAllFirmware = true;
 
   # Set your time zone.
   time.timeZone = "America/Toronto";

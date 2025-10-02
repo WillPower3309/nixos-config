@@ -12,12 +12,12 @@ My personal nixos config
 ```
 root=$(mktemp -d)
 mkdir -p ${root}/nix/persist/etc/ssh
-cp <PATH TO PRIVATE KEY> ${root}/nix/persist/etc/ssh
+cp <PATH TO SYSTEM PRIVATE KEY> ${root}/nix/persist/etc/ssh
+cp ~/.ssh/id_ed25519 ${root}/nix/persist/home/will/.ssh
 ```
 5. Remotely install nixos and send the private key to the new host:
 ```
-nix run github:nix-community/nixos-anywhere -- --generate-hardware-config nixos-generate-con
-fig ./<PATH_TO_CONFIG>/hardware-configuration.nix --extra-files ${root} --flake .#{CONFIG_NAME} --target-host root@<INSTALLATION_TARGET_IP_ADDRESS>
+nix run github:nix-community/nixos-anywhere -- --extra-files ${root} --flake .#{CONFIG_NAME} --target-host root@<INSTALLATION_TARGET_IP_ADDRESS>
 ```
 
 ### Raspberry Pi

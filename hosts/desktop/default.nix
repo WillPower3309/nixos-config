@@ -4,9 +4,9 @@
   imports = [
     impermanence.nixosModules.impermanence
     agenix.nixosModules.default
-    ./hardware-configuration.nix
+    ./disks.nix
     ../../modules/boot.nix
-    ../../modules/containerization.nix
+    #../../modules/containerization.nix
     ../../modules/evolution.nix
     ../../modules/file-management.nix
     ../../modules/fonts.nix
@@ -22,6 +22,8 @@
     ../../modules/users.nix
     ../../modules/web-browsers.nix
   ];
+
+  boot.initrd.availableKernelModules = [ "xhci_pci" "ahci" "nvme" "usbhid" ];
 
   # Set your time zone.
   time.timeZone = "America/Toronto";
@@ -87,5 +89,7 @@
     etc."ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;
   };
 
+  hardware.cpu.amd.updateMicrocode = config.hardware.enableRedistributableFirmware;
   system.stateVersion = config.system.nixos.release;
 }
+

@@ -30,8 +30,9 @@
   time.timeZone = "America/Toronto";
 
   networking = {
+    useNetworkd = true; # systemd-networkd is faster at startup by default and more actively maintained TODO: set up with `systemd.network`
     hostName = "desktop";
-    wireless.enable = false;
+    wireless.enable = false; # no wpa_supplicant needed for an ethernet connection
     nameservers = [ "194.242.2.4#base.dns.mullvad.net" ]; # TODO: across all hosts, use var
   };
 

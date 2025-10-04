@@ -47,6 +47,7 @@
 
   networking = {
     hostName = "laptop";
+    useNetworkd = true;
 #    nameservers = [ "194.242.2.4#base.dns.mullvad.net" ]; # TODO: across all hosts, use var
   };
 

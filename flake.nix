@@ -33,21 +33,20 @@
     };
 
     ags.url = "github:Aylur/ags/v1";
-    stylix.url = "github:danth/stylix";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
   };
 
-  outputs = { self, nixpkgs, home-manager, impermanence, deploy-rs, agenix, disko, nixos-generators, ags, stylix, nixos-hardware, ... }:
+  outputs = { self, nixpkgs, home-manager, impermanence, deploy-rs, agenix, disko, nixos-generators, ags, nixos-hardware, ... }:
   let
     mkNixos = modules: nixpkgs.lib.nixosSystem {
       inherit modules;
       system = "x86_64-linux";
-      specialArgs = { inherit nixpkgs impermanence home-manager agenix disko ags stylix nixos-hardware; };
+      specialArgs = { inherit nixpkgs impermanence home-manager agenix disko ags nixos-hardware; };
     };
 
     mkHome = modules: pkgs: home-manager.lib.homeManagerConfiguration {
       inherit modules pkgs;
-      extraSpecialArgs = { inherit impermanence ags stylix; };
+      extraSpecialArgs = { inherit impermanence ags; };
     };
 
     mkImage = format: modules: nixos-generators.nixosGenerate {

@@ -112,7 +112,7 @@
               URLTemplate = "https://search.nixos.org/options?from=0&size=200&sort=relevance&type=packages&query={searchTerms}";
             }
           ];
-          Remove = [ "Amazon.com" "Bing" "Google" "Wikipedia (en)" ];
+          Remove = [ "Amazon.com" "Bing" "Google" "Wikipedia (en)" "eBay" ];
           # Default = ""; TODO: set as startpage
         };
       };

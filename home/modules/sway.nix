@@ -1,4 +1,4 @@
-{ lib, nixosConfig, pkgs, ... }:
+{ lib, nixosConfig, pkgs, config, ... }:
 
 let
   isDesktop = nixosConfig.networking.hostName == "desktop";
@@ -57,7 +57,7 @@ in
           background = "~/Pictures/wallpaper.png fill";
           scale = if isDesktop then "1" else "1.5";
         };
-        "DP-3" = lib.mkIf isDesktop {
+        "DP-1" = lib.mkIf isDesktop {
           pos = "0 1080";
         };
         "HDMI-A-1" = lib.mkIf isDesktop {
@@ -65,11 +65,7 @@ in
         };
       };
 
-      seat.seat0 = {
-        # TODO: pull xcursor theme from gtk.nix
-        xcursor_theme = "breeze_cursors 10";
-        hide_cursor = "3000";
-      };
+      seat.seat0.hide_cursor = "3000";
 
       startup = [
         { command = "foot --server"; }

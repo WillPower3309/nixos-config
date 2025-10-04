@@ -1,42 +1,35 @@
-{ pkgs, stylix, ... }:
+{ pkgs, config, ... }:
 
-let
-  opacity = 0.8;
-  fontSize = 11;
-
-in
 {
-  imports = [ stylix.homeModules.stylix ];
-
-  stylix = {
+  # TODO: make me work
+  home.pointerCursor = {
     enable = true;
-    image = ../assets/wallpaper.png;
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/nord.yaml";
-    polarity = "dark";
-
-    opacity = {
-      terminal = opacity;
-      popups = opacity;
-    };
-
-    fonts.sizes = {
-      applications = fontSize;
-      desktop = fontSize;
-      popups = fontSize;
-    };
-
-    cursor = {
-      name = "breeze_cursors";
-      package = pkgs.kdePackages.breeze-gtk;
-      size = 10;
-    };
-
-    targets.sway.enable = false;
+    name = "breeze_cursors";
+    package = pkgs.kdePackages.breeze-gtk;
+    size = 24;
+    gtk.enable = true;
+    x11.enable = true;
+    sway.enable = true;
   };
 
-  gtk.iconTheme = {
-    name = "Tela";
-    package = pkgs.tela-icon-theme;
+  gtk = {
+    enable = true;
+    # TODO: font = {};
+    theme = {
+      name = "Arc-Dark";
+      # TODO: gtkThemeFromScheme, manually defined w colors? (nix-colors)
+      package = pkgs.arc-theme;
+    };
+
+    iconTheme = {
+      name = "Tela";
+      package = pkgs.tela-icon-theme;
+    };
+  };
+
+  qt = {
+    enable = true;
+    platformTheme.name = "gtk";
   };
 }
 

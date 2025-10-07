@@ -12,6 +12,7 @@
     ./modules/document-viewer.nix
     ./modules/emacs.nix
     ./modules/evolution-clients.nix
+    ./modules/fetch.nix
     ./modules/foot.nix
     ./modules/gamedev.nix
     ./modules/games.nix
@@ -33,6 +34,8 @@
 
   # TODO: already declared in nix.nix file, don't double declare
   nixpkgs.config.allowUnfree = true;
+
+  xdg.mimeApps.enable = true;
 
   home = {
     username = "will";

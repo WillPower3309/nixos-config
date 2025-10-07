@@ -2,38 +2,39 @@
 
 let
   nixosConfigPath = "~/Projects/nixos-config";
-  powerlevel10kFilePath = "share/zsh-powerlevel10k/powerlevel10k.zsh-theme";
 
 in
 {
-  programs.zsh = {
-    # TODO: already enabled system wide?
-    enable = true;
+  programs = {
+    zsh = {
+      # TODO: already enabled system wide?
+      enable = true;
+      defaultKeymap = "viins";
+      autosuggestion.enable = true;
+      enableCompletion = true;
+      syntaxHighlighting.enable = true;
 
-    defaultKeymap = "viins";
+      sessionVariables = {
+        TERM="xterm-256color";
+      };
 
-    autosuggestion.enable = true;
-    enableCompletion = true;
-    syntaxHighlighting.enable = true;
+      shellAliases = {
+        ls = "colorls";
+        os-rebuild = "nixos-rebuild switch --flake ${nixosConfigPath}#${nixosConfig.networking.hostName}";
+        fetch = "SPRITE=$(pokeget random --hide-name); HEIGHT=$(echo \"$SPRITE\" | wc -l); fastfetch --data-raw \"$SPRITE\"; echo \"$HEIGHT\""; # TODO: vertical align to sprite https://github.com/fastfetch-cli/fastfetch/issues/458
+      };
 
-    initContent = lib.mkOrder 550 ''
-      source ${pkgs.zsh-powerlevel10k}/${powerlevel10kFilePath}
-      source ${./config/p10k.zsh}
-    '';
-
-    plugins = [{
-     name = "powerlevel10k";
-     src = pkgs.zsh-powerlevel10k;
-     file = powerlevel10kFilePath;
-    }];
-
-    sessionVariables = {
-      TERM="xterm-256color";
+      # show fetch on new terminal windows
+      initContent = lib.mkOrder 1500 ''
+        fetch
+      '';
     };
 
-    shellAliases = {
-      ls = "colorls";
-      os-rebuild = "nixos-rebuild switch --flake ${nixosConfigPath}#${nixosConfig.networking.hostName}";
+    starship = {
+      enable = true;
+      settings = {};
     };
   };
+
+  home.packages = [ pkgs.pokeget-rs ]; # TODO: use ${pkgs.pokeget-rs/bin/pokeget} in fetch alias
 }

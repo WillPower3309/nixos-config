@@ -4,7 +4,6 @@
   programs.steam.enable = true;
 
   environment.systemPackages = with pkgs; [
-    neofetch
     pciutils
     colorls
     gtop

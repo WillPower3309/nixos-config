@@ -55,13 +55,19 @@ in
       output = {
         "*" = {
           background = "~/Pictures/wallpaper.png fill";
-          scale = if isDesktop then "1" else "1.5";
+          scale = "1.5";
         };
-        "DP-1" = lib.mkIf isDesktop {
+        # Samsung Odyssey G9
+        "Samsung Electric Company LC49G95T H4ZT300322" = lib.mkIf isDesktop {
           pos = "0 1080";
+          # TODO: causes flickering
+          #adaptive_sync = "on";
+          render_bit_depth = "10";
         };
-        "HDMI-A-1" = lib.mkIf isDesktop {
-          pos = "1280 0";
+        # LG 34 inch ultrawide
+        "LG Electronics LG ULTRAWIDE 0x0002D12B" = lib.mkIf isDesktop {
+          pos = "427 0";
+          scale = "1";
         };
       };
 

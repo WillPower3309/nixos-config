@@ -3,7 +3,10 @@
 {
   programs.git = {
     enable = true;
-    userName = "William McKinnon";
-    userEmail = "contact@willmckinnon.com";
+    settings.user = {
+      name = "William McKinnon";
+      email = "contact@willmckinnon.com";
+    };
   };
 }
+

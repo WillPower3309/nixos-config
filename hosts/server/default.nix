@@ -13,14 +13,15 @@ in
     ../../modules/arr.nix
     ../../modules/calibre.nix
     ../../modules/freshrss.nix
-    ../../modules/immich.nix
+    #../../modules/immich.nix
+    ../../modules/meshcentral.nix
     ../../modules/monitoring.nix
     ../../modules/nebula.nix
     ../../modules/nginx.nix
     ../../modules/nix.nix
     ../../modules/radicale.nix
     ../../modules/plex.nix
-    ../../modules/synapse.nix
+    #../../modules/synapse.nix
     ../../modules/syncthing.nix
     ../../modules/tandoor-recipes.nix
     ../../modules/torrents.nix

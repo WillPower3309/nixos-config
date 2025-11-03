@@ -70,6 +70,7 @@
       lighthouse = mkNixos [ ./hosts/lighthouse ];
       server = mkNixos [ ./hosts/server ];
       router = mkNixos [ ./hosts/router ];
+      proxmox = mkNixos [ ./hosts/proxmox ];
       # TODO: support arm in mkNixos
       tv = nixpkgs.lib.nixosSystem {
         modules = [ ./hosts/tv ];

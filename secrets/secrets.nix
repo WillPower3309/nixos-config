@@ -4,9 +4,10 @@ let
   systemLighthouse = builtins.readFile ../hosts/lighthouse/ssh_host_ed25519_key.pub;
   systemServer = builtins.readFile ../hosts/server/ssh_host_ed25519_key.pub;
   systemRouter = builtins.readFile ../hosts/router/ssh_host_ed25519_key.pub;
+  systemProxmox = builtins.readFile ../hosts/proxmox/ssh_host_ed25519_key.pub;
 
   guiSystems = [ systemDesktop systemLaptop ];
-  systems = guiSystems ++ [ systemServer systemRouter systemLighthouse ];
+  systems = guiSystems ++ [ systemServer systemRouter systemLighthouse systemProxmox ];
 
   userWill = builtins.readFile ../home/id_ed25519.pub;
   editors = [ userWill ];
@@ -14,7 +15,7 @@ let
 in
 {
   # hashed user passwords (can be generated with `mkpasswd -m sha-512`)
-  "hashedRootPassword.age".publicKeys = [ systemServer systemRouter ] ++ guiSystems ++ editors;
+  "hashedRootPassword.age".publicKeys = [ systemServer systemRouter systemProxmox ] ++ guiSystems ++ editors;
   "hashedWillPassword.age".publicKeys = guiSystems ++ editors;
 
   "keepassKeyFile.age".publicKeys = guiSystems ++ editors;

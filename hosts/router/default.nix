@@ -198,27 +198,27 @@ in
 
         reservations = [
           {
-            ip-address = "10.27.27.2";
+            ip-address = "10.27.27.5";
             hw-address = "f8:27:2e:0c:02:ef";
             hostname = "access-point";
           }
           {
-            ip-address = "10.27.27.3";
+            ip-address = "10.27.27.6";
             hw-address = "9c:6b:00:19:ed:ff";
             hostname = "server";
           }
           {
-            ip-address = "10.27.27.4";
+            ip-address = "10.27.27.7";
             hw-address = "b8:27:eb:cd:8e:3a";
             hostname = "home-assistant";
           }
           {
-            ip-address = "10.27.27.5";
+            ip-address = "10.27.27.8";
             hw-address = "c8:7f:54:0a:4b:d2";
             hostname = "desktop";
           }
           {
-            ip-address = "10.27.27.6";
+            ip-address = "10.27.27.9";
             hw-address = "d8:3a:dd:4b:ed:01";
             hostname = "tv";
           }
@@ -226,21 +226,6 @@ in
 #            ip-address = "10.27.27.15";
 #            hostname = "nixos-install";
 #          }
-          {
-            ip-address = "10.27.27.11";
-            hw-address = "38:05:25:31:58:ad";
-            hostname = "node-1-management";
-          }
-          {
-            ip-address = "10.27.27.12";
-            hw-address = "38:05:25:31:5b:a1";
-            hostname = "node-2-management";
-          }
-          {
-            ip-address = "10.27.27.13";
-            hw-address = "38:05:25:31:5b:65";
-            hostname = "node-3-management";
-          }
         ];
 
         option-data = [

@@ -37,9 +37,7 @@ in
   };
 
   home = {
-    packages = with pkgs; [
-      mpc_cli
-    ];
+    packages = with pkgs; [ mpc ];
 
     persistence."/nix/persist/home/will".directories = if hostName == "desktop" then [] else [ "Music" ];
   };

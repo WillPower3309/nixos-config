@@ -10,7 +10,7 @@
       content = {
         type = "gpt";
         partitions = {
-          boot = {
+          ESP = {
             size = "512M";
             type = "EF00";
             content = {
@@ -20,12 +20,17 @@
               mountOptions = [ "umask=0077" ];
             };
           };
-          nix = {
+          luks = {
             size = "100%";
             content = {
-              type = "filesystem";
-              format = "ext4";
-              mountpoint = "/nix";
+              type = "luks";
+              name = "crypted";
+              extraOpenArgs = [ ];
+              settings.allowDiscards = true;
+              content = {
+                type = "lvm_pv";
+                vg = "pool";
+              };
             };
           };
         };
@@ -39,6 +44,25 @@
         "noatime"
         "mode=755"
       ];
+    };
+    lvm_vg = {
+      pool = {
+        type = "lvm_vg";
+        lvs = {
+          swap = {
+            size = "128G";
+            content.type = "swap";
+          };
+          nix = {
+            size = "100%FREE";
+            content = {
+              type = "filesystem";
+              format = "ext4";
+              mountpoint = "/nix";
+            };
+          };
+        };
+      };
     };
   };
 }

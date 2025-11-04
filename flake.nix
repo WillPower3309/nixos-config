@@ -27,6 +27,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    proxmox-nixos = {
+      url = "github:SaumonNet/proxmox-nixos";
+      inputs.nixpkgs-unstable.follows = "nixpkgs";
+    };
+
     nixos-generators = {
       url = "github:nix-community/nixos-generators";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -36,12 +41,12 @@
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
   };
 
-  outputs = { self, nixpkgs, home-manager, impermanence, deploy-rs, agenix, disko, nixos-generators, ags, nixos-hardware, ... }:
+  outputs = { self, nixpkgs, home-manager, impermanence, deploy-rs, agenix, disko, nixos-generators, ags, nixos-hardware, proxmox-nixos, ... }:
   let
     mkNixos = modules: nixpkgs.lib.nixosSystem {
       inherit modules;
       system = "x86_64-linux";
-      specialArgs = { inherit nixpkgs impermanence home-manager agenix disko ags nixos-hardware; };
+      specialArgs = { inherit nixpkgs impermanence home-manager agenix disko ags nixos-hardware proxmox-nixos; };
     };
 
     mkHome = modules: pkgs: home-manager.lib.homeManagerConfiguration {
@@ -88,6 +93,7 @@
       lighthouse = mkDeployTarget "lighthouse.willmckinnon.com" self.nixosConfigurations.lighthouse;
       server = mkDeployTarget "server.willmckinnon.com" self.nixosConfigurations.server;
       router = mkDeployTarget "10.27.27.1" self.nixosConfigurations.router;
+      proxmox = mkDeployTarget "10.27.27.10" self.nixosConfigurations.proxmox;
       tv = {
         hostname = "192.168.1.172";
         profiles.system = {

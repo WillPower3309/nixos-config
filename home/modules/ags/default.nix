@@ -3,6 +3,6 @@
   # needs network manager running to have network widget work
   programs.ags = {
     enable = true;
-    configDir = ./config/ags;
+    configDir = ./config;
   };
 }

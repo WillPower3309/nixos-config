@@ -10,7 +10,6 @@
     ./modules/cad.nix
     ./modules/discord.nix
     ./modules/document-viewer.nix
-    ./modules/emacs.nix
     ./modules/evolution-clients.nix
     ./modules/fetch.nix
     ./modules/foot.nix

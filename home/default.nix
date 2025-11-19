@@ -5,19 +5,19 @@
     agenix.homeManagerModules.age
     ags.homeManagerModules.default
     impermanence.nixosModules.home-manager.impermanence
-    ./modules/android-development.nix
-    ./modules/ags.nix
+    #./modules/android-development.nix
+    ./modules/ags
     ./modules/cad.nix
     ./modules/discord.nix
     ./modules/document-viewer.nix
     ./modules/evolution-clients.nix
     ./modules/fetch.nix
     ./modules/foot.nix
-    ./modules/gamedev.nix
+    #./modules/gamedev.nix
     ./modules/games.nix
     ./modules/git.nix
     ./modules/music.nix
-    ./modules/kde-connect.nix
+    #./modules/kde-connect.nix
     ./modules/keepass.nix
     ./modules/notetaking.nix
     ./modules/photography.nix
@@ -25,7 +25,7 @@
     ./modules/theme.nix
     ./modules/sway.nix
     ./modules/video.nix
-    ./modules/vim.nix
+    ./modules/vim
     ./modules/zsh.nix
   ];
 
@@ -52,8 +52,6 @@
         }
       ];
     };
-
-    file.".config/pipewire/pipewire.conf".source = ./modules/config/pipewire/pipewire.conf;
 
     stateVersion = nixosConfig.system.nixos.release;
   };

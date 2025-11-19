@@ -16,8 +16,14 @@
     ];
   };
 
-  home.file.".config/nvim" = {
-    source = ./config;
-    recursive = true;
+  home = {
+    packages = with pkgs; [
+      clang-tools # c / cpp
+    ];
+
+    file.".config/nvim" = {
+      source = ./config;
+      recursive = true;
+    };
   };
 }

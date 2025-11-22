@@ -37,21 +37,20 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    ags.url = "github:Aylur/ags/v1";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
   };
 
-  outputs = { self, nixpkgs, home-manager, impermanence, deploy-rs, agenix, disko, nixos-generators, ags, nixos-hardware, proxmox-nixos, ... }:
+  outputs = { self, nixpkgs, home-manager, impermanence, deploy-rs, agenix, disko, nixos-generators, nixos-hardware, proxmox-nixos, ... }:
   let
     mkNixos = modules: nixpkgs.lib.nixosSystem {
       inherit modules;
       system = "x86_64-linux";
-      specialArgs = { inherit nixpkgs impermanence home-manager agenix disko ags nixos-hardware proxmox-nixos; };
+      specialArgs = { inherit nixpkgs impermanence home-manager agenix disko nixos-hardware proxmox-nixos; };
     };
 
     mkHome = modules: pkgs: home-manager.lib.homeManagerConfiguration {
       inherit modules pkgs;
-      extraSpecialArgs = { inherit impermanence ags; };
+      extraSpecialArgs = { inherit impermanence; };
     };
 
     mkImage = format: modules: nixos-generators.nixosGenerate {
@@ -90,7 +89,15 @@
 
     # TODO: ex https://github.com/disassembler/network/blob/18e4d34b3d09826f1239772dc3c2e8c6376d5df6/nixos/deploy.nix
     deploy.nodes = {
-      lighthouse = mkDeployTarget "lighthouse.willmckinnon.com" self.nixosConfigurations.lighthouse;
+      lighthouse = {
+        hostname = "lighthouse.willmckinnon.com";
+        profiles.system = {
+          user = "root";
+          sshUser = "root";
+          path = deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.lighthouse;
+          sshOpts = [ "-p" "2222" ];
+        };
+      };
       server = mkDeployTarget "server.willmckinnon.com" self.nixosConfigurations.server;
       router = mkDeployTarget "10.27.27.1" self.nixosConfigurations.router;
       proxmox = mkDeployTarget "10.27.27.10" self.nixosConfigurations.proxmox;

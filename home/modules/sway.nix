@@ -53,10 +53,7 @@ in
       };
 
       output = {
-        "*" = {
-          background = "~/Pictures/wallpaper.png fill";
-          scale = "1.5";
-        };
+        "*".scale = "1.5";
         # Samsung Odyssey G9
         "Samsung Electric Company LC49G95T H4ZT300322" = lib.mkIf isDesktop {
           pos = "0 1080";
@@ -76,7 +73,7 @@ in
       startup = [
         { command = "foot --server"; }
         { command = "autotiling"; }
-        { command = "ags"; }
+        { command = "quickshell"; }
         { command = "wlsunset -l 43.7 -L -79.3"; }
       ];
 
@@ -90,8 +87,8 @@ in
       keybindings = let
         mod = "Mod4";
         term = "footclient";
-        app-menu = "ags -t app-launcher";
-        power-menu = "ags -t power-menu";
+        app-menu = "qs ipc call launcher toggleVisible";
+        power-menu = "";
 
       in {
         "${mod}+Return" = "exec ${term}";

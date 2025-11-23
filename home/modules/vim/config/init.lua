@@ -57,9 +57,9 @@ vim.o.tabstop = 4
 vim.o.shiftwidth = 4
 
 -- Directories
-vim.o.undodir = vim.fn.stdpath('cache') .. '/nvim/undo'
-vim.o.backupdir = vim.fn.stdpath('cache') .. '/nvim/backup'
-vim.o.directory = vim.fn.stdpath('cache') .. '/nvim/swap'
+vim.o.undodir = vim.fn.stdpath('cache') .. '/undo'
+vim.o.backupdir = vim.fn.stdpath('cache') .. '/backup'
+vim.o.directory = vim.fn.stdpath('cache') .. '/swap'
 
 -- Pop-ups should have a rounded border
 vim.o.winborder = 'rounded'

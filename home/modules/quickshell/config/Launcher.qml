@@ -21,7 +21,7 @@ Scope {
         left: true
         right: true
       }
-      WlrLayershell.keyboardFocus: KeyboardFocus.Exclusive
+      WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
 
       property string query: ""
 

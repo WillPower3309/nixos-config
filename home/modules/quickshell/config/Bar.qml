@@ -1,4 +1,5 @@
 import Quickshell
+import Quickshell.I3
 import Quickshell.Services.UPower
 import QtQuick
 import QtQuick.Layouts
@@ -24,13 +25,24 @@ Scope {
         anchors.fill: parent
 
         Text {
-          text: Time.time
+          text: I3.focusedWorkspace.number
           color: "white"
+          Layout.leftMargin: 10
+          anchors.left: parent
         }
 
         Text {
-          text: `${100 * UPower.displayDevice.percentage}%`
+          text: Time.time
           color: "white"
+          anchors.centerIn: parent
+        }
+
+        Text {
+          text: `${Math.round(100 * UPower.displayDevice.percentage)}%`
+          color: "white"
+          anchors.right: parent
+          Layout.rightMargin: 10
+          Layout.alignment: Qt.AlignRight
         }
       }
     }

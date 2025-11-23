@@ -6,7 +6,6 @@ let
 in
 {
   home.packages = with pkgs; [
-    swaybg
     autotiling
     slurp
     grim

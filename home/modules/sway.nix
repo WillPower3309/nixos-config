@@ -59,6 +59,7 @@ in
           # TODO: causes flickering
           #adaptive_sync = "on";
           render_bit_depth = "10";
+          scale = "1";
         };
         # LG 34 inch ultrawide
         "LG Electronics LG ULTRAWIDE 0x0002D12B" = lib.mkIf isDesktop {

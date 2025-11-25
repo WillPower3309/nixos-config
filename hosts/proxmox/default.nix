@@ -4,11 +4,15 @@ let
   authorizedKey = (builtins.readFile ../../home/id_ed25519.pub);
   hostKeyPath = /etc/ssh/ssh_host_ed25519_key;
   ipAddress = "10.27.27.10";
-  rj45InterfaceName0 = "lan0";
-  rj45InterfaceName1 = "lan1";
-  sfpInterfaceName0 = "lan2";
-  sfpInterfaceName1 = "lan3";
-  bridgeInterfaceName = "vmbr0";
+  rj45Interface0 = "eth0";
+  rj45Interface1 = "eth1";
+  sfpInterface0 = "eth2";
+  sfpInterface1 = "eth3";
+  bridgeInterface = "vmbr0";
+  bondInterface = "bond0";
+
+  wanVlanId = 100;
+  lanVlanId = 101;
 
 in
 {
@@ -25,12 +29,12 @@ in
   ];
 
   services = {
-    # 38:05:28:31:AD is the intel AMT ethernet port (uses the I226-LM controller)
+    # 38:05:28:31:AD / rj45Interface1 is the intel AMT ethernet port (uses the I226-LM controller)
     udev.extraRules = ''
-      ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="38:05:25:31:58:ac", NAME="${rj45InterfaceName0}"
-      ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="38:05:25:31:58:ad", NAME="${rj45InterfaceName1}"
-      ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="38:05:25:31:58:aa", NAME="${sfpInterfaceName0}"
-      ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="38:05:25:31:58:ab", NAME="${sfpInterfaceName1}"
+      ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="38:05:25:31:58:ac", NAME="${rj45Interface0}"
+      ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="38:05:25:31:58:ad", NAME="${rj45Interface1}"
+      ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="38:05:25:31:58:aa", NAME="${sfpInterface0}"
+      ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="38:05:25:31:58:ab", NAME="${sfpInterface1}"
     '';
   };
 
@@ -44,32 +48,46 @@ in
 
     defaultGateway = {
       address = "10.27.27.1";
-      interface = rj45InterfaceName0;
+      interface = rj45Interface0;
     };
 
-    bonds.bond0 = {
-      interfaces = [ sfpInterfaceName0 sfpInterfaceName1 ];
+    bonds."${bondInterface}" = {
+      interfaces = [ sfpInterface0 sfpInterface1 ];
       driverOptions = {
         miimon = "100"; # monitor mii link every 100s
         mode = "802.3ad"; # dynamic LACP
-        xmit_hash_policy = "layer3+4"; # IP and TCP/UDP hash
+        xmit_hash_policy = "layer2+3";
       };
     };
 
-    bridges.vmbr0.interfaces = [ rj45InterfaceName0 ];
+    bridges."${bridgeInterface}".interfaces = [ rj45Interface0 ];
+
+    vlans = {
+      "vlan${toString wanVlanId}" = {
+        id = wanVlanId;
+        interface = bridgeInterface;
+      };
+      "vlan${toString lanVlanId}" = {
+        id = lanVlanId;
+        interface = bridgeInterface;
+      };
+    };
 
     interfaces = {
-      "${rj45InterfaceName0}".ipv4.addresses = [{
+      "${bridgeInterface}".ipv4.addresses = [{
         address = ipAddress;
         prefixLength = 24;
       }];
 
-#      "${rj45InterfaceName1}".ipv4.addresses = [{
-#        address = "10.27.27.11";
-#        prefixLength = 24;
-#      }];
+      "vlan${toString wanVlanId}".ipv4.addresses = [{
+        address = "10.1.1.1";
+        prefixLength = 24;
+      }];
 
-      "${bridgeInterfaceName}".useDHCP = lib.mkDefault true;
+      "vlan${toString lanVlanId}".ipv4.addresses = [{
+        address = "10.1.1.2";
+        prefixLength = 24;
+      }];
     };
 
     # TODO: ceph USB4 mesh network: https://fangpenlin.com/posts/2024/01/14/high-speed-usb4-mesh-network/
@@ -127,7 +145,7 @@ in
     enable = true;
     openFirewall = true;
     ipAddress = ipAddress;
-    bridges = [ bridgeInterfaceName ];
+    bridges = [ bridgeInterface ];
   };
 
   system.stateVersion = config.system.nixos.release;

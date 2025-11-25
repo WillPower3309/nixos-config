@@ -17,15 +17,11 @@
       "lighthouse" = {
         hostname = "lighthouse.willmckinnon.com";
         user = "root";
+        port = 2222;
       };
 
       "router" = {
         hostname = "10.27.27.1";
-        user = "root";
-      };
-
-      "tv" = {
-        hostname = "10.27.27.6";
         user = "root";
       };
     };

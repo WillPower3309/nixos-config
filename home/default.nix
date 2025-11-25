@@ -1,12 +1,10 @@
-{ pkgs, impermanence, agenix, ags, nixosConfig, ... }:
+{ pkgs, impermanence, agenix, nixosConfig, ... }:
 
 {
   imports = [
     agenix.homeManagerModules.age
-    ags.homeManagerModules.default
     impermanence.nixosModules.home-manager.impermanence
     #./modules/android-development.nix
-    ./modules/ags
     ./modules/cad.nix
     ./modules/discord.nix
     ./modules/document-viewer.nix

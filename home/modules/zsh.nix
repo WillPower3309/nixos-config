@@ -22,7 +22,8 @@ in
       shellAliases = {
         ls = "colorls";
         os-rebuild = "nixos-rebuild switch --flake ${nixosConfigPath}#${nixosConfig.networking.hostName}";
-        fetch = "SPRITE=$(pokeget random --hide-name); HEIGHT=$(echo \"$SPRITE\" | wc -l); fastfetch --data-raw \"$SPRITE\"; echo \"$HEIGHT\""; # TODO: vertical align to sprite https://github.com/fastfetch-cli/fastfetch/issues/458
+        fetch = "SPRITE=$(pokeget random --hide-name); HEIGHT=$(echo \"$SPRITE\" | wc -l); fastfetch --data-raw \"$SPRITE\"; echo \"$HEIGHT\"";
+        # TODO: vertical align to sprite, can be done with `fastfetch -s Break:Break:OS:Host:Kernel:Uptime:Packages:DE:WM:CPU:GPU:Memory:Swap:Disk:LocalIp:Battery:PowerAdapter:Break:Colors`
       };
 
       # show fetch on new terminal windows & set up transient prompt

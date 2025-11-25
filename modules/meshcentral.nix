@@ -51,8 +51,8 @@ in {
     };
   };
 
-  environment.persistence."/persist".directories = [{
-    directory = "/var/lib/meshcentral";
+  environment.persistence."/nix/persist".directories = [{
+    directory = "/var/lib/private/meshcentral";
     user = "meshcentral";
     group = "meshcentral";
   }];

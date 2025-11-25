@@ -5,5 +5,6 @@ Scope {
   Bar {}
   Background {}
   Launcher {}
+  PowerMenu {}
 }
 

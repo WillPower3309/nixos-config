@@ -7,6 +7,8 @@ import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Widgets
 
+// TODO: animation
+
 Scope {
   LazyLoader {
     id: root
@@ -164,7 +166,7 @@ Scope {
 
   IpcHandler {
     target: "launcher"
-    function toggleVisible(): void { root.active = !root.active; }
+    function toggle(): void { root.active = !root.active; }
   }
 }
 

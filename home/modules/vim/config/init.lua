@@ -11,6 +11,12 @@ vim.keymap.set('n', '<leader>wK', '<C-w>K', { noremap=true, silent=true })
 vim.keymap.set('n', '<leader>wL', '<C-w>L', { noremap=true, silent=true })
 vim.keymap.set('n', '<leader>wc', '<C-w>c', { noremap=true, silent=true })
 
+-- wanted by nvim-tree: disable netrw at the very start of your init.lua
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+require('nvim-tree').setup({
+  renderer = { group_empty = true },
+})
 vim.keymap.set('n', '<leader>op', '<cmd>NvimTreeToggle<CR>', {})
 
 require('telescope').load_extension('fzf')
@@ -72,7 +78,7 @@ vim.o.list = true
 vim.o.listchars = 'tab:│ ,trail:•,extends:#,nbsp:.'
 
 -- Characters to fill the statuslines and vertical separators
-vim.o.fillchars='stl:━,stlnc:━,vert:┃,vertleft:┫,vertright:┣,verthoriz:╋,horiz:━,horizup:┻,horizdown:┳,eob:⬝'
+vim.o.fillchars='stl:━,stlnc:━,vert:┃,vertleft:┫,vertright:┣,verthoriz:╋,horiz:━,horizup:┻,horizdown:┳,eob: '
 
 -- Only one statusline for all windows
 vim.opt.laststatus = 3

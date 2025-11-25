@@ -87,8 +87,8 @@ in
       keybindings = let
         mod = "Mod4";
         term = "footclient";
-        app-menu = "qs ipc call launcher toggleVisible";
-        power-menu = "";
+        app-menu = "qs ipc call launcher toggle";
+        power-menu = "qs ipc call powermenu toggle";
 
       in {
         "${mod}+Return" = "exec ${term}";

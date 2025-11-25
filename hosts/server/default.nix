@@ -104,9 +104,9 @@ in
   services.nfs.server = {
     enable = true;
     exports = ''
-      /export        10.27.27.5(rw,fsid=0,no_subtree_check)
-      /export/photos 10.27.27.5(rw,insecure,no_subtree_check,all_squash,anonuid=65534,anongid=65534)
-      /export/music  10.27.27.5(ro,insecure,no_subtree_check,all_squash,anonuid=65534,anongid=65534)
+      /export        10.27.27.8(rw,fsid=0,no_subtree_check)
+      /export/photos 10.27.27.8(rw,insecure,no_subtree_check,all_squash,anonuid=65534,anongid=65534)
+      /export/music  10.27.27.8(ro,insecure,no_subtree_check,all_squash,anonuid=65534,anongid=65534)
     '';
   };
   # open nfs ports

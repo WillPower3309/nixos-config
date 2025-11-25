@@ -214,7 +214,7 @@ in
           }
           {
             ip-address = "10.27.27.8";
-            hw-address = "c8:7f:54:0a:4b:d2";
+            hw-address = "04:7c:16:76:a9:9c";
             hostname = "desktop";
           }
           {

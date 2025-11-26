@@ -1,4 +1,4 @@
-{ pkgs, config, home-manager, impermanence, agenix, ... }:
+{ pkgs, config, home-manager, impermanence, agenix, rapidshell, ... }:
 
 {
   imports = [ home-manager.nixosModules.home-manager ];
@@ -32,7 +32,7 @@
 
   home-manager = {
     useUserPackages = true;
-    extraSpecialArgs = { inherit impermanence agenix; };
+    extraSpecialArgs = { inherit impermanence agenix rapidshell; };
     backupFileExtension = "backup";
     users.will = import ../home;
   };

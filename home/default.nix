@@ -19,7 +19,6 @@
     ./modules/keepass.nix
     ./modules/notetaking.nix
     ./modules/photography.nix
-    ./modules/quickshell
     ./modules/ssh-client.nix
     ./modules/theme.nix
     ./modules/sway.nix

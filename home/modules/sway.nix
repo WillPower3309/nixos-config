@@ -1,4 +1,4 @@
-{ lib, nixosConfig, pkgs, config, ... }:
+{ lib, nixosConfig, pkgs, config, rapidshell, ... }:
 
 let
   isDesktop = nixosConfig.networking.hostName == "desktop";
@@ -13,8 +13,7 @@ in
     # TODO: use the below!
     # swayidle
     # kanshi
-  ];
-      # Disable mouse acceleration on desktop for all inputs
+  ] ++ [ rapidshell.packages.${pkgs.system}.default ];
 
   wayland.windowManager.sway = {
     enable = true;
@@ -73,7 +72,7 @@ in
       startup = [
         { command = "foot --server"; }
         { command = "autotiling"; }
-        { command = "quickshell"; }
+        { command = "rapidshell"; }
         { command = "wlsunset -l 43.7 -L -79.3"; }
       ];
 
@@ -87,8 +86,8 @@ in
       keybindings = let
         mod = "Mod4";
         term = "footclient";
-        app-menu = "qs ipc call launcher toggle";
-        power-menu = "qs ipc call powermenu toggle";
+        app-menu = "rapidshell ipc call launcher toggle";
+        power-menu = "rapidshell ipc call powermenu toggle";
 
       in {
         "${mod}+Return" = "exec ${term}";

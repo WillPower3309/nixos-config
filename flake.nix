@@ -37,20 +37,25 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    rapidshell = {
+      url = "github:willpower3309/rapidshell";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
   };
 
-  outputs = { self, nixpkgs, home-manager, impermanence, deploy-rs, agenix, disko, nixos-generators, nixos-hardware, proxmox-nixos, ... }:
+  outputs = { self, nixpkgs, home-manager, impermanence, deploy-rs, agenix, disko, nixos-generators, nixos-hardware, proxmox-nixos, rapidshell, ... }:
   let
     mkNixos = modules: nixpkgs.lib.nixosSystem {
       inherit modules;
       system = "x86_64-linux";
-      specialArgs = { inherit nixpkgs impermanence home-manager agenix disko nixos-hardware proxmox-nixos; };
+      specialArgs = { inherit nixpkgs impermanence home-manager agenix disko nixos-hardware proxmox-nixos rapidshell; };
     };
 
     mkHome = modules: pkgs: home-manager.lib.homeManagerConfiguration {
       inherit modules pkgs;
-      extraSpecialArgs = { inherit impermanence; };
+      extraSpecialArgs = { inherit impermanence rapidshell; };
     };
 
     mkImage = format: modules: nixos-generators.nixosGenerate {

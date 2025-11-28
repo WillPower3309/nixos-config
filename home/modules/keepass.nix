@@ -4,8 +4,19 @@
   home = {
     packages = with pkgs; [ keepassxc ];
 
-    file.".cache/keepassxc/keepassxc.ini".text = lib.generators.toINI { } {
-      General.LastActiveDatabase = "/nix/persist/home/will/keepass/vault.kdbx";
+    file = {
+      ".cache/keepassxc/keepassxc.ini".text = lib.generators.toINI { } {
+        General.LastActiveDatabase = "/nix/persist/home/will/keepass/vault.kdbx";
+      };
+
+      ".mozilla/native-messaging-hosts/org.keepassxc.keepassxc_browser.json".text = lib.generators.toJSON { } {
+        "allowed_extensions" = [ "keepassxc-browser@keepassxc.org" ];
+        "description" = "KeePassXC integration with native messaging support";
+        "name" = "org.keepassxc.keepassxc_browser";
+        # TODO: properly get path
+        "path" = "/nix/store/x2xi0dpkm8db7knl9z2bwpqqxhlznns0-keepassxc-2.7.10/bin/keepassxc-proxy";
+        "type" = "stdio";
+      };
     };
   };
 
@@ -14,13 +25,15 @@
       ConfigVersion = 2;
       MinimizeAfterUnlock = true;
     };
-    Browser.Enabled = true;
+    Browser = {
+      Enabled = true;
+    };
     GUI = {
       ApplicationTheme= "dark";
       MinimizeOnClose = true;
       MinimizeToTray = true;
       ShowTrayIcon = true;
-      TrayIconAppearance = "monochrome-dark";
+      TrayIconAppearance = "monochrome-light";
     };
 
     Security.IconDownloadFallback = true;

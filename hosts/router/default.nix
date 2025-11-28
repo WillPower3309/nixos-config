@@ -1,4 +1,4 @@
-{ config, lib, agenix, impermanence, ... }:
+{ config, lib, pkgs, agenix, impermanence, ... }:
 
 let
   authorizedKey = (builtins.readFile ../../home/id_ed25519.pub);
@@ -82,9 +82,10 @@ in
 
   networking = {
     hostName = "router";
+    domain = "willmckinnon.com";
 
     usePredictableInterfaceNames = false; # set interface names via services.udev.extraRules above
-    useDHCP = false;
+    useDHCP = false; # define per interface instead
     wireless.enable = false;
     networkmanager.enable = lib.mkForce false;
     useNetworkd = true;
@@ -110,10 +111,33 @@ in
       internalIPs = [ lanCidr ];
     };
 
-    firewall.interfaces."${lanInterface}" = {
-      allowedUDPPorts = [ 53 67 ];
-      allowedTCPPorts = [ 53 67 ];
+    firewall = {
+      interfaces."${lanInterface}" = {
+        allowedUDPPorts = [ 53 67 ];
+        allowedTCPPorts = [ 53 67 ];
+      };
+
+      # use tc-cake scheduler to avoid buffer bloat
+      # TODO: set bandwidth properly
+      # TODO: Cannot find device "wan0"
+      extraPackages = [ pkgs.iproute2 ];
+      extraCommands = ''
+        # outbound
+        tc qdisc replace dev ${wanInterface} root cake ethernet bandwidth 1gbit
+        # inbound
+        ip link add name ifb0 type ifb # create an ifb device
+        #tc qdisc del dev ${wanInterface} ingress
+        tc qdisc replace dev ${wanInterface} handle ffff: ingress
+        #tc qdisc del dev ifb0 root
+        tc qdisc replace dev ifb0 root cake bandwidth 1gbit besteffort
+        ip link set ifb0 up
+        tc filter add dev ${wanInterface} parent ffff: matchall action mirred egress redirect dev ifb0
+      '';
+      extraStopCommands = ''
+        tc qdisc del dev ${wanInterface} root 2> /dev/null || true
+      '';
     };
+
     # TODO: nftables hardware accel
 #    nftables = {
 #      enable = true;
@@ -167,6 +191,8 @@ in
 #      };
 #    };
   };
+
+  boot.kernelModules = [ "sch_cake" ]; # TODO: move tc-cake scheduling to module?
 
   services.kea.dhcp4 = {
     enable = true;

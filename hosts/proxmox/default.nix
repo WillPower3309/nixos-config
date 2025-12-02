@@ -138,8 +138,14 @@ in
       files = [ (toString hostKeyPath) ];
     };
 
-    etc."ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;
+    etc = {
+      "ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;
+      # pveproxy needs rsa keys to work
+      "ssh/ssh_host_rsa_key.pub".source = ./ssh_host_rsa_key.pub;
+      "ssh/ssh_host_rsa_key".source = config.age.secrets.proxmoxRsaPrivateKey.path;
+    };
   };
+  age.secrets.proxmoxRsaPrivateKey.file = ../../secrets/proxmoxRsaPrivateKey.age;
 
   services.proxmox-ve = {
     enable = true;

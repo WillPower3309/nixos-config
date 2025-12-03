@@ -23,9 +23,9 @@ let
   };
 
   boot = {
-    kernelModules = [ "kvm-intel" "vfio_virqfd" "vfio_pci" "vfio_iommu_type1" "vfio" ];
+    kernelModules = [ "kvm-intel" "vfio_pci" "vfio_iommu_type1" "vfio" ];
     kernelParams = [ "intel_iommu=on" ];
-    blacklistedKernelModules = ["nouveau"];
+    blacklistedKernelModules = [ "nouveau" ];
     extraModprobeConfig = "options vfio-pci ids=10de:1c03,10de:10f1";
   };
 

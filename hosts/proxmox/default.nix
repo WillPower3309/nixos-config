@@ -9,10 +9,8 @@ let
   sfpInterface0 = "eth2";
   sfpInterface1 = "eth3";
   bridgeInterface = "vmbr0";
-  bondInterface = "bond0";
 
-  wanVlanId = 100;
-  lanVlanId = 101;
+  numGpuVfs = 2; # only need for plex and immich vms
 
 in
 {
@@ -51,41 +49,11 @@ in
       interface = rj45Interface0;
     };
 
-    bonds."${bondInterface}" = {
-      interfaces = [ sfpInterface0 sfpInterface1 ];
-      driverOptions = {
-        miimon = "100"; # monitor mii link every 100s
-        mode = "802.3ad"; # dynamic LACP
-        xmit_hash_policy = "layer2+3";
-      };
-    };
-
     bridges."${bridgeInterface}".interfaces = [ rj45Interface0 ];
-
-    vlans = {
-      "vlan${toString wanVlanId}" = {
-        id = wanVlanId;
-        interface = bridgeInterface;
-      };
-      "vlan${toString lanVlanId}" = {
-        id = lanVlanId;
-        interface = bridgeInterface;
-      };
-    };
 
     interfaces = {
       "${bridgeInterface}".ipv4.addresses = [{
         address = ipAddress;
-        prefixLength = 24;
-      }];
-
-      "vlan${toString wanVlanId}".ipv4.addresses = [{
-        address = "10.1.1.1";
-        prefixLength = 24;
-      }];
-
-      "vlan${toString lanVlanId}".ipv4.addresses = [{
-        address = "10.1.1.2";
         prefixLength = 24;
       }];
     };
@@ -94,9 +62,20 @@ in
     # TODO: fallback routing for the ceph mesh network: https://pve.proxmox.com/wiki/Full_Mesh_Network_for_Ceph_Server#Routed_Setup_(with_Fallback)
   };
 
-  boot.loader.systemd-boot = {
-    enable = true;
-    editor = false; # true allows gaining root access by passing init=/bin/sh as a kernel parameter
+  # TODO sriov gpu: https://www.michaelstinkerings.org/gpu-virtualization-with-intel-12th-gen-igpu-uhd-730/
+  boot = {
+    kernelModules = [ "vfio" "vfio_iommu_type1" "vfio_pci" ]; # needed for sriov
+    kernelParams = [ "intel_iommu=on" "iommu=pt" "i915.enable_guc=3" "i915.max_vfs=${toString numGpuVfs}" ]; # needed for sriov
+    kernel.sysfs = {
+      #devices."pci0000:00"."0000:00:02.0".sriov_numvfs = numGpuVfs; # set the number of vfs for the igpu
+      # TODO: doesn't work with udev.extrarules
+      # TODO: set by mathing the number of files in vms folder
+      class.net.${sfpInterface0}.device.sriov_numvfs = 7; # set the number of vfs for the nic
+    };
+    loader.systemd-boot = {
+      enable = true;
+      editor = false; # true allows gaining root access by passing init=/bin/sh as a kernel parameter
+    };
   };
 
   hardware.enableAllFirmware = true;

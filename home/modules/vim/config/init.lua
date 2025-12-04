@@ -12,8 +12,40 @@ vim.keymap.set('n', '<leader>wJ', '<C-w>J', { noremap=true, silent=true })
 vim.keymap.set('n', '<leader>wK', '<C-w>K', { noremap=true, silent=true })
 vim.keymap.set('n', '<leader>wL', '<C-w>L', { noremap=true, silent=true })
 vim.keymap.set('n', '<leader>wc', '<C-w>c', { noremap=true, silent=true })
+vim.keymap.set('t', '<Esc>', '<C-\\><C-n>', { noremap=true, silent=true })
 -- better find
 vim.keymap.set('n', 'n', 'nzz')
+
+-- Term Toggle Keymap
+local term_buf = nil
+local term_win = nil
+vim.keymap.set("n", "<leader>oe", function()
+    if term_win and vim.api.nvim_win_is_valid(term_win) then
+        vim.cmd("hide")
+    else
+        vim.cmd("botright new")
+        local new_buf = vim.api.nvim_get_current_buf()
+        vim.cmd("resize " .. 15)
+        if term_buf and vim.api.nvim_buf_is_valid(term_buf) then
+            vim.cmd("buffer " .. term_buf) -- go to terminal buffer
+            vim.cmd("bd " .. new_buf) -- cleanup new buffer
+        else
+            vim.cmd("terminal")
+            term_buf = vim.api.nvim_get_current_buf()
+        end
+    vim.cmd.startinsert()
+    term_win = vim.api.nvim_get_current_win()
+    end
+end)
+
+-- built in terminal config
+vim.opt_local.mouse = '' -- TODO: terminal only
+vim.api.nvim_create_autocmd({ 'WinEnter' }, {
+    pattern = term_win,
+    callback = function()
+        vim.cmd.startinsert()
+    end
+})
 
 -- Disable unused builtins and language provider support (lua and vimscript plugins only, LSP handles the rest)
 vim.g.loaded_perl_provider = 0

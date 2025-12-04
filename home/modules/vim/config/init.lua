@@ -121,19 +121,19 @@ vim.o.showtabline = 2
 
 local function LineInfo()
     return table.concat {
-        "%#CustomTablineBubbleEdge#",
-        "%#CustomTablineBubbleLine# ",
-        "%2l", -- Space-padded line number
-        "%#CustomTablineBubbleSeparator# ✖ ",
-        "%#CustomTablineBubbleColumn#",
-        "%-2c", -- Space padded, right-aligned column number
-        " %#CustomTablineBubbleEdge#",
-        "%#CustomTablineBubblePercentage# ",
-        "%P", -- Space-padded line number
-        "%#CustomTablineBubbleSeparator# ● ",
-        "%#CustomTablineBubbleTotalLines#",
-        "%L",
-        " %#CustomTablineBubbleEdge# ",
+        '%#CustomTablineBubbleEdge#',
+        '%#CustomTablineBubbleLine# ',
+        '%2l', -- Space-padded line number
+        '%#CustomTablineBubbleSeparator# ✖ ',
+        '%#CustomTablineBubbleColumn#',
+        '%-2c', -- Space padded, right-aligned column number
+        ' %#CustomTablineBubbleEdge#',
+        '%#CustomTablineBubblePercentage# ',
+        '%P', -- Space-padded line number
+        '%#CustomTablineBubbleSeparator# ● ',
+        '%#CustomTablineBubbleTotalLines#',
+        '%L',
+        ' %#CustomTablineBubbleEdge# ',
     }
 end
 
@@ -158,18 +158,18 @@ function FiletypeAndDirectoryAndGit()
     local git_info = vim.b.gitsigns_status_dict
 
     local git_info_or_end_bubble
-    if not git_info or git_info.head == "" then
-        git_info_or_end_bubble = " %#CustomTablineBubbleEdge#"
+    if not git_info or git_info.head == '' then
+        git_info_or_end_bubble = ' %#CustomTablineBubbleEdge#'
     else
-        git_info_or_end_bubble = " %#CustomTablineBubbleEdge#%#CustomTablineBubbleGit# "..git_info.head.." %#CustomTablineBubbleEdge#"
+        git_info_or_end_bubble = ' %#CustomTablineBubbleEdge#%#CustomTablineBubbleGit# '..git_info.head..' %#CustomTablineBubbleEdge#'
     end
 
     return table.concat {
-        "%#CustomTablineBubbleEdge#",
-        "%#CustomTablineBubbleFiletype# ",
-        vim.bo.filetype == "" and "-" or vim.bo.filetype,
-        " %#CustomTablineBubbleEdge#",
-        "%#CustomTablineBubbleDirectory# ",
+        '%#CustomTablineBubbleEdge#',
+        '%#CustomTablineBubbleFiletype# ',
+        vim.bo.filetype == '' and '-' or vim.bo.filetype,
+        ' %#CustomTablineBubbleEdge#',
+        '%#CustomTablineBubbleDirectory# ',
         truncated_path,
         git_info_or_end_bubble
     }
@@ -190,26 +190,26 @@ function Tabs()
         end
         local tab_bubble, hi_label, hi_index
         if (i == selected_tabnr) then
-            hi_index = "%#CustomTablineBubbleIndexSel#"
+            hi_index = '%#CustomTablineBubbleIndexSel#'
             if (vim.bo.modified) then
-                hi_label = "%#CustomTablineBubbleLabelSelModified#"
+                hi_label = '%#CustomTablineBubbleLabelSelModified#'
             else
-                hi_label = "%#CustomTablineBubbleLabelSel#"
+                hi_label = '%#CustomTablineBubbleLabelSel#'
             end
         else
-            hi_index = "%#CustomTablineBubbleIndex#"
-            hi_label = "%#CustomTablineBubbleLabel#"
+            hi_index = '%#CustomTablineBubbleIndex#'
+            hi_label = '%#CustomTablineBubbleLabel#'
         end
 
         tab_bubble = table.concat {
-            "%"..i.."T", -- Start of clickable section for tab i
+            '%'..i..'T', -- Start of clickable section for tab i
             '%#CustomTablineBubbleEdge#',
             hi_index..' '..i..' ',
             '%#CustomTablineBubbleEdge#',
             '%#CustomTablineBubbleEdge#',
             hi_label..' '..file..' ',
             '%#CustomTablineBubbleEdge#',
-            "%X", -- End of clickable section
+            '%X', -- End of clickable section
             ' ',
         }
         tabs_string = tabs_string..tab_bubble
@@ -221,9 +221,9 @@ end
 function CustomTabline()
     return table.concat {
         Tabs(),
-        "%=", -- Switch to right side
+        '%=', -- Switch to right side
         FiletypeAndDirectoryAndGit(),
-        " ",
+        ' ',
         LineInfo(),
     }
 end

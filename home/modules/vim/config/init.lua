@@ -1,3 +1,5 @@
+vim.loader.enable()
+
 vim.g.mapleader = ' '
 vim.keymap.set('n', '<leader>wv', ':vsplit<CR>', { noremap=true, silent=true })
 vim.keymap.set('n', '<leader>ws', ':split<CR>', { noremap=true, silent=true })
@@ -10,19 +12,58 @@ vim.keymap.set('n', '<leader>wJ', '<C-w>J', { noremap=true, silent=true })
 vim.keymap.set('n', '<leader>wK', '<C-w>K', { noremap=true, silent=true })
 vim.keymap.set('n', '<leader>wL', '<C-w>L', { noremap=true, silent=true })
 vim.keymap.set('n', '<leader>wc', '<C-w>c', { noremap=true, silent=true })
+-- better find
+vim.keymap.set('n', 'n', 'nzz')
 
--- wanted by nvim-tree: disable netrw at the very start of your init.lua
-vim.g.loaded_netrw = 1
-vim.g.loaded_netrwPlugin = 1
+-- Disable unused builtins and language provider support (lua and vimscript plugins only, LSP handles the rest)
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_ruby_provider = 0
+vim.g.loaded_node_provider = 0
+vim.g.loaded_python_provider = 0
+vim.g.loaded_python3_provider = 0
+vim.g.loaded_netrw = 1 -- wanted by nvim-tree
+vim.g.loaded_netrwPlugin = 1 -- wanted by nvim-tree
+vim.g.loaded_netrwFileHandlers = true
+vim.g.loaded_netrwSettings = true
+vim.g.loaded_gzip = true
+vim.g.loaded_rrhelper = true
+vim.g.loaded_tarPlugin = true
+vim.g.loaded_zipPlugin = true
+vim.g.loaded_2html_plugin = true
+vim.g.loaded_vimballPlugin = true
+vim.g.loaded_getscriptPlugin = true
+vim.g.loaded_logipat = true
+vim.g.loaded_tutor_mode_plugin = true
+vim.g.loaded_matchit = true
+
+-- TODO: style like https://github.com/reyhankaplan/dotfiles/tree/f40a05211494748a5c0f08ab965b5e0bee6b268c
 require('nvim-tree').setup({
-  renderer = { group_empty = true },
+    renderer = {
+        group_empty = true,
+        icons = {
+            -- TODO: set glyphs
+            git_placement = 'after',
+            padding = ' ',
+            show = {
+                git = false,
+                folder_arrow = false,
+            },
+        },
+    },
+    hijack_cursor = true,
+    diagnostics = { enable = true }, -- lsp highlighting
+    update_focused_file = {
+        enable = true,
+        update_root = true,
+    },
 })
 vim.keymap.set('n', '<leader>op', '<cmd>NvimTreeToggle<CR>', {})
 
-require('telescope').load_extension('fzf')
+require('telescope').load_extension('fzf') -- fzf is faster
 local builtin = require('telescope.builtin')
 vim.keymap.set('n', '<leader> ', builtin.find_files, {})
 vim.keymap.set('n', '<leader>*', builtin.live_grep, {})
+vim.keymap.set('n', 'gd', '<cmd>Telescope lsp_definitions<CR>', {})
 
 vim.opt.number = true
 
@@ -49,13 +90,6 @@ vim.api.nvim_create_autocmd({ 'BufLeave', 'FocusLost', 'InsertEnter', 'CmdlineEn
         end
     end
 })
-
--- Disable language provider support (lua and vimscript plugins only, LSP handles the rest)
-vim.g.loaded_perl_provider = 0
-vim.g.loaded_ruby_provider = 0
-vim.g.loaded_node_provider = 0
-vim.g.loaded_python_provider = 0
-vim.g.loaded_python3_provider = 0
 
 -- Spaces & tabs
 vim.o.expandtab = true
@@ -197,7 +231,7 @@ end
 -- Empty since all the info is in the tabline now
 -- TODO Add LSP info in statusline at some point
 function CustomStatusline()
-    return ""
+    return ''
 end
 
 -- Since some of the displayed information does not update automatically in the
@@ -210,18 +244,39 @@ vim.api.nvim_create_autocmd({'CursorMoved', 'BufEnter'}, {
 })
 
 vim.api.nvim_exec([[
-  set tabline=%!v:lua.CustomTabline()
-  set statusline=%!v:lua.CustomStatusline()
+    set tabline=%!v:lua.CustomTabline()
+    set statusline=%!v:lua.CustomStatusline()
 ]], false)
 
 vim.o.termguicolors = true
 
+-- resize splits if window resized
+vim.api.nvim_create_autocmd({ 'VimResized' }, {
+    callback = function()
+        local current_tab = vim.fn.tabpagenr()
+        vim.cmd('tabdo wincmd =')
+        vim.cmd('tabnext ' .. current_tab)
+    end
+})
+
+-- wrap and spellcheck in text files
+vim.api.nvim_create_autocmd({ 'VimResized' }, {
+    callback = function()
+        pattern = { 'text', 'plaintex', 'typst', 'gitcommit', 'markdown' }
+        vim.opt_local.wrap = true
+        vim.opt_local.spell = true
+    end
+})
+
 -- lsp
 vim.lsp.config.clangd = {
-  filetypes = { 'c', 'cpp', 'cc', 'h', 'hh', 'hpp' },
-  cmd = { 'clangd', '--background-index' },
-  root_markers = { '.git' },
+    filetypes = { 'c', 'cpp', 'cc', 'h', 'hh', 'hpp' },
+    cmd = { 'clangd', '--background-index' },
+    root_markers = { '.git' },
 }
 
 vim.lsp.enable({ 'clangd' })
+
+-- remove diagnostic signs to the left of the line number column
+vim.diagnostic.config({ signs = false })
 

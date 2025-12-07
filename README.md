@@ -31,3 +31,9 @@ Haven't yet had the patience to set up addons and settings with nix. Addons used
 + https://github.com/croneter/PlexKodiConnect
   + will likely need to `chmod +w` the `.kodi/userdata/library/video/` directory
 
+## Managed Switch Setup
+The default IP of the switch is `192.168.0.1`. To configure the switch (and move it to the proper subnet, perform the following steps:
+1. Give the client a static IP on the same subnet: `sudo ip addr add 192.168.0.2 dev <interface name>`
+2. Remove the old interface IP address (if it had one): `sudo ip addr delete <previous ip>/32 dev <interface name>`
+3. Add a route to the switch: `sudo ip route add 192.168.0.1 dev <interface name>`
+

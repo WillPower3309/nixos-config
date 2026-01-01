@@ -13,8 +13,7 @@
         "allowed_extensions" = [ "keepassxc-browser@keepassxc.org" ];
         "description" = "KeePassXC integration with native messaging support";
         "name" = "org.keepassxc.keepassxc_browser";
-        # TODO: properly get path
-        "path" = "/nix/store/x2xi0dpkm8db7knl9z2bwpqqxhlznns0-keepassxc-2.7.10/bin/keepassxc-proxy";
+        "path" = "${pkgs.keepassxc}/bin/keepassxc-proxy";
         "type" = "stdio";
       };
     };

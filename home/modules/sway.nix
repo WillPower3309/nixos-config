@@ -17,6 +17,8 @@ in
 
   xdg.autostart.enable = true;
 
+  age.secrets.keepassPassword.file = ../secrets/keepass.age;
+
   wayland.windowManager.sway = {
     enable = true;
     package = pkgs.swayfx;
@@ -77,7 +79,8 @@ in
         { command = "autotiling"; }
         { command = "rapidshell"; }
         { command = "wlsunset -l 43.7 -L -79.3"; }
-        { command = "keepassxc"; }
+        # TODO: move to keepassxc module
+        { command = "cat ${config.age.secrets.keepassPassword.path} | keepassxc --pw-stdin /nix/persist/home/will/keepass/vault.kdbx"; }
       ];
 
       window = {

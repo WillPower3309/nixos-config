@@ -18,8 +18,6 @@ in
   "hashedRootPassword.age".publicKeys = [ systemServer systemRouter systemProxmox ] ++ guiSystems ++ editors;
   "hashedWillPassword.age".publicKeys = guiSystems ++ editors;
 
-  "keepassKeyFile.age".publicKeys = guiSystems ++ editors;
-
   # syncthing certs and keys
   "desktopSyncthingKey.age".publicKeys = [ systemDesktop ] ++ editors;
   "desktopSyncthingCert.age".publicKeys = [ systemDesktop ] ++ editors;

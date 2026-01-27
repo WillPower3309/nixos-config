@@ -19,7 +19,8 @@
       Enabled = true;
     };
     GUI = {
-      ApplicationTheme= "dark";
+      ApplicationTheme = "dark";
+      MinimizeOnStartup = true;
       MinimizeOnClose = true;
       MinimizeToTray = true;
       ShowTrayIcon = true;

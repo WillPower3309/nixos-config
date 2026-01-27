@@ -55,7 +55,7 @@
 
     mkHome = modules: pkgs: home-manager.lib.homeManagerConfiguration {
       inherit modules pkgs;
-      extraSpecialArgs = { inherit impermanence rapidshell; };
+      extraSpecialArgs = { inherit impermanence agenix rapidshell; };
     };
 
     mkImage = format: modules: nixos-generators.nixosGenerate {

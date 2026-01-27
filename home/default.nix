@@ -1,8 +1,8 @@
-{ pkgs, impermanence, agenix, nixosConfig, ... }:
+{ config, pkgs, impermanence, agenix, nixosConfig, ... }:
 
 {
   imports = [
-    agenix.homeManagerModules.age
+    agenix.homeManagerModules.default
     impermanence.nixosModules.home-manager.impermanence
     #./modules/android-development.nix
     ./modules/cad.nix
@@ -33,6 +33,8 @@
   nixpkgs.config.allowUnfree = true;
 
   xdg.mimeApps.enable = true;
+
+  age.identityPaths = [ "/nix/persist/home/will/.ssh/id_ed25519" ];
 
   home = {
     username = "will";

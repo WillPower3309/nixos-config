@@ -1,21 +1,12 @@
-{ pkgs, lib, ... }:
+{ pkgs, config, lib, ... }:
 
 {
+  # TODO: https://www.reddit.com/r/NixOS/comments/1l9xbd9/how_to_declaratively_link_keepassxc_databases_to/
   home = {
     packages = with pkgs; [ keepassxc ];
 
-    file = {
-      ".cache/keepassxc/keepassxc.ini".text = lib.generators.toINI { } {
-        General.LastActiveDatabase = "/nix/persist/home/will/keepass/vault.kdbx";
-      };
-
-      ".mozilla/native-messaging-hosts/org.keepassxc.keepassxc_browser.json".text = lib.generators.toJSON { } {
-        "allowed_extensions" = [ "keepassxc-browser@keepassxc.org" ];
-        "description" = "KeePassXC integration with native messaging support";
-        "name" = "org.keepassxc.keepassxc_browser";
-        "path" = "${pkgs.keepassxc}/bin/keepassxc-proxy";
-        "type" = "stdio";
-      };
+    file.".cache/keepassxc/keepassxc.ini".text = lib.generators.toINI { } {
+      General.LastActiveDatabase = "/nix/persist/home/will/keepass/vault.kdbx";
     };
   };
 
@@ -39,5 +30,3 @@
   };
 }
 
-# https://askubuntu.com/questions/1210158/start-keepassxc-on-boot/1210421#1210421
-# echo "<password>" | keepassxc --pw-stdin keepass/vault.kdbx

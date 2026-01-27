@@ -15,9 +15,12 @@ in
     # kanshi
   ] ++ [ rapidshell.packages.${pkgs.system}.default ];
 
+  xdg.autostart.enable = true;
+
   wayland.windowManager.sway = {
     enable = true;
     package = pkgs.swayfx;
+    systemd.xdgAutostart = config.xdg.autostart.enable;
 
     checkConfig = false;
 
@@ -74,6 +77,7 @@ in
         { command = "autotiling"; }
         { command = "rapidshell"; }
         { command = "wlsunset -l 43.7 -L -79.3"; }
+        { command = "keepassxc"; }
       ];
 
       window = {

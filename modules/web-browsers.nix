@@ -1,13 +1,11 @@
-{ pkgs, ... }:
+{ lib, pkgs, ... }:
 
 {
-  # TODO https://github.com/Kreyren/nixos-config/blob/bd4765eb802a0371de7291980ce999ccff59d619/nixos/users/kreyren/home/modules/web-browsers/firefox/firefox.nix#L116-L148
-  # TODO https://www.reddit.com/r/uBlockOrigin/comments/1c3uhp7/comment/kzm5srm/
-  # TODO https://old.reddit.com/r/uBlockOrigin/comments/1ao5fpd/blocking_facebook_reels_and_suggested_contents/
   programs = {
     firefox = {
       enable = true;
       languagePacks = [ "en-US" ];
+      nativeMessagingHosts.packages = [ pkgs.keepassxc ];
 
       # Check about:policies#documentation for options.
       policies = {

@@ -48,6 +48,7 @@
           directory = ".local/share/Steam ";
           method = "symlink";
         }
+        ".mozilla" # TODO: properly configure instead
       ];
     };
 

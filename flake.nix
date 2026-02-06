@@ -45,20 +45,20 @@
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
   };
 
-  outputs = { self, nixpkgs, home-manager, impermanence, deploy-rs, agenix, disko, nixos-generators, nixos-hardware, proxmox-nixos, rapidshell, ... }:
+  outputs = { self, nixpkgs, ... }@inputs:
   let
     mkNixos = modules: nixpkgs.lib.nixosSystem {
       inherit modules;
       system = "x86_64-linux";
-      specialArgs = { inherit nixpkgs impermanence home-manager agenix disko nixos-hardware proxmox-nixos rapidshell; };
+      specialArgs = { inherit inputs; };
     };
 
-    mkHome = modules: pkgs: home-manager.lib.homeManagerConfiguration {
+    mkHome = modules: pkgs: inputs.home-manager.lib.homeManagerConfiguration {
       inherit modules pkgs;
-      extraSpecialArgs = { inherit impermanence agenix rapidshell; };
+      extraSpecialArgs = { inherit inputs; };
     };
 
-    mkImage = format: modules: nixos-generators.nixosGenerate {
+    mkImage = format: modules: inputs.nixos-generators.nixosGenerate {
       inherit format modules;
       system = "x86_64-linux";
     };
@@ -68,7 +68,7 @@
       profiles.system = {
         user = "root";
         sshUser = "root";
-        path = deploy-rs.lib.x86_64-linux.activate.nixos configPath;
+        path = inputs.deploy-rs.lib.x86_64-linux.activate.nixos configPath;
       };
     };
 
@@ -80,11 +80,12 @@
       server = mkNixos [ ./hosts/server ];
       router = mkNixos [ ./hosts/router ];
       proxmox = mkNixos [ ./hosts/proxmox ];
+
       # TODO: support arm in mkNixos
       tv = nixpkgs.lib.nixosSystem {
         modules = [ ./hosts/tv ];
         system = "aarch64-linux";
-        specialArgs = { inherit nixpkgs nixos-hardware impermanence home-manager disko; };
+        specialArgs = { inherit inputs; };
       };
     };
 
@@ -94,12 +95,12 @@
 
     # TODO: ex https://github.com/disassembler/network/blob/18e4d34b3d09826f1239772dc3c2e8c6376d5df6/nixos/deploy.nix
     deploy.nodes = {
-      lighthouse = {
+      lighthouse = mkDeployTarget {
         hostname = "lighthouse.willmckinnon.com";
         profiles.system = {
           user = "root";
           sshUser = "root";
-          path = deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.lighthouse;
+          path = inputs.deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.lighthouse;
           sshOpts = [ "-p" "2222" ];
         };
       };
@@ -111,7 +112,7 @@
         profiles.system = {
           user = "root";
           sshUser = "root";
-          path = deploy-rs.lib.aarch64-linux.activate.nixos self.nixosConfigurations.tv;
+          path = inputs.deploy-rs.lib.aarch64-linux.activate.nixos self.nixosConfigurations.tv;
         };
       };
     };

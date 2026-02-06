@@ -1,4 +1,4 @@
-{ lib, nixosConfig, pkgs, config, rapidshell, ... }:
+{ lib, nixosConfig, pkgs, config, inputs, ... }:
 
 let
   isDesktop = nixosConfig.networking.hostName == "desktop";
@@ -13,7 +13,7 @@ in
     # TODO: use the below!
     # swayidle
     # kanshi
-  ] ++ [ rapidshell.packages.${pkgs.system}.default ];
+  ] ++ [ inputs.rapidshell.packages.${pkgs.system}.default ];
 
   xdg.autostart.enable = true;
 

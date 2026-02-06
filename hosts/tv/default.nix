@@ -1,4 +1,4 @@
-{ config, pkgs, lib, nixos-hardware, impermanence, home-manager, ... }:
+{ config, pkgs, lib, inputs, ... }:
 
 # TODO: remove what is already done in the nixos-hardware module
 let
@@ -7,9 +7,9 @@ let
 in
 {
   imports = [
-    nixos-hardware.nixosModules.raspberry-pi-4
-    impermanence.nixosModules.impermanence
-    home-manager.nixosModules.home-manager
+    inputs.nixos-hardware.nixosModules.raspberry-pi-4
+    inputs.impermanence.nixosModules.impermanence
+    inputs.home-manager.nixosModules.home-manager
     ./disks.nix
     ../../modules/nix.nix
     ../../modules/sound.nix

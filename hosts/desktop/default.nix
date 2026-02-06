@@ -1,9 +1,9 @@
-{ config, pkgs, impermanence, agenix, ... }:
+{ config, pkgs, inputs, ... }:
 
 {
   imports = [
-    impermanence.nixosModules.impermanence
-    agenix.nixosModules.default
+    inputs.impermanence.nixosModules.impermanence
+    inputs.agenix.nixosModules.default
     ./disks.nix
     ../../modules/boot.nix
     #../../modules/containerization.nix
@@ -83,7 +83,7 @@
   # TODO: get deploy-rs file from flake too?
   environment.systemPackages = with pkgs; [
     deploy-rs
-    agenix.packages.x86_64-linux.default
+    inputs.agenix.packages.x86_64-linux.default
   ];
 
   environment.variables = {

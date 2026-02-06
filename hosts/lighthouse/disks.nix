@@ -1,7 +1,7 @@
-{ disko, ... }:
+{ inputs, ... }:
 
 {
-  imports = [ disko.nixosModules.disko ];
+  imports = [ inputs.disko.nixosModules.disko ];
 
   disko.devices = {
     disk.main = {
@@ -39,7 +39,7 @@
       };
     };
     nodev."/" = {
-      fsType = "tmpfs"; 
+      fsType = "tmpfs";
       mountOptions = [
         "size=128M"
         "defaults"

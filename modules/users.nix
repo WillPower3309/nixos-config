@@ -1,7 +1,7 @@
-{ pkgs, config, home-manager, impermanence, agenix, rapidshell, ... }:
+{ pkgs, config, inputs, ... }:
 
 {
-  imports = [ home-manager.nixosModules.home-manager ];
+  imports = [ inputs.home-manager.nixosModules.home-manager ];
 
   programs.zsh.enable = true;
 
@@ -32,7 +32,7 @@
 
   home-manager = {
     useUserPackages = true;
-    extraSpecialArgs = { inherit impermanence agenix rapidshell; };
+    extraSpecialArgs = { inherit inputs; };
     backupFileExtension = "backup";
     users.will = import ../home;
   };

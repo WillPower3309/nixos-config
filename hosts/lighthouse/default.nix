@@ -1,4 +1,4 @@
-{ config, modulesPath, lib, pkgs, nixpkgs, agenix, impermanence, ... }:
+{ config, modulesPath, lib, pkgs, nixpkgs, inputs, ... }:
 
 let
   authorizedKey = (builtins.readFile ../../home/id_ed25519.pub);
@@ -8,8 +8,8 @@ in
 {
   imports = [
     "${modulesPath}/virtualisation/digital-ocean-config.nix"
-    agenix.nixosModules.default
-    impermanence.nixosModules.impermanence
+    inputs.agenix.nixosModules.default
+    inputs.impermanence.nixosModules.impermanence
     ./disks.nix
     ../../modules/nix.nix
   ];

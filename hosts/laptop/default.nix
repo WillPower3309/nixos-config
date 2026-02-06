@@ -1,10 +1,10 @@
-{ config, pkgs, impermanence, agenix, nixos-hardware, ... }:
+{ config, pkgs, inputs, ... }:
 
 {
   imports = [
-    impermanence.nixosModules.impermanence
-    agenix.nixosModules.default
-    nixos-hardware.nixosModules.framework-16-7040-amd
+    inputs.impermanence.nixosModules.impermanence
+    inputs.agenix.nixosModules.default
+    inputs.nixos-hardware.nixosModules.framework-16-7040-amd
     ./disks.nix
     ../../modules/android-dev.nix
     ../../modules/bluetooth.nix
@@ -39,7 +39,8 @@
 
   hardware.graphics = {
     enable = true;
-    extraPackages = [ pkgs.rocmPackages.clr.icd ];
+    enable32Bit = true; # needed for proton games
+    extraPackages = [ pkgs.rocmPackages.clr.icd ]; # opencl
   };
 
   # Set your time zone.
@@ -78,7 +79,7 @@
   # TODO: get deploy-rs file from flake too?
   environment.systemPackages = with pkgs; [
     deploy-rs
-    agenix.packages.x86_64-linux.default
+    inputs.agenix.packages.x86_64-linux.default
   ];
 
   environment.variables = {

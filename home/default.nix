@@ -1,9 +1,9 @@
-{ config, pkgs, impermanence, agenix, nixosConfig, ... }:
+{ config, pkgs, nixosConfig, inputs, ... }:
 
 {
   imports = [
-    agenix.homeManagerModules.default
-    impermanence.nixosModules.home-manager.impermanence
+    inputs.agenix.homeManagerModules.default
+    inputs.impermanence.nixosModules.home-manager.impermanence
     #./modules/android-development.nix
     ./modules/cad.nix
     ./modules/discord.nix

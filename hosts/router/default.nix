@@ -1,4 +1,4 @@
-{ config, lib, pkgs, agenix, impermanence, ... }:
+{ config, lib, pkgs, inputs, ... }:
 
 let
   authorizedKey = (builtins.readFile ../../home/id_ed25519.pub);
@@ -14,8 +14,8 @@ in
 # TODO: prometheus and grafana: https://thinglab.org/2024/12/nixos_router_software/
 {
   imports = [
-    agenix.nixosModules.default
-    impermanence.nixosModules.impermanence
+    inputs.agenix.nixosModules.default
+    inputs.impermanence.nixosModules.impermanence
     ./disks.nix
     ./hardware-configuration.nix
     ../../modules/nix.nix

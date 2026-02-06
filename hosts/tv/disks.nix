@@ -1,4 +1,4 @@
-{ disko, nixpkgs, pkgs, ... }:
+{ nixpkgs, pkgs, inputs, ... }:
 
 # TODO: resize /nix to fill space in excess of the 6G image size as hook
 # https://github.com/nix-community/disko/blob/master/docs/disko-images.md
@@ -35,7 +35,7 @@ let
   '';
 
 in {
-  imports = [ disko.nixosModules.disko ];
+  imports = [ inputs.disko.nixosModules.disko ];
 
   disko = {
     imageBuilder = {
@@ -43,7 +43,7 @@ in {
       pkgs = nixpkgs.legacyPackages.x86_64-linux;
       kernelPackages = nixpkgs.legacyPackages.x86_64-linux.linuxPackages_latest;
     };
-    devices = { 
+    devices = {
       disk.main = {
         device = "/dev/mmcblk0"; # SD Card
         type = "disk";
@@ -90,7 +90,7 @@ in {
         };
       };
       nodev."/" = {
-        fsType = "tmpfs"; 
+        fsType = "tmpfs";
         mountOptions = [
           "size=128M"
           "defaults"

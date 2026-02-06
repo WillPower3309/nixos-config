@@ -1,4 +1,4 @@
-{ config, pkgs, impermanence, agenix, ... }:
+{ config, pkgs, inputs, ... }:
 
 let
   authorizedKey = (builtins.readFile ../../home/id_ed25519.pub);
@@ -7,8 +7,8 @@ let
 in
 {
   imports = [
-    agenix.nixosModules.default
-    impermanence.nixosModules.impermanence
+    inputs.agenix.nixosModules.default
+    inputs.impermanence.nixosModules.impermanence
     ./hardware-configuration.nix
     ../../modules/arr.nix
     ../../modules/calibre.nix

@@ -1,4 +1,4 @@
-{ config, pkgs, lib, impermanence, agenix, proxmox-nixos, ... }:
+{ config, pkgs, lib, inputs, ... }:
 
 let
   authorizedKey = (builtins.readFile ../../home/id_ed25519.pub);
@@ -15,15 +15,15 @@ let
 in
 {
   imports = [
-    agenix.nixosModules.default
-    impermanence.nixosModules.impermanence
-    proxmox-nixos.nixosModules.proxmox-ve
+    inputs.agenix.nixosModules.default
+    inputs.impermanence.nixosModules.impermanence
+    inputs.proxmox-nixos.nixosModules.proxmox-ve
     ./disks.nix
     ../../modules/nix.nix
   ];
 
   nixpkgs.overlays = [
-    proxmox-nixos.overlays.x86_64-linux
+    inputs.proxmox-nixos.overlays.x86_64-linux
   ];
 
   services = {

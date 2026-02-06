@@ -301,5 +301,8 @@ vim.lsp.config.clangd = {
 vim.lsp.enable({ 'clangd' })
 
 -- remove diagnostic signs to the left of the line number column
-vim.diagnostic.config({ signs = false })
+vim.diagnostic.config({
+    underline = true,
+    signs = false,
+})
 

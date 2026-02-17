@@ -48,7 +48,7 @@ in
           ${desktopDevice} = genDevice desktopDevice "QPGKBDU-6S4XWKH-DLNIZLR-RBRUSQ2-7RMMZS3-G2QB7RJ-ANZS36W-KTTAIQM";
           ${laptopDevice} = genDevice laptopDevice "TZHR5AI-RWOKMDR-RMZVPR5-3YF3HF5-FTADDX3-GDFYKEY-U6NK3RY-NQKLKA3";
           ${serverDevice} = genDevice serverDevice "V5AV6D5-5ITLYTL-35UHX6S-LKMFZ6U-FVGLEZP-EFGGR3R-O6AVGG7-ONT5MQE";
-          ${phoneDevice}.id = "F6DBZ2M-62WCNA7-GYD3LP3-4ODIDAQ-W6FMTHG-QN32HWG-AW4UXI5-6T6R6AP";
+          ${phoneDevice}.id = "22P2DVT-2OVRU5H-RW62AKV-RXDHIZW-7UXS7KE-UEBLEQT-FXYBNRK-M4PX5QE";
         };
 
         folders = {

@@ -4,7 +4,7 @@
   home = {
     packages = [ pkgs.obsidian ];
 
-    persistence."/nix/persist/home/will".directories = [
+    persistence."/nix/persist".directories = [
       "notes"
       # TODO: replace below with declarative config
       ".config/obsidian"

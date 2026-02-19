@@ -2,9 +2,9 @@
 
 {
   home = {
-    packages = [ pkgs.android-studio ];
+    packages = with pkgs; [ android-studio android-tools ];
 
-    persistence."/nix/persist/home/will".directories = [
+    persistence."/nix/persist".directories = [
       ".android"
       ".java"
       "Android"

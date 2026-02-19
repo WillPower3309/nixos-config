@@ -39,6 +39,6 @@ in
   home = {
     packages = with pkgs; [ mpc ];
 
-    persistence."/nix/persist/home/will".directories = if hostName == "desktop" then [] else [ "Music" ];
+    persistence."/nix/persist".directories = if hostName == "desktop" then [] else [ "Music" ];
   };
 }

@@ -8,6 +8,6 @@
       orca-slicer
     ];
 
-    persistence."/nix/persist/home/will".directories = [ ".config/OrcaSlicer" ];
+    persistence."/nix/persist".directories = [ ".config/OrcaSlicer" ];
   };
 }

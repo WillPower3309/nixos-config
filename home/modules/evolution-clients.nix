@@ -6,8 +6,8 @@
       gnome-contacts
       gnome-calendar
     ];
-    
-    persistence."/nix/persist/home/will".directories = [
+
+    persistence."/nix/persist".directories = [
       ".config/evolution"
       ".cache/evolution"
     ];

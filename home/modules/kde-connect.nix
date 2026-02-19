@@ -25,5 +25,5 @@
     indicator = true;
   };
 
-  home.persistence."/nix/persist/home/will".directories = [ ".config/kdeconnect" ];
+  home.persistence."/nix/persist".directories = [ ".config/kdeconnect" ];
 }

@@ -28,7 +28,7 @@
   };
 
   home = {
-    persistence."/nix/persist/home/will".files = [
+    persistence."/nix/persist".files = [
       ".ssh/id_ed25519"
       ".ssh/known_hosts"
     ];

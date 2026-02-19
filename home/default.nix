@@ -3,7 +3,6 @@
 {
   imports = [
     inputs.agenix.homeManagerModules.default
-    inputs.impermanence.nixosModules.home-manager.impermanence
     #./modules/android-development.nix
     ./modules/cad.nix
     ./modules/discord.nix
@@ -40,16 +39,11 @@
     username = "will";
     homeDirectory = "/home/will";
 
-    persistence."/nix/persist/home/will" = {
-      allowOther = true;
+    persistence."/nix/persist" = {
       directories = [
         "Downloads"
         "Pictures"
         "Projects"
-        {
-          directory = ".local/share/Steam ";
-          method = "symlink";
-        }
         ".mozilla" # TODO: properly configure instead
       ];
     };

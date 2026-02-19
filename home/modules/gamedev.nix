@@ -3,7 +3,7 @@
 {
   home = {
     packages = with pkgs; [ unityhub dotnet-sdk_8 ];
-    persistence."/nix/persist/home/will".directories = [
+    persistence."/nix/persist".directories = [
       "Unity"
       ".config/unity3d"
       ".config/unityhub"

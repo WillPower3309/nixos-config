@@ -8,7 +8,7 @@
       gamemode
     ];
 
-    persistence."/nix/persist/home/will".directories = [
+    persistence."/nix/persist".directories = [
       ".local/share/Steam"
       ".minecraft"
     ];

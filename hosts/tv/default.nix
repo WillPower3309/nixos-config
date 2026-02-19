@@ -7,30 +7,24 @@ let
 in
 {
   imports = [
-    inputs.nixos-hardware.nixosModules.raspberry-pi-4
     inputs.impermanence.nixosModules.impermanence
     inputs.home-manager.nixosModules.home-manager
     ./disks.nix
+    ../../modules/boot.nix
     ../../modules/nix.nix
     ../../modules/sound.nix
   ];
 
-  powerManagement.cpuFreqGovernor = "powersave";
-
-  # Avoiding some heavy IO
-  nix.settings.auto-optimise-store = false;
-
-  boot = {
-    loader = {
-      generic-extlinux-compatible.enable = true;
-      grub.enable = false;
-    };
-
-    # enable HDMI audio
-    kernelParams = [ "snd_bcm2835.enable_hdmi=1" ];
-
-    supportedFilesystems.zfs = lib.mkForce false;
+  boot.initrd.availableKernelModules = [ "xhci_pci" "nvme" "usb_storage" ];
+  hardware = {
+    cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+    enableAllFirmware = true;
+    graphics.enable = true;
+    bluetooth.enable = false;
   };
+
+  # enable HDMI audio
+  boot.kernelParams = [ "snd_bcm2835.enable_hdmi=1" ];
 
   time.timeZone = "America/Toronto";
 
@@ -42,7 +36,7 @@ in
   users = {
     users = {
       root = {
-        password = "pi";
+        password = "tv";
         openssh.authorizedKeys.keys = [ (builtins.readFile ../../home/id_ed25519.pub) ];
       };
       kodi = {
@@ -65,20 +59,6 @@ in
       type = "ed25519";
     }];
   };
-
-  hardware = {
-    graphics.enable = true;
-    bluetooth.enable = false;
-    raspberry-pi."4" = {
-      i2c1.enable = true;
-      fkms-3d.enable = true;
-    };
-  };
-
-  # an overlay to enable raspberrypi support in libcec, and thus cec-client
-  nixpkgs.overlays = [
-    (self: super: { libcec = super.libcec.override { withLibraspberrypi = true; }; })
-  ];
 
   environment.systemPackages = with pkgs; [ libcec moonlight-qt polkit ];
 
@@ -179,6 +159,5 @@ in
     etc."ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;
   };
 
-  nixpkgs.hostPlatform = "aarch64-linux"; # TODO: auto define in modules/nix.nix?
   system.stateVersion = config.system.nixos.release;
 }

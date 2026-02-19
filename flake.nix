@@ -27,9 +27,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    proxmox-nixos = {
-      url = "github:SaumonNet/proxmox-nixos";
-      inputs.nixpkgs-unstable.follows = "nixpkgs";
+    proxmox-nixos.url = "github:SaumonNet/proxmox-nixos";
+
+    pinenote-nixos = {
+      url = "github:WeraPea/pinenote-nixos";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     nixos-generators = {
@@ -80,10 +82,11 @@
       server = mkNixos [ ./hosts/server ];
       router = mkNixos [ ./hosts/router ];
       proxmox = mkNixos [ ./hosts/proxmox ];
+      tv = mkNixos [ ./hosts/tv ];
 
       # TODO: support arm in mkNixos
-      tv = nixpkgs.lib.nixosSystem {
-        modules = [ ./hosts/tv ];
+      pinenote = nixpkgs.lib.nixosSystem {
+        modules = [ ./hosts/pinenote ];
         system = "aarch64-linux";
         specialArgs = { inherit inputs; };
       };
@@ -107,14 +110,7 @@
       server = mkDeployTarget "server.willmckinnon.com" self.nixosConfigurations.server;
       router = mkDeployTarget "10.27.27.1" self.nixosConfigurations.router;
       proxmox = mkDeployTarget "10.27.27.10" self.nixosConfigurations.proxmox;
-      tv = {
-        hostname = "192.168.1.172";
-        profiles.system = {
-          user = "root";
-          sshUser = "root";
-          path = inputs.deploy-rs.lib.aarch64-linux.activate.nixos self.nixosConfigurations.tv;
-        };
-      };
+      tv = mkDeployTarget "10.27.27.9" self.nixosConfigurations.tv;
     };
   };
 }

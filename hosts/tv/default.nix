@@ -1,6 +1,5 @@
 { config, pkgs, lib, inputs, ... }:
 
-# TODO: remove what is already done in the nixos-hardware module
 let
   hostKeyPath = /etc/ssh/ssh_host_ed25519_key;
 
@@ -12,7 +11,6 @@ in
     ./disks.nix
     ../../modules/boot.nix
     ../../modules/nix.nix
-    ../../modules/sound.nix
   ];
 
   boot.initrd.availableKernelModules = [ "xhci_pci" "nvme" "usb_storage" ];
@@ -23,8 +21,10 @@ in
     bluetooth.enable = false;
   };
 
-  # enable HDMI audio
-  boot.kernelParams = [ "snd_bcm2835.enable_hdmi=1" ];
+  services = {
+    pulseaudio.enable = false;
+    pipewire.enable = false;
+  };
 
   time.timeZone = "America/Toronto";
 
@@ -67,7 +67,21 @@ in
     KERNEL=="vchiq", GROUP="video", MODE="0660", TAG+="systemd", ENV{SYSTEMD_ALIAS}="/dev/vchiq"
   '';
 
+
+  # TODO: custom plugins https://discourse.nixos.org/t/how-to-add-custom-kodi-plugins-yet-another-how-to-use-a-custom-derivation-in-my-flake-post/46238
+    # remove nixpkgs.config.kodi.enableAdvancedLauncher = true
   nixpkgs.config.kodi.enableAdvancedLauncher = true;
+  services.getty.autologinUser = "kodi";
+  environment.loginShellInit = let kodi-package = pkgs.kodi-gbm.withPackages(kodiPkgs: with kodiPkgs; [
+    inputstream-adaptive
+    youtube
+    joystick
+  ]);
+  in ''
+    [[ "$(tty)" = "/dev/tty1" ]] && ${kodi-package}/bin/kodi-standalone
+  '';
+
+  # TODO: hardening
   systemd = {
     sockets.cec-client = {
       after = [ "dev-vchiq.device" ];
@@ -79,46 +93,16 @@ in
         SocketMode = "0660";
       };
     };
-
-    # TODO: custom plugins https://discourse.nixos.org/t/how-to-add-custom-kodi-plugins-yet-another-how-to-use-a-custom-derivation-in-my-flake-post/46238
-      # remove nixpkgs.config.kodi.enableAdvancedLauncher = true
-    # TODO: hardening
-    services = {
-      kodi = let kodi-package = pkgs.kodi-gbm.withPackages(kodiPkgs: with kodiPkgs; [
-        inputstream-adaptive
-        youtube
-        joystick
-      ]);
-      in {
-        description = "Kodi media center";
-        wantedBy = ["multi-user.target"];
-        after = [
-          "network-online.target"
-          "sound.target"
-          "systemd-user-sessions.service"
-        ];
-        wants = [ "network-online.target" ];
-        serviceConfig = {
-          Type = "simple";
-          User = "kodi";
-          ExecStart = "${kodi-package}/bin/kodi-standalone";
-          Restart = "always";
-          TimeoutStopSec = "15s";
-          TimeoutStopFailureMode = "kill";
-        };
-      };
-
-      cec-client = {
-        after = [ "dev-vchiq.device" ];
-        bindsTo = [ "dev-vchiq.device" ];
-        wantedBy = [ "multi-user.target" ];
-        serviceConfig = {
-          ExecStart = ''${pkgs.libcec}/bin/cec-client -d 1'';
-          ExecStop = ''/bin/sh -c "echo q > /run/cec.fifo"'';
-          StandardInput = "socket";
-          StandardOutput = "journal";
-          Restart="no";
-        };
+    services.cec-client = {
+      after = [ "dev-vchiq.device" ];
+      bindsTo = [ "dev-vchiq.device" ];
+      wantedBy = [ "multi-user.target" ];
+      serviceConfig = {
+        ExecStart = ''${pkgs.libcec}/bin/cec-client -d 1'';
+        ExecStop = ''/bin/sh -c "echo q > /run/cec.fifo"'';
+        StandardInput = "socket";
+        StandardOutput = "journal";
+        Restart="no";
       };
     };
   };

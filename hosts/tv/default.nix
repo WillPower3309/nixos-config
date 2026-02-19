@@ -60,22 +60,24 @@ in
     }];
   };
 
-  environment.systemPackages = with pkgs; [ libcec moonlight-qt polkit ];
+  environment.systemPackages = with pkgs; [ libcec polkit ];
 
-  # allow access to raspi cec device for video group
+  # allow access to pulse eight cec device for video group
   services.udev.extraRules = ''
-    KERNEL=="vchiq", GROUP="video", MODE="0660", TAG+="systemd", ENV{SYSTEMD_ALIAS}="/dev/vchiq"
+    KERNEL=="ttyACM0", GROUP="video", MODE="0660", TAG+="systemd", ENV{SYSTEMD_ALIAS}="/dev/vchiq"
   '';
-
 
   # TODO: custom plugins https://discourse.nixos.org/t/how-to-add-custom-kodi-plugins-yet-another-how-to-use-a-custom-derivation-in-my-flake-post/46238
     # remove nixpkgs.config.kodi.enableAdvancedLauncher = true
+    # https://github.com/jurialmunkey/skin.arctic.fuse.3
+    # https://github.com/croneter/PlexKodiConnect
   nixpkgs.config.kodi.enableAdvancedLauncher = true;
   services.getty.autologinUser = "kodi";
   environment.loginShellInit = let kodi-package = pkgs.kodi-gbm.withPackages(kodiPkgs: with kodiPkgs; [
     inputstream-adaptive
-    youtube
     joystick
+    plex-for-kodi
+    youtube
   ]);
   in ''
     [[ "$(tty)" = "/dev/tty1" ]] && ${kodi-package}/bin/kodi-standalone
@@ -109,25 +111,26 @@ in
 
   users.extraUsers.kodi.isNormalUser = true;
 
-  home-manager.users.kodi = {
-    nixpkgs.config.allowUnfree = true;
-    home = {
-      username = "kodi";
-      homeDirectory = "/home/kodi";
-      stateVersion = config.system.nixos.release;
+  #home-manager.users.kodi = {
+  #  programs.home-manager.enable = true;
 
-      file = {
-        widevine-lib = {
-          source = "${pkgs.widevine-cdm}/share/google/chrome/WidevineCdm/_platform_specific/linux_x64/libwidevinecdm.so";
-          target = ".kodi/cdm/libwidevinecdm.so";
-        };
-        widevine-manifest= {
-          source = "${pkgs.widevine-cdm}/share/google/chrome/WidevineCdm/manifest.json";
-          target = ".kodi/cdm/manifest.json";
-        };
-      };
-    };
-  };
+  #  home = {
+  #    username = "kodi";
+  #    homeDirectory = "/home/kodi";
+  #    stateVersion = config.system.nixos.release;
+
+  #    file = {
+  #      widevine-lib = {
+  #        source = "${pkgs.widevine-cdm}/share/google/chrome/WidevineCdm/_platform_specific/linux_x64/libwidevinecdm.so";
+  #        target = ".kodi/cdm/libwidevinecdm.so";
+  #      };
+  #      widevine-manifest= {
+  #        source = "${pkgs.widevine-cdm}/share/google/chrome/WidevineCdm/manifest.json";
+  #        target = ".kodi/cdm/manifest.json";
+  #      };
+  #    };
+  #  };
+  #};
 
   environment = {
     persistence."/nix/persist" = {

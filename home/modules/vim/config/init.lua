@@ -82,7 +82,7 @@ require('nvim-tree').setup({
 })
 vim.keymap.set('n', '<leader>op', '<cmd>NvimTreeToggle<CR>', {})
 
-require('telescope').load_extension('fzf') -- fzf is faster
+-- TODO: fix me require('telescope').load_extension('fzf') -- fzf is faster
 local builtin = require('telescope.builtin')
 vim.keymap.set('n', '<leader> ', builtin.find_files, {})
 vim.keymap.set('n', '<leader>*', builtin.live_grep, {})

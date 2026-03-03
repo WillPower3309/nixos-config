@@ -295,6 +295,26 @@
         "type": "indirect"
       }
     },
+    "pinenote-nixos": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1771120430,
+        "narHash": "sha256-uv9U3arVtO3eV0Bq7KGhbJiaCTU9y47udaDfn0X9hlo=",
+        "owner": "WeraPea",
+        "repo": "pinenote-nixos",
+        "rev": "6d1a56076ab3ecc291654b6628abc2cd066b474a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "WeraPea",
+        "repo": "pinenote-nixos",
+        "type": "github"
+      }
+    },
     "proxmox-nixos": {
       "inputs": {
         "flake-compat": "flake-compat_2",
@@ -347,6 +367,7 @@
         "nixos-generators": "nixos-generators",
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs_2",
+        "pinenote-nixos": "pinenote-nixos",
         "proxmox-nixos": "proxmox-nixos",
         "rapidshell": "rapidshell"
       }

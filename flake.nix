@@ -98,7 +98,7 @@
 
     # TODO: ex https://github.com/disassembler/network/blob/18e4d34b3d09826f1239772dc3c2e8c6376d5df6/nixos/deploy.nix
     deploy.nodes = {
-      lighthouse = mkDeployTarget {
+      lighthouse = {
         hostname = "lighthouse.willmckinnon.com";
         profiles.system = {
           user = "root";
@@ -107,10 +107,10 @@
           sshOpts = [ "-p" "2222" ];
         };
       };
-      server = mkDeployTarget "server.willmckinnon.com" self.nixosConfigurations.server;
       router = mkDeployTarget "10.27.27.1" self.nixosConfigurations.router;
+      server = mkDeployTarget "server.willmckinnon.com" self.nixosConfigurations.server;
+      tv = mkDeployTarget "tv.willmckinnon.com" self.nixosConfigurations.tv;
       proxmox = mkDeployTarget "10.27.27.10" self.nixosConfigurations.proxmox;
-      tv = mkDeployTarget "10.27.27.9" self.nixosConfigurations.tv;
     };
   };
 }

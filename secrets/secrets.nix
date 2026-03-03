@@ -42,8 +42,9 @@ in
   "serverWireguardPrivateKey.age".publicKeys = [ systemServer ] ++ editors;
   "serverWireguardPeerPresharedKey.age".publicKeys = [ systemServer ] ++ editors;
 
-  "proxmoxRsaPrivateKey.age".publicKeys = [ systemProxmox ];
+  "proxmoxRsaPrivateKey.age".publicKeys = [ systemProxmox ] ++ editors;
 
+  # service specific secrets
   "radicaleHtpasswd.age".publicKeys = [ systemServer ] ++ editors;
   "tandoorSecretKey.age".publicKeys = [ systemServer ] ++ editors;
   "calibrePassword.age".publicKeys = [ systemServer ] ++ editors;

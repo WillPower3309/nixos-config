@@ -5,17 +5,15 @@ My personal nixos config
 
 ### Generic x86 (remote installation)
 
-1. Build the nixos installation image: `nix build .#packages.x86_64-linux.installationMedia`
-2. Flash the image to a USB stick
-3. Boot nixos through the installation media and note its IP address
-4. Generate a key pair for the given host, and move the public key to a tmp directory:
+1. Boot nixos through the installation media and note its IP address
+2. Generate a key pair for the given host, and move the public key to a tmp directory:
 ```
 root=$(mktemp -d)
 mkdir -p ${root}/nix/persist/etc/ssh
 cp <PATH TO SYSTEM PRIVATE KEY> ${root}/nix/persist/etc/ssh
 cp ~/.ssh/id_ed25519 ${root}/nix/persist/home/will/.ssh
 ```
-5. Remotely install nixos and send the private key to the new host:
+3. Remotely install nixos and send the private key to the new host:
 ```
 nix run github:nix-community/nixos-anywhere -- --extra-files ${root} --flake .#<CONFIG_NAME> --target-host root@<INSTALLATION_TARGET_IP_ADDRESS>
 ```

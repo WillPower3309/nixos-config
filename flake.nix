@@ -34,11 +34,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nixos-generators = {
-      url = "github:nix-community/nixos-generators";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     rapidshell = {
       url = "github:willpower3309/rapidshell";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -60,11 +55,6 @@
       extraSpecialArgs = { inherit inputs; };
     };
 
-    mkImage = format: modules: inputs.nixos-generators.nixosGenerate {
-      inherit format modules;
-      system = "x86_64-linux";
-    };
-
     mkDeployTarget = hostname: configPath: {
       hostname = hostname;
       profiles.system = {
@@ -81,20 +71,18 @@
       lighthouse = mkNixos [ ./hosts/lighthouse ];
       server = mkNixos [ ./hosts/server ];
       router = mkNixos [ ./hosts/router ];
-      proxmox = mkNixos [ ./hosts/proxmox ];
+      #proxmox = mkNixos [ ./hosts/proxmox ];
       tv = mkNixos [ ./hosts/tv ];
 
       # TODO: support arm in mkNixos
-      pinenote = nixpkgs.lib.nixosSystem {
-        modules = [ ./hosts/pinenote ];
-        system = "aarch64-linux";
-        specialArgs = { inherit inputs; };
-      };
+      #pinenote = nixpkgs.lib.nixosSystem {
+      #  modules = [ ./hosts/pinenote ];
+      #  system = "aarch64-linux";
+      #  specialArgs = { inherit inputs; };
+      #};
     };
 
     homeConfigurations."will" = mkHome [ ./home ] nixpkgs.legacyPackages."x86_64-linux";
-
-    packages.x86_64-linux.installationMedia = mkImage "install-iso" [ ./images/installation-media.nix ];
 
     # TODO: ex https://github.com/disassembler/network/blob/18e4d34b3d09826f1239772dc3c2e8c6376d5df6/nixos/deploy.nix
     deploy.nodes = {

@@ -25,11 +25,14 @@ in
   };
 
   # lighthouse: 192.168.100.1
-  # server: 192.168.100.2
-  # desktop: 192.168.100.3
-  # laptop: 192.168.100.4
-  # phone: 192.168.100.5
-  # pikvm: 192.168.100.6
+  # pve0: 192.168.100.2
+  # pve1: 192.168.100.3
+  # pve2: 192.168.100.4
+  # desktop: 192.168.100.5
+  # laptop: 192.168.100.6
+  # phone: 192.168.100.7
+  # pinenote: 192.168.100.8
+  # server: 192.168.100.9
   services.nebula.networks.home = {
     enable = true;
     isLighthouse = false;

@@ -6,10 +6,17 @@ let
   lokiDataDir = "/persist/var/lib/loki";
 
 in {
-  age.secrets.grafanaAdminPassword = {
-    file = ../secrets/grafanaAdminPassword.age;
-    owner = "grafana";
-    group = "grafana";
+  age.secrets = {
+    grafanaSecretKey = {
+      file = ../secrets/grafanaSecretKey.age;
+      owner = "grafana";
+      group = "grafana";
+    };
+    grafanaAdminPassword = {
+      file = ../secrets/grafanaAdminPassword.age;
+      owner = "grafana";
+      group = "grafana";
+    };
   };
 
   services = {
@@ -24,6 +31,7 @@ in {
         };
 
         security = { # TODO: add more
+          secret_key = "$__file{${config.age.secrets.grafanaSecretKey.path}}";
           content_security_policy = true;
           cookie_secure = true;
           disable_gravatar = true;

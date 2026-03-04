@@ -10,6 +10,9 @@ let
   lanAddress = "10.27.27.1";
   lanCidr = "10.27.27.0/24";
 
+  serverIp = "10.27.27.6";
+  tvIp = "10.27.27.9";
+
 in
 # TODO: prometheus and grafana: https://thinglab.org/2024/12/nixos_router_software/
 {
@@ -229,7 +232,7 @@ in
             hostname = "access-point";
           }
           {
-            ip-address = "10.27.27.6";
+            ip-address = serverIp;
             hw-address = "9c:6b:00:19:ed:ff";
             hostname = "server";
           }
@@ -244,14 +247,10 @@ in
             hostname = "desktop";
           }
           {
-            ip-address = "10.27.27.9";
-            hw-address = "d8:3a:dd:4b:ed:01";
+            ip-address = tvIp;
+            hw-address = "54:b2:03:93:42:2e";
             hostname = "tv";
           }
-#          {
-#            ip-address = "10.27.27.15";
-#            hostname = "nixos-install";
-#          }
         ];
 
         option-data = [
@@ -297,13 +296,13 @@ in
         prefetch = true;
         edns-buffer-size = 1232;
 
-        # allow resolving these domains to private addresses
-        private-domain = "willmckinnon.com";
+        private-domain = "willmckinnon.com"; # allow resolving these domains to private addresses
         local-zone = [
-          '' test.willmckinnon.com typetransparent ''
+          ''"willmckinnon.com" typetransparent''
         ];
         local-data = [
-          '' "test.willmckinnon.com A 10.27.27.3" ''
+          ''"server.willmckinnon.com IN A ${serverIp}"''
+          ''"tv.willmckinnon.com IN A ${tvIp}"''
         ];
       };
 

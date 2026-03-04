@@ -24,6 +24,11 @@
         hostname = "10.27.27.1";
         user = "root";
       };
+
+      "tv" = {
+        hostname = "tv.willmckinnon.com";
+        user = "root";
+      };
     };
   };
 

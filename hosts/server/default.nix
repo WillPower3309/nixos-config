@@ -1,7 +1,6 @@
-{ config, pkgs, inputs, ... }:
+{ config, pkgs, inputs, lib, ... }:
 
 let
-  authorizedKey = (builtins.readFile ../../home/id_ed25519.pub);
   hostKeyPath = /etc/ssh/ssh_host_ed25519_key;
 
 in
@@ -11,7 +10,7 @@ in
     inputs.impermanence.nixosModules.impermanence
     ./hardware-configuration.nix
     ../../modules/arr.nix
-    ../../modules/calibre.nix
+    #../../modules/calibre.nix
     ../../modules/freshrss.nix
     #../../modules/immich.nix
     ../../modules/meshcentral.nix
@@ -32,30 +31,17 @@ in
     supportedFilesystems = [ "zfs" ];
 
     initrd = {
-      kernelModules = [ "igc" ];
+      kernelModules = [ "igc" ]; # intel ethernet controller
+      systemd.enable = true;
 
       network = {
         enable = true;
-
         ssh = {
           enable = true;
           port = 2222;
+          authorizedKeys = lib.map (key: "command=\"/bin/systemd-tty-ask-password-agent\",restrict,pty ${key}") config.users.users.root.openssh.authorizedKeys.keys;
           hostKeys = [ (/persist + hostKeyPath) ];
-          authorizedKeys = [ authorizedKey ];
         };
-
-        # auto load zfs password prompt on login & kill other prompt so boot can continue
-        postCommands = ''
-          cat <<EOF > /root/.profile
-          if pgrep -x "zfs" > /dev/null
-          then
-            zfs load-key -a
-            killall zfs
-          else
-            echo "zfs not running -- maybe the pool is taking some time to load"
-          fi
-          EOF
-        '';
       };
     };
   };
@@ -64,24 +50,14 @@ in
     hostName = "server";
     hostId = "7347e9d6";
     wireless.enable = false;
-    #nameservers = [ "194.242.2.4#base.dns.mullvad.net" ];
   };
-
-# TODO: reenable once i figure out how to not break netns and local addresses (see modules / wifi.nix)
-#  services.resolved = {
-#    enable = true;
-#    dnssec = "true";
-#    domains = [ "~." ];
-#    fallbackDns = [ "194.242.2.4#base.dns.mullvad.net" ]; # TODO: across all hosts, use var
-#    dnsovertls = "true";
-#  };
 
   age.secrets.hashedRootPassword.file = ../../secrets/hashedRootPassword.age;
 
   users = {
     users.root = {
       hashedPasswordFile = config.age.secrets.hashedRootPassword.path;
-      openssh.authorizedKeys.keys = [ authorizedKey ];
+      openssh.authorizedKeys.keys = [ (builtins.readFile ../../home/id_ed25519.pub) ];
     };
     mutableUsers = false;
   };

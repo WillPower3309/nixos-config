@@ -11,6 +11,7 @@
 
     plugins = with pkgs.vimPlugins; [
       nvim-tree-lua
+      plenary-nvim # needed by telescope
       telescope-nvim
       telescope-fzf-native-nvim
     ];

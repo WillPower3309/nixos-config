@@ -17,7 +17,7 @@
           actions.update-props."device.disabled" = "true";
         }];
         "52-default-output"."monitor.alsa.rules" = [{
-          matches = [{ "device.name" = "alsa_card.usb-S.M.S.L_Audio_SMSL_M-3_Desktop_DAC-00"; }];
+          matches = [{ "device.name" = "alsa_card.usb-Topping_DX5_II-00"; }];
           actions.update-props."device.profile" = "pro-audio";
         }];
         "53-default-input"."monitor.alsa.rules" = [{

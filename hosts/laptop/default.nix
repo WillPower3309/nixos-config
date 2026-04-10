@@ -65,7 +65,6 @@
 
   programs = {
     dconf.enable = true; # needed for sway
-    light.enable = true; # laptop needs backlight
     fuse.userAllowOther = true; # persistence (TODO: make one file)
   };
 

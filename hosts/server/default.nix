@@ -30,6 +30,10 @@ in
     loader.systemd-boot.enable = true;
     supportedFilesystems = [ "zfs" ];
 
+    # TODO: get nebula in initrd, good docs:
+    # https://wiki.nixos.org/wiki/Remote_disk_unlocking
+    # https://jyn.dev/remotely-unlocking-an-encrypted-hard-disk
+    # TODO: secrets? different host key?
     initrd = {
       kernelModules = [ "igc" ]; # intel ethernet controller
       systemd.enable = true;

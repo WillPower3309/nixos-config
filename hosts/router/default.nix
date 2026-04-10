@@ -251,6 +251,11 @@ in
             hw-address = "54:b2:03:93:42:2e";
             hostname = "tv";
           }
+          {
+            ip-address = "10.27.27.10";
+            hw-address = "c0:f5:35:f4:95:bd";
+            hostname = "3d-printer";
+          }
         ];
 
         option-data = [

@@ -2,8 +2,8 @@
 
 {
   imports = [
-    inputs.impermanence.nixosModules.impermanence
     inputs.agenix.nixosModules.default
+    inputs.impermanence.nixosModules.impermanence
     ./disks.nix
     ../../modules/boot.nix
     #../../modules/containerization.nix

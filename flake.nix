@@ -39,6 +39,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    lanzaboote = {
+      url = "github:nix-community/lanzaboote"; # TODO: use next stable release
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
   };
 
@@ -96,7 +101,7 @@
         };
       };
       router = mkDeployTarget "10.27.27.1" self.nixosConfigurations.router;
-      server = mkDeployTarget "server.willmckinnon.com" self.nixosConfigurations.server;
+      server = mkDeployTarget "10.27.27.6" self.nixosConfigurations.server;
       tv = mkDeployTarget "tv.willmckinnon.com" self.nixosConfigurations.tv;
       proxmox = mkDeployTarget "10.27.27.10" self.nixosConfigurations.proxmox;
     };

@@ -18,7 +18,7 @@
 
       mouse.hide-when-typing = "yes";
 
-      colors = {
+      colors-dark = {
         alpha = lib.mkForce "0.8";
         cursor = "2e3440 d8dee9";
         foreground = "eceff4";

@@ -7,6 +7,7 @@ let
   wanInterface = "wan0";
   lanInterface = "lan0";
 
+  # TODO: follow 10.1.<vlan>.<host>
   lanAddress = "10.27.27.1";
   lanCidr = "10.27.27.0/24";
 
@@ -83,6 +84,7 @@ in
     '';
   };
 
+  # TODO: use tc-cake scheduler to avoid buffer bloat
   networking = {
     hostName = "router";
     domain = "willmckinnon.com";
@@ -91,13 +93,30 @@ in
     useDHCP = false; # define per interface instead
     wireless.enable = false;
     networkmanager.enable = lib.mkForce false;
+    firewall.enable = false; # use nftables instead
     useNetworkd = true;
+
+    vlans = {
+      trusted = {
+        interface = lanInterface;
+        id = 20;
+      };
+      guest = {
+        interface = lanInterface;
+        id = 90;
+      };
+      management = {
+        interface = lanInterface;
+        id = 100;
+      };
+    };
 
     interfaces = {
       "${wanInterface}" = {
         useDHCP = true;
         tempAddress = "disabled"; # Disable Temp Addresses for ISP's sake.
       };
+
       "${lanInterface}" = {
         useDHCP = false;
         ipv4.addresses = [{
@@ -105,97 +124,63 @@ in
           prefixLength = 24;
         }];
       };
+
+      # TODO: write reusable nix functions to reduce LOC for the following
+      trusted.ipv4.addresses = [{
+        address = "10.27.${toString config.networking.vlans.trusted.id}.1";
+        prefixLength = 24;
+      }];
+      guest.ipv4.addresses = [{
+        address = "10.27.${toString config.networking.vlans.guest.id}.1";
+        prefixLength = 24;
+      }];
+      management.ipv4.addresses = [{
+        address = "10.27.${toString config.networking.vlans.management.id}.1";
+        prefixLength = 24;
+      }];
     };
 
-    nat = {
+    # TODO: read https://www.mankier.com/8/nft#, Make sure I know what the following are: address families, hooks, tables, chains, rules, and sets
+    nftables = {
       enable = true;
-      externalInterface = wanInterface;
-      internalInterfaces = [ lanInterface ];
-      internalIPs = [ lanCidr ];
-    };
+      ruleset = ''
+        table ip filter {
+          chain input {
+            type filter hook input priority 0; policy drop;
+            iifname { "${lanInterface}", "trusted" } accept comment "Allow trusted local network to access the router"
+            iifname "${wanInterface}" ct state { established, related } accept comment "Allow established traffic"
+            iifname "${wanInterface}" icmp type { echo-request, destination-unreachable, time-exceeded } counter accept comment "Allow select ICMP"
+            iifname "${wanInterface}" counter drop comment "Drop all other unsolicited traffic from wan"
+            iifname "lo" accept comment "allow loopback"
+            tcp dport 22 accept comment "allow ssh"
+          }
+          chain forward {
+            type filter hook forward priority 0; policy drop;
+            iifname { "${lanInterface}", "trusted", "guest" } oifname { "${wanInterface}" } accept comment "Allow LAN to WAN"
+            iifname { "${wanInterface}" } oifname { "${lanInterface}", "trusted", "guest" } ct state { established, related } accept comment "Allow established back to LANs"
+            iifname { "trusted" } oifname { "management" } counter accept comment "Allow trusted to management"
+            iifname { "management" } oifname { "trusted" } ct state { established, related } counter accept comment "Allow established & related back to trusted"
+          }
+        }
 
-    firewall = {
-      interfaces."${lanInterface}" = {
-        allowedUDPPorts = [ 53 67 ];
-        allowedTCPPorts = [ 53 67 ];
-      };
+        table ip nat {
+          chain postrouting {
+            type nat hook postrouting priority 100; policy accept;
+            oifname "${wanInterface}" masquerade
+          }
+        }
 
-      # use tc-cake scheduler to avoid buffer bloat
-      # TODO: set bandwidth properly
-      # TODO: Cannot find device "wan0"
-      extraPackages = [ pkgs.iproute2 ];
-      extraCommands = ''
-        # outbound
-        tc qdisc replace dev ${wanInterface} root cake ethernet bandwidth 1gbit
-        # inbound
-        ip link add name ifb0 type ifb # create an ifb device
-        #tc qdisc del dev ${wanInterface} ingress
-        tc qdisc replace dev ${wanInterface} handle ffff: ingress
-        #tc qdisc del dev ifb0 root
-        tc qdisc replace dev ifb0 root cake bandwidth 1gbit besteffort
-        ip link set ifb0 up
-        tc filter add dev ${wanInterface} parent ffff: matchall action mirred egress redirect dev ifb0
+        table ip6 filter {
+          chain input {
+            type filter hook input priority 0; policy drop;
+          }
+          chain forward {
+            type filter hook forward priority 0; policy drop;
+          }
+        }
       '';
-      extraStopCommands = ''
-        tc qdisc del dev ${wanInterface} root 2> /dev/null || true
-      '';
     };
-
-    # TODO: nftables hardware accel
-#    nftables = {
-#      enable = true;
-#      tables = {
-#        filterV4 = {
-#          family = "ip";
-#          content = ''
-#            chain input {
-#              type filter hook input priority 0; policy drop;
-#              iifname "lo" accept comment "allow loopback traffic"
-#              iifname "${lanInterface}" accept comment "allow traffic from ${lanInterface}"
-#              iifname "${wanInterface}" counter drop comment "drop all other traffic from ${wanInterface}"
-#              ct state vmap { established : accept, related : accept, invalid : drop } comment "allow traffic from established and related packets, drop invalid"
-#            }
-#            chain forward {
-#              type filter hook forward priority 0; policy drop;
-#              ct state vmap { established : accept, related : accept, invalid : drop }
-#              iifname "${lanInterface}" accept comment "allow ${lanInterface} connections to go wherever"
-#              counter drop
-#            }
-#          '';
-#        };
-
-#        filterV6 = {
-#          family = "ip6";
-#          content = ''
-#            chain input {
-#              type filter hook input priority 0; policy drop;
-#            }
-#            chain forward {
-#              type filter hook forward priority 0; policy drop;
-#            }
-#          '';
-#        };
-
-#        natV4 = {
-#          family = "ip";
-#          content = ''
-#            chain prerouting {
-#              type nat hook prerouting priority filter; policy accept;
-#              iifname "${lanInterface}" udp dport 53 counter redirect to 53 comment "redirect DNS queries to the router's DNS"
-#              iifname "${lanInterface}" tcp dport 53 counter redirect to 53 comment "redirect DNS queries to the router's DNS"
-#            }
-#          content = ''
-#            chain postrouting {
-#              type nat hook postrouting priority 100; policy accept;
-#              oifname "${wanInterface}" masquerade comment "replace source address with ${wanInterface} IP address"
-#            }
-#          '';
-#        };
-#      };
-#    };
   };
-
-  boot.kernelModules = [ "sch_cake" ]; # TODO: move tc-cake scheduling to module?
 
   services.kea.dhcp4 = {
     enable = true;
@@ -213,62 +198,82 @@ in
       renew-timer = 1000;
       rebind-timer = 2000;
 
-      subnet4 = [{
-        id = 1;
-        subnet = lanCidr;
-        pools = [{
-          pool = "10.27.27.16 - 10.27.27.254";
-        }];
+      subnet4 = [
+        {
+          id = 1;
+          subnet = lanCidr;
+          pools = [{ pool = "10.27.27.16 - 10.27.27.254"; }];
 
-        # optimize perf
-        reservations-in-subnet = true;
-        reservations-global = false;
-        reservations-out-of-pool = true;
+          # optimize perf
+          reservations-in-subnet = true;
+          reservations-global = false;
+          reservations-out-of-pool = true;
 
-        reservations = [
-          {
-            ip-address = "10.27.27.5";
-            hw-address = "f8:27:2e:0c:02:ef";
-            hostname = "access-point";
-          }
-          {
-            ip-address = serverIp;
-            hw-address = "9c:6b:00:19:ed:ff";
-            hostname = "server";
-          }
-          {
-            ip-address = "10.27.27.7";
-            hw-address = "b8:27:eb:cd:8e:3a";
-            hostname = "home-assistant";
-          }
-          {
-            ip-address = "10.27.27.8";
-            hw-address = "04:7c:16:76:a9:9c";
-            hostname = "desktop";
-          }
-          {
-            ip-address = tvIp;
-            hw-address = "54:b2:03:93:42:2e";
-            hostname = "tv";
-          }
-          {
-            ip-address = "10.27.27.10";
-            hw-address = "c0:f5:35:f4:95:bd";
-            hostname = "3d-printer";
-          }
-        ];
+          reservations = [
+            {
+              ip-address = "10.27.27.5";
+              hw-address = "f8:27:2e:0c:02:ef";
+              hostname = "access-point";
+            }
+            {
+              ip-address = serverIp;
+              hw-address = "9c:6b:00:19:ed:ff";
+              hostname = "server";
+            }
+            {
+              ip-address = "10.27.27.7";
+              hw-address = "b8:27:eb:cd:8e:3a";
+              hostname = "home-assistant";
+            }
+            {
+              ip-address = "10.27.27.8";
+              hw-address = "04:7c:16:76:a9:9c";
+              hostname = "desktop";
+            }
+            {
+              ip-address = tvIp;
+              hw-address = "54:b2:03:93:42:2e";
+              hostname = "tv";
+            }
+            {
+              ip-address = "10.27.27.10";
+              hw-address = "c0:f5:35:f4:95:bd";
+              hostname = "3d-printer";
+            }
+          ];
 
-        option-data = [
-          {
-            name = "routers";
-            data = lanAddress;
-          }
-          {
-            name = "domain-name-servers";
-            data = lanAddress;
-          }
-        ];
-      }];
+          option-data = [
+            {
+              name = "routers";
+              data = lanAddress;
+            }
+            {
+              name = "domain-name-servers";
+              data = lanAddress;
+            }
+          ];
+        }
+        # TODO: make this a nix function
+        # TODO: add trusted dhcp
+        {
+          id = config.networking.vlans.management.id;
+
+          # optimize perf
+          reservations-in-subnet = true;
+          reservations-global = false;
+          reservations-out-of-pool = true;
+
+          subnet = "10.27.${toString config.networking.vlans.management.id}.0/24";
+          pools = [{ pool = "10.27.${toString config.networking.vlans.management.id}.5 - 10.27.${toString config.networking.vlans.management.id}.254"; }];
+
+          option-data = [
+            {
+              name = "routers";
+              data = "10.27.${toString config.networking.vlans.management.id}.1";
+            }
+          ];
+        }
+      ];
     };
   };
 
@@ -306,7 +311,7 @@ in
           ''"willmckinnon.com" typetransparent''
         ];
         local-data = [
-          ''"server.willmckinnon.com IN A ${serverIp}"''
+          #''"server.willmckinnon.com IN A ${serverIp}"''
           ''"tv.willmckinnon.com IN A ${tvIp}"''
         ];
       };

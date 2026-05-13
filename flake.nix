@@ -100,10 +100,10 @@
           sshOpts = [ "-p" "2222" ];
         };
       };
-      router = mkDeployTarget "10.27.27.1" self.nixosConfigurations.router;
-      server = mkDeployTarget "10.27.27.6" self.nixosConfigurations.server;
+      router = mkDeployTarget "10.1.27.1" self.nixosConfigurations.router;
+      server = mkDeployTarget "10.1.27.6" self.nixosConfigurations.server;
       tv = mkDeployTarget "tv.willmckinnon.com" self.nixosConfigurations.tv;
-      proxmox = mkDeployTarget "10.27.27.10" self.nixosConfigurations.proxmox;
+      proxmox = mkDeployTarget "10.1.27.10" self.nixosConfigurations.proxmox;
     };
   };
 }

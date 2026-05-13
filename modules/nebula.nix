@@ -50,7 +50,7 @@ in
         delay = "1s";
         respond_delay = "5s";
       };
-      preferred_ranges = [ "10.27.27.0/24" ]; # prefer local network
+      preferred_ranges = [ "10.1.27.0/24" ]; # prefer local network
       pki.disconnect_invalid = true; # close tunnels to hosts which are no longer trusted
     };
     firewall = {

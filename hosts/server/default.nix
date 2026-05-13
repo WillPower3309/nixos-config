@@ -11,10 +11,10 @@ in
     ./hardware-configuration.nix
     ../../modules/arr.nix
     #../../modules/calibre.nix
-    ../../modules/freshrss.nix
+    #../../modules/freshrss.nix
     #../../modules/immich.nix
     ../../modules/meshcentral.nix
-    ../../modules/monitoring.nix
+    #../../modules/monitoring.nix
     ../../modules/nebula.nix
     ../../modules/nginx.nix
     ../../modules/nix.nix
@@ -84,9 +84,9 @@ in
   services.nfs.server = {
     enable = true;
     exports = ''
-      /export        10.27.27.8(rw,fsid=0,no_subtree_check)
-      /export/photos 10.27.27.8(rw,insecure,no_subtree_check,all_squash,anonuid=65534,anongid=65534)
-      /export/music  10.27.27.8(ro,insecure,no_subtree_check,all_squash,anonuid=65534,anongid=65534)
+      /export        10.1.27.8(rw,fsid=0,no_subtree_check)
+      /export/photos 10.1.27.8(rw,insecure,no_subtree_check,all_squash,anonuid=65534,anongid=65534)
+      /export/music  10.1.27.8(ro,insecure,no_subtree_check,all_squash,anonuid=65534,anongid=65534)
     '';
   };
   # open nfs ports

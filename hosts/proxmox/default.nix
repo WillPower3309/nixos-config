@@ -3,7 +3,7 @@
 let
   authorizedKey = (builtins.readFile ../../home/id_ed25519.pub);
   hostKeyPath = /etc/ssh/ssh_host_ed25519_key;
-  ipAddress = "10.1.27.10";
+  ipAddress = "10.1.10.10";
   rj45Interface0 = "eth0";
   rj45Interface1 = "eth1";
   sfpInterface0 = "eth2";
@@ -45,7 +45,7 @@ in
     useNetworkd = true;
 
     defaultGateway = {
-      address = "10.1.27.1";
+      address = "10.1.10.1";
       interface = rj45Interface0;
     };
 

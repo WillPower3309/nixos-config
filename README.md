@@ -40,10 +40,10 @@ The default IP of the switch is `192.168.0.1`. To configure the switch (and move
 ### VLANs
 |  ID |    Name    |
 | --- | ---------- |
-|  10 | WAN        |
-|  20 | Trusted    |
-|  30 | Guest      |
-|  40 | IOT        |
+|  10 | Trusted    |
+|  20 | Guest      |
+|  30 | IOT        |
 |  90 | Corosync   |
 | 100 | Management |
+| 999 | WAN        |
 

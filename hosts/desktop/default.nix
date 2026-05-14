@@ -66,14 +66,14 @@
   # TODO: convert to systemd.mounts as described in https://nixos.wiki/wiki/NFS ?
   # TODO: move to photography module
   fileSystems."/mnt/photos" = {
-    device = "10.1.27.6:/photos";
+    device = "10.1.10.6:/photos";
     fsType = "nfs";
     # lazy mount, disconnect after 10 minutes
     options = [ "x-systemd.automount" "noauto" "x-systemd.idle-timeout=600" ];
   };
 
   fileSystems."/mnt/music" = {
-    device = "10.1.27.6:/music";
+    device = "10.1.10.6:/music";
     fsType = "nfs";
     # lazy mount, disconnect after 10 minutes
     options = [ "x-systemd.automount" "noauto" "x-systemd.idle-timeout=600" ];

@@ -21,7 +21,7 @@
       };
 
       "router" = {
-        hostname = "10.1.27.1";
+        hostname = "10.1.10.1";
         user = "root";
       };
 

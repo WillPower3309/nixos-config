@@ -122,6 +122,8 @@ in
         PasswordAuthentication = false;
         KbdInteractiveAuthentication = false;
         GatewayPorts = "yes"; # for plex ssh tunnel
+        ClientAliveInterval = 60;
+        ClientAliveCountMax = 3;
       };
       hostKeys = [{
         path = "/nix/persist${(toString hostKeyPath)}";

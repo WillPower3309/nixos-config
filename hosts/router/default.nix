@@ -223,6 +223,7 @@ in
       interfaces-config = {
         interfaces = lib.mapAttrsToList (name: net: "${lanInterface}.${toString net.id}") (lib.filterAttrs (name: net: net.dhcp.enable) networks);
         re-detect = true; # actively re-detect interfaces if they are re-created by networkd
+        dhcp-socket-type = "raw"; # capture packets at the link-layer, surviving interface toggles
       };
 
       lease-database = {
@@ -235,8 +236,6 @@ in
       valid-lifetime = 4000;
       renew-timer = 1000;
       rebind-timer = 2000;
-
-      # TODO: add back? dhcp-socket-type = "raw"; # capture packets at the link-layer, surviving interface toggles
 
       subnet4 = lib.mapAttrsToList (name: net: {
         id = net.id;

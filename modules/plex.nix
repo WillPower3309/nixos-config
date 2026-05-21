@@ -3,7 +3,7 @@
 let
   plexPort = 32400;
   localAddress = "127.0.0.1:${toString plexPort}";
-  baseDomain = "${config.networking.hostName}.willmckinnon.com";
+  baseDomain = config.networking.fqdn;
   address = "plex.${baseDomain}";
 
 in

@@ -13,7 +13,7 @@ let
   folderDir = if config.networking.hostName == "server" then "/data" else "/nix/persist/home/${syncthingUser}";
   dataDir = if config.networking.hostName == "server" then "/persist/syncthing" else folderDir;
 
-  baseDomain = "willmckinnon.com";
+  baseDomain = config.networking.domain;
 
   genDevice = hostName: id: { id = id; addresses = [ "tcp://${hostName}.${baseDomain}:22000" ]; };
 

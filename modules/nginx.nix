@@ -1,7 +1,7 @@
 { config, ... }:
 
 let
-  domainName = "${config.networking.hostName}.willmckinnon.com";
+  domainName = config.networking.fqdn;
   acmeDataDir = "/var/lib/acme";
 
 in

@@ -1,7 +1,7 @@
 { config, pkgs, ... }:
 
 let
-  baseDomain = "${config.networking.hostName}.willmckinnon.com";
+  baseDomain = config.networking.fqdn;
   address = "transmission.${baseDomain}";
   wgNamespace = "wg";
   wgInterface = "wg0";

@@ -1,7 +1,7 @@
 { config, lib, ... }:
 
 let
-  baseDomain = "${config.networking.hostName}.willmckinnon.com";
+  baseDomain = config.networking.fqdn;
 
   createNginxProxy = port: {
     locations."/".proxyPass = "http://127.0.0.1:${port}";

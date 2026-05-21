@@ -1,7 +1,7 @@
 { config, pkgs, ... }:
 
 let
-  baseDomain = "${config.networking.hostName}.willmckinnon.com";
+  baseDomain = "${config.networking.fqdn}";
   loopbackAddr = "127.0.0.1";
   lokiDataDir = "/persist/var/lib/loki";
 

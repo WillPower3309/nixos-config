@@ -2,7 +2,7 @@
 
 let
   loopbackIp = "127.0.0.1";
-  baseDomain = "${config.networking.hostName}.willmckinnon.com";
+  baseDomain = config.networking.fqdn;
 
 in {
   imports = [ ./postgresql.nix ];

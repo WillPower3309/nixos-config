@@ -112,7 +112,6 @@ in
 
   networking = {
     hostName = "router";
-    domain = "willmckinnon.com"; # TODO: define this across all hosts
     usePredictableInterfaceNames = false; # set interface names via services.udev.extraRules above
     useDHCP = false; # define per interface instead
     wireless.enable = false;

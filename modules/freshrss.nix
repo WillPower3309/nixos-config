@@ -1,7 +1,7 @@
 { config, ... }:
 
 let
-  baseDomain = "${config.networking.hostName}.willmckinnon.com";
+  baseDomain = config.networking.fqdn;
   endpoint = "freshrss.${baseDomain}";
 
 in {

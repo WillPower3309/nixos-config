@@ -2,7 +2,7 @@
 
 let
   port = "5232";
-  baseDomain = "${config.networking.hostName}.willmckinnon.com";
+  baseDomain = config.networking.fqdn;
   address = "radicale.${baseDomain}";
   dataDir = "/data/radicale";
 

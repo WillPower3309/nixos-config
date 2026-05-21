@@ -1,7 +1,7 @@
 { config, pkgs, ... }:
 
 let
-  baseDomain = "${config.networking.hostName}.willmckinnon.com";
+  baseDomain = config.networking.fqdn;
   libraryDir = "/data/books";
   userDbDir = "/persist/etc/calibre-server";
   userDbFilePath = "${userDbDir}/users.sqlite";

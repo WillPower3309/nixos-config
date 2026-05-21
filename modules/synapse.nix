@@ -1,7 +1,7 @@
 { config, pkgs, ... }:
 
 let
-  baseDomain = "${config.networking.hostName}.willmckinnon.com";
+  baseDomain = "${config.networking.fqdn}";
   address = "synapse.${baseDomain}";
   clientPort = 8008;
   # TODO: add upstream option

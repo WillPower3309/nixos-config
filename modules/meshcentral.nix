@@ -1,6 +1,6 @@
 { config, ... }:
 
-let baseDomain = "${config.networking.hostName}.willmckinnon.com";
+let baseDomain = config.networking.fqdn;
 
 in {
   services = {

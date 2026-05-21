@@ -5,7 +5,7 @@ let
   address = "tandoor.${baseDomain}";
 
 in {
-  age.secrets.tandoorSecretKey.file = ./.. + builtins.toPath "/secrets/tandoorSecretKey.age";
+  age.secrets.tandoorSecretKey.file = ../../.. + builtins.toPath "/secrets/tandoorSecretKey.age";
 
   services = {
     tandoor-recipes = {

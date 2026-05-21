@@ -6,7 +6,7 @@ let
 
 in
 {
-  age.secrets.acme.file = ../secrets/acme.age;
+  age.secrets.acme.file = ../../../secrets/acme.age;
 
   security.acme = {
     acceptTerms = true;

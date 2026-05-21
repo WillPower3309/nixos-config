@@ -8,12 +8,12 @@ let
 in {
   age.secrets = {
     grafanaSecretKey = {
-      file = ../secrets/grafanaSecretKey.age;
+      file = ../../../secrets/grafanaSecretKey.age;
       owner = "grafana";
       group = "grafana";
     };
     grafanaAdminPassword = {
-      file = ../secrets/grafanaAdminPassword.age;
+      file = ../../../secrets/grafanaAdminPassword.age;
       owner = "grafana";
       group = "grafana";
     };

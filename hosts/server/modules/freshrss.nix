@@ -6,7 +6,7 @@ let
 
 in {
   age.secrets.freshrssAdminPassword = {
-    file = ./../secrets/freshrssAdminPassword.age;
+    file = ../../../secrets/freshrssAdminPassword.age;
     owner = config.services.freshrss.user;
     group = config.users.users.${config.services.freshrss.user}.group;
   };

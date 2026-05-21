@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
 let
   baseDomain = config.networking.fqdn;
@@ -93,10 +93,12 @@ in {
   };
 
   age.secrets = {
-    wireguardPrivateKey.file = ./.. + builtins.toPath "/secrets/${config.networking.hostName}WireguardPrivateKey.age";
-    wireguardPeerPresharedKey.file = ./.. + builtins.toPath "/secrets/${config.networking.hostName}WireguardPeerPresharedKey.age";
+    wireguardPrivateKey.file = ./../../.. + builtins.toPath "/secrets/${config.networking.hostName}WireguardPrivateKey.age";
+    wireguardPeerPresharedKey.file = ./../../.. + builtins.toPath "/secrets/${config.networking.hostName}WireguardPeerPresharedKey.age";
   };
 
+  # TODO: currently incompatible with networkd
+  networking.useNetworkd = lib.mkForce false;
   networking.wireguard.interfaces.${wgInterface} = {
     ips = [ wgIp ];
     privateKeyFile = config.age.secrets.wireguardPrivateKey.path;

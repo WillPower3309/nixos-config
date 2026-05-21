@@ -34,7 +34,7 @@ in {
     };
   };
 
-  age.secrets.calibrePassword.file = ../secrets/calibrePassword.age;
+  age.secrets.calibrePassword.file = ../../../secrets/calibrePassword.age;
 
   system.activationScripts = {
     calibre-library-init.text = ''

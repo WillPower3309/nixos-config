@@ -6,26 +6,26 @@ let
 in
 {
   imports = [
-    ./hardware-configuration.nix
     ../../modules/headless
-    ../../modules/arr.nix
-    #../../modules/calibre.nix
-    #../../modules/freshrss.nix
-    #../../modules/immich.nix
-    ../../modules/meshcentral.nix
-    #../../modules/monitoring.nix
     ../../modules/nebula.nix
-    ../../modules/nginx.nix
-    ../../modules/radicale.nix
-    ../../modules/plex.nix
-    #../../modules/synapse.nix
     ../../modules/syncthing.nix
-    ../../modules/tandoor-recipes.nix
-    ../../modules/torrents.nix
+    ./hardware-configuration.nix
+    ./modules/arr.nix
+    #./modules/calibre.nix
+    #./modules/freshrss.nix
+    #./modules/immich.nix
+    ./modules/meshcentral.nix
+    #./modules/monitoring.nix
+    ./modules/nginx.nix
+    ./modules/radicale.nix
+    ./modules/plex.nix
+    #./modules/synapse.nix
+    ./modules/tandoor-recipes.nix
+    ./modules/torrents.nix
   ];
 
   boot = {
-    loader.lanzaboote.enable = false;
+    lanzaboote.enable = false;
     supportedFilesystems = [ "zfs" ];
 
     # TODO: get nebula in initrd, good docs:

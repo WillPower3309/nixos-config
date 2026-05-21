@@ -9,7 +9,7 @@ let
 in
 {
   age.secrets.radicaleHtpasswd = {
-    file = ../secrets/radicaleHtpasswd.age;
+    file = ../../../secrets/radicaleHtpasswd.age;
     owner = "radicale";
     group = "radicale";
   };

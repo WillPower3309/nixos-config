@@ -11,7 +11,7 @@ in {
   imports = [ ./postgresql.nix ];
 
   age.secrets.synapseSharedSecret = {
-    file = ../secrets/synapseSharedSecret.age;
+    file = ../../../secrets/synapseSharedSecret.age;
     owner = "matrix-synapse";
     group = "matrix-synapse";
   };

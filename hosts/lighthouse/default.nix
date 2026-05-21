@@ -9,9 +9,7 @@ in
   imports = [
     "${modulesPath}/virtualisation/digital-ocean-config.nix"
     inputs.agenix.nixosModules.default
-    inputs.impermanence.nixosModules.impermanence
     ./disks.nix
-    ../../modules/nix.nix
   ];
 
   # fixes duplicated devices in mirroredBoots
@@ -152,22 +150,6 @@ in
     };
   };
 
-  # Set your time zone.
-  time.timeZone = "America/Toronto";
-
-  environment = {
-    persistence."/nix/persist" = {
-      hideMounts = true;
-      directories = [
-        "/var/log"
-        "/var/lib/nixos"
-      ];
-      files = [ (toString hostKeyPath) ];
-    };
-
-    etc."ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;
-  };
-
-  system.stateVersion = config.system.nixos.release;
+  environment.etc."ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;
 }
 

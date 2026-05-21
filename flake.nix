@@ -62,26 +62,17 @@
     nixosConfigurations = lib.genAttrs hostNames (name: lib.nixosSystem {
       system = "x86_64-linux"; # overridden in host module otherwise
       modules = [
-        { networking.hostName = lib.mkDefault name; }
+        { networking.hostName = lib.mkForce name; }
         ./hosts/${name}
+        ./modules/common
+        # TODO: add modules/features?
       ];
       specialArgs = { inherit inputs; };
     });
 
     # TODO: dedicated deployment port and user?
-    deploy.nodes = lib.genAttrs (name: cfg: {
-      hostname = cfg.config.networking.fqdn;
-      profiles.system = {
-        user = "root";
-        sshUser = "root";
-        sshOpts = [ "-p" builtins.elemAt cfg.config.services.opensssh.ports 0 ];
-        path = lib.pipe cfg [
-          (c: c.pkgs.targetPlatform.system)
-          (arch: deploy-rs.lib.${arch}.activate.nixos or (throw "Unsupported architecture: ${arch}"))
-          (activate: activate cfg)
-        ];
-      };
-    }) self.nixosConfigurations // { # TODO: make these dynamic too
+    # TODO: all should be dynamic
+    deploy.nodes = {
       router-legacy = {
         hostname = "10.1.10.1";
         profiles.system = {
@@ -106,7 +97,19 @@
           path = deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.proxmox;
         };
       };
-    };
+    } // (lib.mapAttrs (name: cfg: {
+      hostname = cfg.config.networking.fqdn;
+      profiles.system = {
+        user = "root";
+        sshUser = "root";
+        sshOpts = [ "-p" builtins.toString (builtins.elemAt cfg.config.services.openssh.ports 0) ];
+        path = lib.pipe cfg [
+          (c: c.pkgs.targetPlatform.system)
+          (arch: deploy-rs.lib.${arch}.activate.nixos or (throw "Unsupported architecture: ${arch}"))
+          (activate: activate cfg)
+        ];
+      };
+    }) self.nixosConfigurations);
   };
 }
 

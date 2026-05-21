@@ -47,10 +47,8 @@ in
 {
   imports = [
     inputs.agenix.nixosModules.default
-    inputs.impermanence.nixosModules.impermanence
     ./disks.nix
     ./hardware-configuration.nix
-    ../../modules/nix.nix
   ];
 
   age.secrets.hashedRootPassword.file = ../../secrets/hashedRootPassword.age;
@@ -105,14 +103,12 @@ in
     };
   };
 
-  services = {
-    udev.extraRules = ''
-      ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="60:be:b4:00:85:28", NAME="${wanInterface}"
-      ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="60:be:b4:00:85:29", NAME="${lanInterface}"
-      ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="60:be:b4:00:85:2a", NAME="opt0"
-      ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="60:be:b4:00:85:2b", NAME="opt1"
-    '';
-  };
+  services.udev.extraRules = ''
+    ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="60:be:b4:00:85:28", NAME="${wanInterface}"
+    ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="60:be:b4:00:85:29", NAME="${lanInterface}"
+    ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="60:be:b4:00:85:2a", NAME="opt0"
+    ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="60:be:b4:00:85:2b", NAME="opt1"
+  '';
 
   networking = {
     hostName = "router";
@@ -288,7 +284,7 @@ in
         private-domain = config.networking.domain; # allow resolving these domains to private addresses
         local-zone = [ ''"${config.networking.domain}" typetransparent'' ];
         local-data = [
-          # TODO: iterate through network dhcp reservations
+          # TODO: iterate through network dhcp reservations (or should I set based on hostname automatically?)
           ''"tv.${config.networking.domain} IN A 10.1.20.9"''
         ];
       };
@@ -374,20 +370,6 @@ in
     '';
   };
 
-  environment = {
-    persistence."/nix/persist" = {
-      hideMounts = true;
-      directories = [
-        "/var/log"
-        "/var/lib/nixos"
-      ];
-      files = [ hostKeyPath ];
-    };
-
-    etc."ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;
-  };
-
-  time.timeZone = "America/Toronto";
-  system.stateVersion = config.system.nixos.release;
+  environment.etc."ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;
 }
 

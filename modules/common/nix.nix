@@ -14,10 +14,10 @@
   };
 
   nixpkgs = {
-    # overlays = flake-overlays;
     config = {
       allowUnfree = true;
       oraclejdk.accept_license = true;
     };
   };
 }
+

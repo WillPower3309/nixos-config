@@ -15,7 +15,6 @@ in
     inputs.home-manager.nixosModules.home-manager
     ./disks.nix
     ../../modules/boot.nix
-    ../../modules/nix.nix
   ];
 
   boot = {
@@ -50,8 +49,6 @@ in
     pulseaudio.enable = false;
     pipewire.enable = false;
   };
-
-  time.timeZone = "America/Toronto";
 
   networking = {
     hostName = "tv";
@@ -158,19 +155,11 @@ in
   #};
 
   environment = {
-    persistence."/nix/persist" = {
-      hideMounts = true;
-      directories = [
-        "/var/log"
-        "/var/lib/nixos"
-        # TODO: add below to HM
-        { directory = "/home/kodi/.kodi"; user = "kodi"; group = "users"; }
-        { directory = "/home/kodi/.cache"; user = "kodi"; group = "users"; }
-      ];
-      files = [ (toString hostKeyPath) ];
-    };
+    persistence."/nix/persist".directories = [
+      # TODO: add below to HM
+      { directory = "/home/kodi/.kodi"; user = "kodi"; group = "users"; }
+      { directory = "/home/kodi/.cache"; user = "kodi"; group = "users"; }
+    ];
     etc."ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;
   };
-
-  system.stateVersion = config.system.nixos.release;
 }

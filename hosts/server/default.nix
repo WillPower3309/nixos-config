@@ -7,7 +7,6 @@ in
 {
   imports = [
     inputs.agenix.nixosModules.default
-    inputs.impermanence.nixosModules.impermanence
     ./hardware-configuration.nix
     ../../modules/arr.nix
     #../../modules/calibre.nix
@@ -17,7 +16,6 @@ in
     #../../modules/monitoring.nix
     ../../modules/nebula.nix
     ../../modules/nginx.nix
-    ../../modules/nix.nix
     ../../modules/radicale.nix
     ../../modules/plex.nix
     #../../modules/synapse.nix
@@ -92,21 +90,5 @@ in
   # open nfs ports
   networking.firewall.allowedTCPPorts = [ 2049 ];
 
-  # Set your time zone.
-  time.timeZone = "America/Toronto";
-
-  environment = {
-    persistence."/persist" = {
-      hideMounts = true;
-      directories = [
-        "/var/log"
-        "/var/lib/nixos"
-      ];
-      files = [ (toString hostKeyPath) ];
-    };
-
-    etc."ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;
-  };
-
-  system.stateVersion = config.system.nixos.release;
+  environment.etc."ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;
 }

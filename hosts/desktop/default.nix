@@ -3,7 +3,6 @@
 {
   imports = [
     inputs.agenix.nixosModules.default
-    inputs.impermanence.nixosModules.impermanence
     ./disks.nix
     ../../modules/boot.nix
     #../../modules/containerization.nix
@@ -13,7 +12,6 @@
     ../../modules/greetd.nix
     ../../modules/kernel.nix
     ../../modules/nebula.nix
-    ../../modules/nix.nix
     ../../modules/packages.nix
     ../../modules/polkit.nix # needed for sway
     ../../modules/screen-record.nix
@@ -25,9 +23,6 @@
 
   boot.initrd.availableKernelModules = [ "xhci_pci" "ahci" "nvme" "usbhid" "amdgpu" ];
   hardware.enableAllFirmware = true;
-
-  # Set your time zone.
-  time.timeZone = "America/Toronto";
 
   networking = {
     useNetworkd = true; # systemd-networkd is faster at startup by default and more actively maintained TODO: set up with `systemd.network`
@@ -94,20 +89,8 @@
     GDK_BACKEND = "wayland";
   };
 
-  environment = {
-    persistence."/nix/persist" = {
-      hideMounts = true;
-      directories = [
-        "/var/log"
-        "/var/lib/nixos"
-      ];
-      files = [ "/etc/ssh/ssh_host_ed25519_key" ];
-    };
-
-    etc."ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;
-  };
+  environment.etc."ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;
 
   hardware.cpu.amd.updateMicrocode = config.hardware.enableRedistributableFirmware;
-  system.stateVersion = config.system.nixos.release;
 }
 

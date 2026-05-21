@@ -2,7 +2,6 @@
 
 {
   imports = [
-    inputs.impermanence.nixosModules.impermanence
     inputs.agenix.nixosModules.default
     inputs.nixos-hardware.nixosModules.framework-16-7040-amd
     ./disks.nix
@@ -16,7 +15,6 @@
     ../../modules/greetd.nix
     ../../modules/kernel.nix
     ../../modules/nebula.nix
-    ../../modules/nix.nix
     ../../modules/packages.nix
     ../../modules/polkit.nix # needed for sway
     ../../modules/power.nix
@@ -42,9 +40,6 @@
     enable32Bit = true; # needed for proton games
     extraPackages = [ pkgs.rocmPackages.clr.icd ]; # opencl
   };
-
-  # Set your time zone.
-  time.timeZone = "America/Toronto";
 
   networking = {
     hostName = "laptop";
@@ -89,19 +84,6 @@
     GDK_BACKEND = "wayland";
   };
 
-  environment = {
-    persistence."/nix/persist" = {
-      hideMounts = true;
-      directories = [
-        "/var/log"
-        "/var/lib/nixos"
-      ];
-      files = [ "/etc/ssh/ssh_host_ed25519_key" ];
-    };
-
-    etc."ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;
-  };
-
-  system.stateVersion = config.system.nixos.release;
+  environment.etc."ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;
 }
 

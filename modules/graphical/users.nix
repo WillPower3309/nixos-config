@@ -6,8 +6,8 @@
   programs.zsh.enable = true;
 
   age.secrets = {
-    hashedWillPassword.file = ../secrets/hashedWillPassword.age;
-    hashedRootPassword.file = ../secrets/hashedRootPassword.age;
+    hashedWillPassword.file = ../../secrets/hashedWillPassword.age;
+    hashedRootPassword.file = ../../secrets/hashedRootPassword.age;
   };
 
   users = {
@@ -34,6 +34,6 @@
     useUserPackages = true;
     extraSpecialArgs = { inherit inputs; };
     backupFileExtension = "backup";
-    users.will = import ../home;
+    users.will = import ../../home;
   };
 }

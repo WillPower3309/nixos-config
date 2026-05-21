@@ -1,10 +1,9 @@
-{ config, lib, pkgs, inputs, ... }:
+{ config, lib, pkgs, ... }:
 
 # TODO: set up reverse DNS pointer records (PTR) in unbound so devices can be recognized via hostname instead of IP
 # TODO: prometheus and grafana, map Prometheus metrics collection exporters to trace live CAKE drop rates and queue latencies onto Grafana
 let
   authorizedKey = (builtins.readFile ../../home/id_ed25519.pub);
-  hostKeyPath = "/etc/ssh/ssh_host_ed25519_key";
 
   wanInterface = "wan0";
   lanInterface = "lan0";
@@ -46,9 +45,9 @@ let
 in
 {
   imports = [
-    inputs.agenix.nixosModules.default
     ./disks.nix
     ./hardware-configuration.nix
+    ../../modules/headless
   ];
 
   age.secrets.hashedRootPassword.file = ../../secrets/hashedRootPassword.age;
@@ -61,24 +60,10 @@ in
     mutableUsers = false;
   };
 
-  services.openssh = {
-    enable = true;
-    openFirewall = true;
-    settings = {
-      PasswordAuthentication = false;
-      KbdInteractiveAuthentication = false;
-    };
-    hostKeys = [{
-      path = "/nix/persist${hostKeyPath}";
-      type = "ed25519";
-    }];
-  };
-
   powerManagement.cpuFreqGovernor = "powersave";
 
   boot = {
-    loader.systemd-boot.enable = true;
-    initrd.systemd.enable = true;
+    lanzaboote.enable = false; # TODO: enable
 
     kernel.sysctl = {
       # enable IP forwarding
@@ -111,13 +96,10 @@ in
   '';
 
   networking = {
-    hostName = "router";
     usePredictableInterfaceNames = false; # set interface names via services.udev.extraRules above
     useDHCP = false; # define per interface instead
-    wireless.enable = false;
     networkmanager.enable = lib.mkForce false;
     firewall.enable = false; # use nftables instead
-    useNetworkd = true;
 
     # TODO: read https://www.mankier.com/8/nft
     # TODO: from above, make sure I know what the following are: address families, hooks, tables, chains, rules, and sets
@@ -284,7 +266,7 @@ in
         local-zone = [ ''"${config.networking.domain}" typetransparent'' ];
         local-data = [
           # TODO: iterate through network dhcp reservations (or should I set based on hostname automatically?)
-          ''"tv.${config.networking.domain} IN A 10.1.20.9"''
+          ''"tv.${config.networking.domain} IN A 10.1.10.9"''
         ];
       };
 

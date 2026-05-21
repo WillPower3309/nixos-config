@@ -1,4 +1,4 @@
-{ config, pkgs, inputs, lib, ... }:
+{ config, pkgs, lib, ... }:
 
 let
   hostKeyPath = /etc/ssh/ssh_host_ed25519_key;
@@ -6,8 +6,8 @@ let
 in
 {
   imports = [
-    inputs.agenix.nixosModules.default
     ./hardware-configuration.nix
+    ../../modules/headless
     ../../modules/arr.nix
     #../../modules/calibre.nix
     #../../modules/freshrss.nix
@@ -25,7 +25,7 @@ in
   ];
 
   boot = {
-    loader.systemd-boot.enable = true;
+    loader.lanzaboote.enable = false;
     supportedFilesystems = [ "zfs" ];
 
     # TODO: get nebula in initrd, good docs:
@@ -48,11 +48,7 @@ in
     };
   };
 
-  networking = {
-    hostName = "server";
-    hostId = "7347e9d6";
-    wireless.enable = false;
-  };
+  networking.hostId = "7347e9d6"; # needed for zfs
 
   age.secrets.hashedRootPassword.file = ../../secrets/hashedRootPassword.age;
 
@@ -64,18 +60,10 @@ in
     mutableUsers = false;
   };
 
-  services.openssh = {
-    enable = true;
-    openFirewall = true;
-    settings = {
-      PasswordAuthentication = false;
-      KbdInteractiveAuthentication = false;
-    };
-    hostKeys = [{
-      path = "/persist/${(toString hostKeyPath)}";
-      type = "ed25519";
-    }];
-  };
+  services.openssh.hostKeys = lib.mkForce [{
+    path = "/persist${(toString hostKeyPath)}"; # uses /persist instead of /nix/persist
+    type = "ed25519";
+  }];
 
   zramSwap.enable = true;
 

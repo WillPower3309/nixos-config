@@ -63,6 +63,9 @@
       system = "x86_64-linux"; # overridden in host module otherwise
       modules = [
         { networking.hostName = lib.mkForce name; }
+        inputs.impermanence.nixosModules.impermanence
+        inputs.agenix.nixosModules.default
+        inputs.lanzaboote.nixosModules.lanzaboote
         ./hosts/${name}
         ./modules/common
         # TODO: add modules/features?
@@ -102,7 +105,7 @@
       profiles.system = {
         user = "root";
         sshUser = "root";
-        sshOpts = [ "-p" builtins.toString (builtins.elemAt cfg.config.services.openssh.ports 0) ];
+        sshOpts = [ "-p" (builtins.toString (builtins.elemAt cfg.config.services.openssh.ports 0)) ];
         path = lib.pipe cfg [
           (c: c.pkgs.targetPlatform.system)
           (arch: deploy-rs.lib.${arch}.activate.nixos or (throw "Unsupported architecture: ${arch}"))

@@ -5,19 +5,15 @@
 
 { config, pkgs, lib, inputs, ... }:
 
-let
-  hostKeyPath = /etc/ssh/ssh_host_ed25519_key;
-
-in
 {
   imports = [
-    inputs.impermanence.nixosModules.impermanence
     inputs.home-manager.nixosModules.home-manager
     ./disks.nix
-    ../../modules/boot.nix
+    ../../modules/headless # not headless but we want the ssh config
   ];
 
   boot = {
+    lanzaboote.enable = false; # TODO: enable
     initrd.availableKernelModules = [ "xhci_pci" "nvme" "usb_storage" ];
     kernelParams = [
       "vt.global_cursor_default=0"  # disable VT switching flicker
@@ -69,19 +65,6 @@ in
       };
     };
     mutableUsers = false;
-  };
-
-  services.openssh = {
-    enable = true;
-    openFirewall = true;
-    settings = {
-      PasswordAuthentication = false;
-      KbdInteractiveAuthentication = false;
-    };
-    hostKeys = [{
-      path = "/nix/persist/${(toString hostKeyPath)}";
-      type = "ed25519";
-    }];
   };
 
   # script to start moonlight on tty2

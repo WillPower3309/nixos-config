@@ -2,7 +2,6 @@
 
 let
   authorizedKey = (builtins.readFile ../../home/id_ed25519.pub);
-  hostKeyPath = /etc/ssh/ssh_host_ed25519_key;
   ipAddress = "10.1.10.3";
   rj45Interface0 = "eth0";
   rj45Interface1 = "eth1";
@@ -22,9 +21,9 @@ let
 in
 {
   imports = [
-    inputs.agenix.nixosModules.default
     inputs.proxmox-nixos.nixosModules.proxmox-ve
     ./disks.nix
+    ../../modules/headless
   ];
 
   nixpkgs.overlays = [ inputs.proxmox-nixos.overlays.x86_64-linux ];
@@ -52,12 +51,8 @@ in
 
   # use the first virtual function as the host's interface
   networking = let hostInterface = "${sfpInterface0}v0"; in {
-    hostName = "proxmox";
     usePredictableInterfaceNames = false; # set interface names via services.udev.extraRules above
     useDHCP = false;
-    wireless.enable = false;
-    networkmanager.enable = lib.mkForce false;
-    useNetworkd = true;
 
     # Bind the Host Static IP directly to the first Virtual Function (VF 0)
     interfaces."${hostInterface}" = {
@@ -111,26 +106,13 @@ in
           enable = true;
           port = 2222;
           authorizedKeys = lib.map (key: "command=\"/bin/systemd-tty-ask-password-agent\",restrict,pty ${key}") config.users.users.root.openssh.authorizedKeys.keys;
-          hostKeys = [ (/persist + hostKeyPath) ];
+          hostKeys = [ (/persist/etc/ssh/ssh_host_ed25519_key) ];
         };
       };
     };
   };
 
   hardware.enableAllFirmware = true;
-
-  services.openssh = {
-    enable = true;
-    openFirewall = true;
-    settings = {
-      PasswordAuthentication = false;
-      KbdInteractiveAuthentication = false;
-    };
-    hostKeys = [{
-      path = "/nix/persist/${(toString hostKeyPath)}";
-      type = "ed25519";
-    }];
-  };
 
   age.secrets.proxmoxRsaPrivateKey.file = ../../secrets/proxmoxRsaPrivateKey.age;
 

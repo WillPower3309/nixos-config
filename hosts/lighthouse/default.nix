@@ -1,19 +1,24 @@
-{ config, modulesPath, lib, pkgs, nixpkgs, inputs, ... }:
+{ config, modulesPath, lib, pkgs, nixpkgs, ... }:
 
 let
   authorizedKey = (builtins.readFile ../../home/id_ed25519.pub);
-  hostKeyPath = /etc/ssh/ssh_host_ed25519_key;
 
 in
 {
   imports = [
     "${modulesPath}/virtualisation/digital-ocean-config.nix"
-    inputs.agenix.nixosModules.default
     ./disks.nix
+    ../../modules/headless
   ];
 
   # fixes duplicated devices in mirroredBoots
-  boot.loader.grub.devices = lib.mkForce ["/dev/vda"];
+  boot = {
+    lanzaboote.enable = false;
+    loader = {
+      systemd-boot.enable = false;
+      grub.devices = lib.mkForce ["/dev/vda"];
+    };
+  };
 
   # do not use DHCP, as DigitalOcean provisions IPs using cloud-init
   networking.useDHCP = lib.mkForce false;
@@ -113,20 +118,8 @@ in
 
   services = {
     openssh = {
-      enable = true;
-      ports = [ 2222 ];
-      openFirewall = true;
-      settings = {
-        PasswordAuthentication = false;
-        KbdInteractiveAuthentication = false;
-        GatewayPorts = "yes"; # for plex ssh tunnel
-        ClientAliveInterval = 60;
-        ClientAliveCountMax = 3;
-      };
-      hostKeys = [{
-        path = "/nix/persist${(toString hostKeyPath)}";
-        type = "ed25519";
-      }];
+      ports = lib.mkForce [ 2222 ];
+      settings.GatewayPorts = "yes"; # for plex ssh tunnel
     };
 
     nebula.networks.home = {

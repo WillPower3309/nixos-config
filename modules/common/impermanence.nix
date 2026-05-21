@@ -1,12 +1,10 @@
-{ config, inputs, ... }:
+{ config, ... }:
 
 let
   # TODO: universal persistant dir, remove config usage
   persistentDir = if config.networking.hostName == "server" then "/persist" else "/nix/persist";
 
 in {
-  imports = [ inputs.impermanence.nixosModules.default ];
-
   environment = {
     persistence.${persistentDir} = {
       hideMounts = true;

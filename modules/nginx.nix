@@ -12,7 +12,7 @@ in
     acceptTerms = true;
     defaults = {
       email = "contact@willmckinnon.com";
-      credentialsFile = config.age.secrets.acme.path;
+      environmentFile = config.age.secrets.acme.path;
       dnsProvider = "cloudflare";
     };
 

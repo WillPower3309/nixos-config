@@ -59,10 +59,12 @@
   # it is expected that nfs mounts are owned by nobody:nogroup
   fileSystems."/export/music" =
     { device = "/data/media/Music";
+      fsType = "none";
       options = [ "bind" ];
     };
   fileSystems."/export/photos" =
     { device = "/data/photos";
+      fsType = "none";
       options = [ "bind" ];
     };
 

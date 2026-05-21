@@ -47,63 +47,66 @@
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
   };
 
-  outputs = { self, nixpkgs, ... }@inputs:
+  outputs = { self, nixpkgs, deploy-rs, ... }@inputs:
   let
-    mkNixos = modules: nixpkgs.lib.nixosSystem {
-      inherit modules;
-      system = "x86_64-linux";
+    lib = nixpkgs.lib;
+
+    hostNames = lib.pipe ./hosts [
+      builtins.readDir
+      (lib.filterAttrs (name: type: type == "directory"))
+      builtins.attrNames
+    ];
+
+  in {
+    # TODO: pass network config of all hosts down to router, ssh client, etc
+    nixosConfigurations = lib.genAttrs hostNames (name: lib.nixosSystem {
+      system = "x86_64-linux"; # overridden in host module otherwise
+      modules = [
+        { networking.hostName = lib.mkDefault name; }
+        ./hosts/${name}
+      ];
       specialArgs = { inherit inputs; };
-    };
+    });
 
-    mkHome = modules: pkgs: inputs.home-manager.lib.homeManagerConfiguration {
-      inherit modules pkgs;
-      extraSpecialArgs = { inherit inputs; };
-    };
-
-    mkDeployTarget = hostname: configPath: {
-      hostname = hostname;
+    # TODO: dedicated deployment port and user?
+    deploy.nodes = lib.genAttrs (name: cfg: {
+      hostname = cfg.config.networking.fqdn;
       profiles.system = {
         user = "root";
         sshUser = "root";
-        path = inputs.deploy-rs.lib.x86_64-linux.activate.nixos configPath;
+        sshOpts = [ "-p" builtins.elemAt cfg.config.services.opensssh.ports 0 ];
+        path = lib.pipe cfg [
+          (c: c.pkgs.targetPlatform.system)
+          (arch: deploy-rs.lib.${arch}.activate.nixos or (throw "Unsupported architecture: ${arch}"))
+          (activate: activate cfg)
+        ];
       };
-    };
-
-  in {
-    nixosConfigurations = {
-      desktop = mkNixos [ ./hosts/desktop ];
-      laptop = mkNixos [ ./hosts/laptop ];
-      lighthouse = mkNixos [ ./hosts/lighthouse ];
-      server = mkNixos [ ./hosts/server ];
-      router = mkNixos [ ./hosts/router ];
-      #proxmox = mkNixos [ ./hosts/proxmox ];
-      tv = mkNixos [ ./hosts/tv ];
-
-      # TODO: support arm in mkNixos
-      #pinenote = nixpkgs.lib.nixosSystem {
-      #  modules = [ ./hosts/pinenote ];
-      #  system = "aarch64-linux";
-      #  specialArgs = { inherit inputs; };
-      #};
-    };
-
-    homeConfigurations."will" = mkHome [ ./home ] nixpkgs.legacyPackages."x86_64-linux";
-
-    # TODO: ex https://github.com/disassembler/network/blob/18e4d34b3d09826f1239772dc3c2e8c6376d5df6/nixos/deploy.nix
-    deploy.nodes = {
-      lighthouse = {
-        hostname = "lighthouse.willmckinnon.com";
+    }) self.nixosConfigurations // { # TODO: make these dynamic too
+      router-legacy = {
+        hostname = "10.1.10.1";
         profiles.system = {
           user = "root";
           sshUser = "root";
-          path = inputs.deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.lighthouse;
-          sshOpts = [ "-p" "2222" ];
+          path = deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.router;
         };
       };
-      router = mkDeployTarget "10.1.10.1" self.nixosConfigurations.router;
-      server = mkDeployTarget "10.1.10.6" self.nixosConfigurations.server;
-      tv = mkDeployTarget "tv.willmckinnon.com" self.nixosConfigurations.tv;
-      proxmox = mkDeployTarget "10.1.10.10" self.nixosConfigurations.proxmox;
+      server-legacy = {
+        hostname = "10.1.10.6";
+        profiles.system = {
+          user = "root";
+          sshUser = "root";
+          path = deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.server;
+        };
+      };
+      proxmox-legacy = {
+        hostname = "10.1.10.3";
+        profiles.system = {
+          user = "root";
+          sshUser = "root";
+          path = deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.proxmox;
+        };
+      };
     };
   };
 }
+

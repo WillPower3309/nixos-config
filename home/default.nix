@@ -14,6 +14,7 @@
     ./modules/games.nix
     ./modules/git.nix
     ./modules/music.nix
+    ./modules/opencode.nix
     #./modules/kde-connect.nix
     ./modules/keepass.nix
     ./modules/notetaking.nix

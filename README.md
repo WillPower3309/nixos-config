@@ -17,6 +17,8 @@ cp ~/.ssh/id_ed25519 ${root}/nix/persist/home/will/.ssh
 ```
 nix run github:nix-community/nixos-anywhere -- --extra-files ${root} --flake .#<CONFIG_NAME> --target-host root@<INSTALLATION_TARGET_IP_ADDRESS>
 ```
+4. Boot the new host and run `sudo nix run nixpkgs#sbctl verify` to validate the host is ready for secure boot
+5. Enable secure boot in the BIOS
 
 ### Raspberry Pi
 1. Generate a key pair for the given host, and move the public key to the host's folder

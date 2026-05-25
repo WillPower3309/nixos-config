@@ -1,0 +1,33 @@
+{ inputs, ... }:
+
+{
+  flake.modules.nixos.freshrss = { config, ... }: let
+    baseDomain = config.networking.fqdn;
+    endpoint = "freshrss.${baseDomain}";
+
+  in {
+    age.secrets.freshrssAdminPassword = {
+      file = "${inputs.secrets}/freshrssAdminPassword.age";
+      owner = config.services.freshrss.user;
+      group = config.users.users.${config.services.freshrss.user}.group;
+    };
+
+    services = {
+      freshrss = {
+        enable = true;
+        baseUrl = "https://${endpoint}";
+        dataDir = "/data/freshrss";
+        webserver = "nginx";
+        virtualHost = endpoint;
+        authType = "form";
+        passwordFile = config.age.secrets.freshrssAdminPassword.path;
+      };
+
+      nginx.virtualHosts."${config.services.freshrss.virtualHost}" = {
+        useACMEHost = baseDomain;
+        forceSSL = true;
+        kTLS = true;
+      };
+    };
+  };
+}

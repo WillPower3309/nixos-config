@@ -1,0 +1,201 @@
+{ inputs, ... }:
+
+{
+  flake.modules.nixos.monitoring = { config, pkgs, ... }: let
+    baseDomain = "${config.networking.fqdn}";
+    loopbackAddr = "127.0.0.1";
+    lokiDataDir = "/persist/var/lib/loki";
+
+  in {
+    age.secrets = {
+      grafanaSecretKey = {
+        file = "${inputs.secrets}/grafanaSecretKey.age";
+        owner = "grafana";
+        group = "grafana";
+      };
+      grafanaAdminPassword = {
+        file = "${inputs.secrets}/grafanaAdminPassword.age";
+        owner = "grafana";
+        group = "grafana";
+      };
+    };
+
+    services = {
+      grafana = {
+        enable = true;
+        declarativePlugins = [];
+        settings = {
+          server = {
+            http_port = 2342;
+            http_addr = loopbackAddr;
+            domain = "grafana.${baseDomain}";
+          };
+
+          security = {
+            secret_key = "$__file{${config.age.secrets.grafanaSecretKey.path}}";
+            content_security_policy = true;
+            cookie_secure = true;
+            disable_gravatar = true;
+
+            admin_user = "admin";
+            admin_password = "$__file{${config.age.secrets.grafanaAdminPassword.path}}";
+          };
+
+          anayltics = {
+            reporting_enabled = false;
+            feedback_links_enabled = false;
+          };
+        };
+
+        provision = {
+          enable = true;
+          datasources.settings = {
+            apiVersion = 1;
+            datasources = [
+              {
+                name = "Prometheus";
+                url = "http://localhost:${toString config.services.prometheus.port}";
+                type = "prometheus";
+                isDefault = true;
+              }
+              {
+                name = "Loki";
+                url = "http://localhost:${toString config.services.loki.configuration.server.http_listen_port}";
+                type = "loki";
+              }
+            ];
+          };
+        };
+      };
+
+      prometheus = {
+        enable = true;
+        port = 9001;
+
+        exporters = {
+          node = {
+            enable = true;
+            enabledCollectors = [ "systemd" ];
+            port = 9002;
+          };
+        };
+
+        scrapeConfigs = [{
+          job_name = "${config.networking.hostName}-scrape";
+          static_configs = [{
+            targets = [ "${loopbackAddr}:${toString config.services.prometheus.exporters.node.port}" ];
+          }];
+        }];
+      };
+
+      loki = {
+        enable = true;
+
+        configuration = {
+          server = {
+            http_listen_port = 3100;
+            grpc_listen_port = 9096;
+          };
+
+          auth_enabled = false;
+
+          ingester = {
+            lifecycler = {
+              address = loopbackAddr;
+              ring = {
+                kvstore.store = "inmemory";
+                replication_factor = 1;
+              };
+            };
+            chunk_idle_period = "1h";
+            max_chunk_age = "1h";
+            chunk_target_size = 999999;
+            chunk_retain_period = "30s";
+          };
+
+          schema_config.configs = [{
+            from = "2024-04-01";
+            store = "tsdb";
+            object_store = "filesystem";
+            schema = "v13";
+            index = {
+              prefix = "index_";
+              period = "24h";
+            };
+          }];
+
+          storage_config = {
+            tsdb_shipper = {
+              active_index_directory = "${lokiDataDir}/tsdb-index";
+              cache_location = "${lokiDataDir}/tsdb-cache";
+              cache_ttl = "24h";
+            };
+
+            filesystem.directory = "${lokiDataDir}/chunks";
+          };
+
+          limits_config = {
+            reject_old_samples = true;
+            reject_old_samples_max_age = "168h";
+          };
+
+          table_manager = {
+            retention_deletes_enabled = false;
+            retention_period = "0s";
+          };
+
+          compactor = {
+            working_directory = lokiDataDir;
+            compactor_ring.kvstore.store = "inmemory";
+          };
+        };
+      };
+
+      promtail = {
+        enable = true;
+
+        configuration = {
+          server = {
+            http_listen_port = 28183;
+            grpc_listen_port = 0;
+          };
+
+          positions.filename = "/tmp/positions.yaml";
+
+          clients = [{
+            url = "http://${loopbackAddr}:${toString config.services.loki.configuration.server.http_listen_port}/loki/api/v1/push";
+          }];
+
+          scrape_configs = [{
+            job_name = "journal";
+            journal = {
+              max_age = "12h";
+              labels = {
+                job = "systemd-journal";
+                host = config.networking.hostName;
+              };
+            };
+            relabel_configs = [{
+              source_labels = ["__journal__systemd_unit"];
+              target_label = "unit";
+            }];
+          }];
+        };
+      };
+
+      nginx.virtualHosts.${config.services.grafana.settings.server.domain} = {
+        useACMEHost = baseDomain;
+        forceSSL = true;
+        kTLS = true;
+        locations."/" = {
+          proxyPass = "http://${config.services.grafana.settings.server.http_addr}:${toString config.services.grafana.settings.server.http_port}";
+          proxyWebsockets = true;
+        };
+      };
+    };
+
+    system.activationScripts.loki-dir-init.text = ''
+      install -d -o ${config.services.loki.user} -g ${config.services.loki.group} ${lokiDataDir}
+    '';
+  };
+}

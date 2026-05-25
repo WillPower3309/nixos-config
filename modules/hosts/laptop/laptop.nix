@@ -4,6 +4,8 @@
   flake.nixosConfigurations = inputs.self.lib.mkNixos "x86_64-linux" "laptop";
 
   flake.modules.nixos.laptop = { config, ... }: {
+    networking.hostName = "laptop";
+
     imports = with inputs.self.modules.nixos; [
       common
       graphical

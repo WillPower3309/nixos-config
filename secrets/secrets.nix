@@ -1,15 +1,15 @@
 let
-  systemDesktop = builtins.readFile ../hosts/desktop/ssh_host_ed25519_key.pub;
-  systemLaptop = builtins.readFile ../hosts/laptop/ssh_host_ed25519_key.pub;
-  systemLighthouse = builtins.readFile ../hosts/lighthouse/ssh_host_ed25519_key.pub;
-  systemServer = builtins.readFile ../hosts/server/ssh_host_ed25519_key.pub;
-  systemRouter = builtins.readFile ../hosts/router/ssh_host_ed25519_key.pub;
-  systemProxmox = builtins.readFile ../hosts/proxmox/ssh_host_ed25519_key.pub;
+  systemDesktop = builtins.readFile ../modules/hosts/desktop/ssh_host_ed25519_key.pub;
+  systemLaptop = builtins.readFile ../modules/hosts/laptop/ssh_host_ed25519_key.pub;
+  systemLighthouse = builtins.readFile ../modules/hosts/lighthouse/ssh_host_ed25519_key.pub;
+  systemServer = builtins.readFile ../modules/hosts/server/ssh_host_ed25519_key.pub;
+  systemRouter = builtins.readFile ../modules/hosts/router/ssh_host_ed25519_key.pub;
+  systemProxmox = builtins.readFile ../modules/hosts/proxmox/ssh_host_ed25519_key.pub;
 
   guiSystems = [ systemDesktop systemLaptop ];
   systems = guiSystems ++ [ systemServer systemRouter systemLighthouse systemProxmox ];
 
-  userWill = builtins.readFile ../home/id_ed25519.pub;
+  userWill = builtins.readFile ../modules/home/id_ed25519.pub;
   editors = [ userWill ];
 
 in

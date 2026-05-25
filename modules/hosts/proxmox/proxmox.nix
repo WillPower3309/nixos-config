@@ -1,4 +1,4 @@
-{ inputs, lib, ... }:
+{ inputs, ... }:
 
 let
   authorizedKey = builtins.readFile ../../../modules/home/id_ed25519.pub;
@@ -8,12 +8,7 @@ let
   sfpInterface0 = "sfp0";
   sfpInterface1 = "sfp1";
 
-  numNetVfs = lib.pipe ./vms [
-    builtins.readDir
-    builtins.attrNames
-    builtins.length
-    (count: count + 2)
-  ];
+  numNetVfs = 32; # TODO: better value, remove var (only used once)?
   numGpuVfs = 2;
 
 in
@@ -21,8 +16,6 @@ in
   flake.nixosConfigurations = inputs.self.lib.mkNixos "x86_64-linux" "proxmox";
 
   flake.modules.nixos.proxmox = { config, pkgs, lib, ... }: {
-    networking.hostName = "proxmox";
-
     imports = with inputs.self.modules.nixos; [
       common
       ssh-server
@@ -46,6 +39,7 @@ in
     '';
 
     networking = let hostInterface = "${sfpInterface0}v0"; in {
+      hostName = "proxmox";
       usePredictableInterfaceNames = false;
       useDHCP = false;
 

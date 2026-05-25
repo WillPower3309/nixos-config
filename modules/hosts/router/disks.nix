@@ -8,7 +8,7 @@
       disk.main = {
         device = "/dev/sda";
         type = "disk";
-        imageSize = "4G";
+        imageSize = "4G"; # this is the minimum size needed, expand the /nix partition to fill the extra space on the disk afterwards
         imageName = "router-image";
         content = {
           type = "gpt";

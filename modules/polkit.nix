@@ -1,30 +1,32 @@
-{ pkgs, lib, config, ... }:
+{ inputs, ... }:
 
 {
-  security = {
-    polkit.enable = true;
-    # fingerprint sensor, need to run `sudo fprintd-enroll USER`
-    # printd enabled by framework 16 nixos-hardware
-    pam.services = lib.mkIf (config.networking.hostName == "laptop") {
-      polkit-1.fprintAuth = true;
-      sudo.fprintAuth = true;
+  flake.modules.nixos.polkit = { pkgs, lib, config, ... }: {
+    security = {
+      polkit.enable = true;
+      # fingerprint sensor, need to run `sudo fprintd-enroll USER`
+      # printd enabled by framework 16 nixos-hardware
+      pam.services = lib.mkIf (config.networking.hostName == "laptop") {
+        polkit-1.fprintAuth = true;
+        sudo.fprintAuth = true;
+      };
     };
-  };
 
-  # use polkit_gnome as authentication agent
-  environment.systemPackages = with pkgs; [ polkit_gnome ];
-  systemd = {
-    user.services.polkit-gnome-authentication-agent-1 = {
-      description = "polkit-gnome-authentication-agent-1";
-      wantedBy = [ "graphical-session.target" ];
-      wants = [ "graphical-session.target" ];
-      after = [ "graphical-session.target" ];
-      serviceConfig = {
-        Type = "simple";
-        ExecStart = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
-        Restart = "on-failure";
-        RestartSec = 1;
-        TimeoutStopSec = 10;
+    # use polkit_gnome as authentication agent
+    environment.systemPackages = with pkgs; [ polkit_gnome ];
+    systemd = {
+      user.services.polkit-gnome-authentication-agent-1 = {
+        description = "polkit-gnome-authentication-agent-1";
+        wantedBy = [ "graphical-session.target" ];
+        wants = [ "graphical-session.target" ];
+        after = [ "graphical-session.target" ];
+        serviceConfig = {
+          Type = "simple";
+          ExecStart = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
+          Restart = "on-failure";
+          RestartSec = 1;
+          TimeoutStopSec = 10;
+        };
       };
     };
   };

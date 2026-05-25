@@ -4,7 +4,7 @@
   # TODO: add steam program here
   home = {
     packages = with pkgs; [
-      lutris
+      #lutris
       gamemode
     ];
 

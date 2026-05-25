@@ -1,13 +1,14 @@
-{ config, pkg, ... }:
+{ inputs, ... }:
 
 {
-  networking.networkmanager = {
-    enable = true;
-    wifi.macAddress = "random";
-#    dns = "systemd-resolved";
-  };
+  flake.modules.nixos.wifi = {
+    networking.networkmanager = {
+      enable = true;
+      wifi.macAddress = "random";
+    };
 
-  environment.persistence."/nix/persist".directories = [
-    "/etc/NetworkManager/system-connections"
-  ];
+    environment.persistence."/nix/persist".directories = [
+      "/etc/NetworkManager/system-connections"
+    ];
+  };
 }

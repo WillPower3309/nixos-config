@@ -1,7 +1,11 @@
 { inputs, lib, ... }:
 
 {
-  flake.lib = {
+  options.flake.lib = lib.mkOption {
+    type = lib.types.lazyAttrsOf lib.types.unspecified;
+  };
+
+  config.flake.lib = {
     mkNixos = system: name: {
       ${name} = inputs.nixpkgs.lib.nixosSystem {
         modules = [

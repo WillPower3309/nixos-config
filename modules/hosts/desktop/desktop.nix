@@ -35,7 +35,6 @@
 
     environment.etc."ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;
 
-    # TODO: DX5 as default output - sometimes scarlett solo takes the output
     services.pipewire.wireplumber = {
       enable = true;
       extraConfig = {

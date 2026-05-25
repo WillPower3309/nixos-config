@@ -1,22 +1,24 @@
-{ pkgs, ... }:
+{ inputs, ... }:
 
 {
-  nix = {
-    extraOptions = ''
-      experimental-features = nix-command flakes
-    '';
+  flake.modules.nixos.nix = {
+    nix = {
+      extraOptions = ''
+        experimental-features = nix-command flakes
+      '';
 
-    gc = {
-      automatic = true;
-      dates = "thursday";
-      options = "--delete-older-than 8d";
+      gc = {
+        automatic = true;
+        dates = "thursday";
+        options = "--delete-older-than 8d";
+      };
     };
-  };
 
-  nixpkgs = {
-    config = {
-      allowUnfree = true;
-      oraclejdk.accept_license = true;
+    nixpkgs = {
+      config = {
+        allowUnfree = true;
+        oraclejdk.accept_license = true;
+      };
     };
   };
 }

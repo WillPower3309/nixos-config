@@ -12,7 +12,7 @@ in
     imports = with inputs.self.modules.nixos; [
       common
       ssh-server
-    ];
+    ] ++ [ inputs.agenix.nixosModules.age ];
 
     boot = {
       lanzaboote.enable = false;
@@ -24,6 +24,7 @@ in
 
     networking.useDHCP = lib.mkForce false;
 
+    # Based on https://github.com/canonical/cloud-init/blob/main/config/cloud.cfg.tmpl
     services.cloud-init = {
       enable = true;
       network.enable = true;
@@ -47,6 +48,24 @@ in
       };
     };
 
+    age.secrets = {
+      nebulaCaCert = {
+        file = "${inputs.secrets}/nebulaCaCert.age";
+        owner = "nebula-home";
+        group = "nebula-home";
+      };
+      lighthouseNebulaCert = {
+        file = "${inputs.secrets}/lighthouseNebulaCert.age";
+        owner = "nebula-home";
+        group = "nebula-home";
+      };
+      lighthouseNebulaKey = {
+        file = "${inputs.secrets}/lighthouseNebulaKey.age";
+        owner = "nebula-home";
+        group = "nebula-home";
+      };
+    };
+
     networking.firewall = {
       allowedUDPPorts = [ 4242 ];
       allowedTCPPorts = [ 32400 ];
@@ -67,8 +86,12 @@ in
       };
 
       nebula.networks.home = {
+        enable = true;
         isLighthouse = true;
         isRelay = true;
+        cert = config.age.secrets.lighthouseNebulaCert.path; # lighthouse.crt
+        key = config.age.secrets.lighthouseNebulaKey.path; # lighthouse.key
+        ca = config.age.secrets.nebulaCaCert.path; # ca.crt
       };
 
       fail2ban = {

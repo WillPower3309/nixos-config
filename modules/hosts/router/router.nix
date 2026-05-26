@@ -48,7 +48,7 @@ in
     imports = with inputs.self.modules.nixos; [
       common
       ssh-server
-    ];
+    ] ++ [ inputs.agenix.nixosModules.age ];
 
     age.secrets.hashedRootPassword.file = "${inputs.secrets}/hashedRootPassword.age";
 

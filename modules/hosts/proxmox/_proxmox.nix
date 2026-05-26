@@ -21,6 +21,7 @@ in
       ssh-server
     ] ++ [
       inputs.proxmox-nixos.nixosModules.proxmox-ve
+      inputs.agenix.nixosModules.age
     ];
 
     nixpkgs.overlays = [ inputs.proxmox-nixos.overlays.x86_64-linux ];

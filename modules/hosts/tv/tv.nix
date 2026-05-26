@@ -10,7 +10,7 @@
     ];
 
     boot = {
-      lanzaboote.enable = false;
+      lanzaboote.enable = false; # TODO: enable
       initrd.availableKernelModules = [ "xhci_pci" "nvme" "usb_storage" ];
       kernelParams = [
         "vt.global_cursor_default=0"
@@ -47,7 +47,7 @@
       hostName = "tv";
       wireless.enable = false;
       interfaces.eno1.wakeOnLan.enable = true;
-      firewall.allowedUDPPorts = [ 9 ];
+      firewall.allowedUDPPorts = [ 9 ];  # wake on LAN
     };
 
     users = {
@@ -58,13 +58,14 @@
         };
         kodi = {
           isNormalUser = true;
-          extraGroups = [ "video" "audio" "input" "render" "dialout" ];
+          extraGroups = [ "video" "audio" "input" "render" "dialout" ];  # dialout needed for CEC serial device
         };
       };
       mutableUsers = false;
     };
 
-    systemd.services."getty@tty2".enable = false;
+    # script to start moonlight on tty2
+    systemd.services."getty@tty2".enable = false; # prevent login prompts from interfering
     environment.systemPackages = let
       moonlight-kodi-wrapper = pkgs.writeShellScriptBin "launch-moonlight" ''
         KODI_PID=$(pidof kodi.bin)
@@ -95,6 +96,10 @@
       setuid = true;
     };
 
+    # TODO: custom plugins https://discourse.nixos.org/t/how-to-add-custom-kodi-plugins-yet-another-how-to-use-a-custom-derivation-in-my-flake-post/46238
+    # remove nixpkgs.config.kodi.enableAdvancedLauncher = true
+    # https://github.com/jurialmunkey/skin.arctic.fuse.3
+    # https://github.com/croneter/PlexKodiConnect
     nixpkgs.config.kodi.enableAdvancedLauncher = true;
 
     services.getty.autologinUser = "kodi";
@@ -108,6 +113,7 @@
 
     environment = {
       persistence."/nix/persist".directories = [
+        # TODO: add below to HM
         { directory = "/home/kodi/.kodi"; user = "kodi"; group = "users"; }
         { directory = "/home/kodi/.cache"; user = "kodi"; group = "users"; }
       ];

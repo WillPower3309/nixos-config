@@ -1,11 +1,14 @@
 { inputs, lib, ... }:
 
+# TODO: set up reverse DNS pointer records (PTR) in unbound so devices can be recognized via hostname instead of IP
+# TODO: prometheus and grafana, map Prometheus metrics collection exporters to trace live CAKE drop rates and queue latencies onto Grafana
 let
   authorizedKey = builtins.readFile ../../../modules/home/id_ed25519.pub;
 
   wanInterface = "wan0";
   lanInterface = "lan0";
 
+  # should be 90-95% of the true limit (needed for cake)
   wanDownloadSpeed = "900mbit";
   wanUploadSpeed = "900mbit";
 
@@ -32,14 +35,14 @@ let
       id = 30;
       dhcp = { enable = true; reservations = []; };
     };
+    # TODO: this won't be needed once meshcentral and router are moved to proxmox
     management = {
       id = 100;
       dhcp = { enable = false; reservations = []; };
     };
   };
 
-in
-{
+in {
   flake.nixosConfigurations = inputs.self.lib.mkNixos "x86_64-linux" "router";
 
   flake.modules.nixos.router = { config, pkgs, lib, ... }: {
@@ -62,17 +65,28 @@ in
 
     powerManagement.cpuFreqGovernor = "powersave";
 
-    boot = {
-      lanzaboote.enable = false;
+    hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 
+    boot = {
+      lanzaboote.enable = false; # TODO: enable
+      initrd.availableKernelModules = [ "ahci" "xhci_pci" "usbhid" "usb_storage" "sd_mod" ];
       kernel.sysctl = {
         "net.ipv4.conf.all.forwarding" = 1;
+
+        # not using IPv6 yet
         "net.ipv6.conf.all.forwarding" = 0;
         "net.ipv6.conf.all.accept_ra" = 0;
         "net.ipv6.conf.all.autoconf" = 0;
         "net.ipv6.conf.all.use_tempaddr" = 0;
-        "net.core.rmem_max" = 1048576;
-        "net.ipv4.ip_nonlocal_bind" = 1;
+
+        "net.core.rmem_max" = 1048576; # Fix Unbound socket receive buffer warnings safely
+        "net.ipv4.ip_nonlocal_bind" = 1; # Allow applications to bind to any IP address without waiting for the interface link to be up
+
+        # deny martian packets TODO: once DNS is set up properly (otherwise this breaks nebula)
+        #"net.ipv4.conf.default.rp_filter" = 1;
+        #"net.ipv4.conf.all.rp_filter" = 1;
+
+        # On WAN, allow IPv6 autoconfiguration and tempory address use.
         "net.ipv6.conf.${wanInterface}.accept_ra" = 2;
         "net.ipv6.conf.${wanInterface}.autoconf" = 1;
       };
@@ -86,11 +100,14 @@ in
     '';
 
     networking = {
-      usePredictableInterfaceNames = false;
-      useDHCP = false;
+      usePredictableInterfaceNames = false; # set interface names via services.udev.extraRules above
+      useDHCP = false; # define per interface instead
       networkmanager.enable = lib.mkForce false;
-      firewall.enable = false;
+      firewall.enable = false; # use nftables instead
 
+      # TODO: read https://www.mankier.com/8/nft
+      # TODO: from above, make sure I know what the following are: address families, hooks, tables, chains, rules, and sets
+      # TODO: add iot rules
       nftables = {
         enable = true;
         ruleset = ''
@@ -186,8 +203,8 @@ in
       settings = {
         interfaces-config = {
           interfaces = lib.mapAttrsToList (name: net: "${lanInterface}.${toString net.id}") (lib.filterAttrs (name: net: net.dhcp.enable) networks);
-          re-detect = true;
-          dhcp-socket-type = "raw";
+          re-detect = true; # actively re-detect interfaces if they are re-created by networkd
+          dhcp-socket-type = "raw"; # capture packets at the link-layer, surviving interface toggles
         };
 
         lease-database = {
@@ -205,6 +222,7 @@ in
           id = net.id;
           subnet = "10.1.${toString net.id}.0/24";
           pools = if net.dhcp.enable then [{
+            # set a reservation = number of reservations + 2 (router & switch)
             pool = "10.1.${toString net.id}.${toString (builtins.length net.dhcp.reservations + 2)} - 10.1.${toString net.id}.254";
           }] else [ ];
 
@@ -245,11 +263,12 @@ in
 
           ip-freebind = true;
           so-reuseport = true;
-          so-rcvbuf = "1m";
+          so-rcvbuf = "1m"; # Safe to use with net.core.rmem_max elevated via sysctl
 
           private-domain = config.networking.domain;
           local-zone = [ ''"${config.networking.domain}" typetransparent'' ];
           local-data = [
+            # TODO: iterate through network dhcp reservations (or should I set based on hostname automatically?)
             ''"tv.${config.networking.domain} IN A 10.1.10.9"''
           ];
         };
@@ -260,6 +279,7 @@ in
           forward-first = false;
           forward-tls-upstream = true;
 
+          # TODO: use mullvad
           forward-addr = [
             "1.1.1.1@853#cloudflare-dns.com"
             "1.0.0.1@853#cloudflare-dns.com"
@@ -270,6 +290,8 @@ in
 
     boot.kernelModules = [ "ifb" ];
 
+    # use cake to fix bufferbloat
+    # TODO: download speed is cut in half?
     systemd.services.sqm-cake = {
       description = "CAKE SQM Network Shaper on WAN and Virtual Ingress IFB Interfaces";
       after = [ "network-online.target" ];

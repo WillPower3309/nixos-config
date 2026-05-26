@@ -16,10 +16,15 @@ in
       nebula
       syncthing
       arr
+      # calibre
+      # freshrss
+      # immich
       meshcentral
+      # monitoring
       nginx
       plex
       radicale
+      # synapse
       tandoor
       torrents
     ];
@@ -28,8 +33,12 @@ in
       lanzaboote.enable = false;
       supportedFilesystems = [ "zfs" ];
 
+      # TODO: get nebula in initrd, good docs:
+      # https://wiki.nixos.org/wiki/Remote_disk_unlocking
+      # https://jyn.dev/remotely-unlocking-an-encrypted-hard-disk
+      # TODO: secrets? different host key?
       initrd = {
-        kernelModules = [ "igc" ];
+        kernelModules = [ "igc" ];  # intel ethernet controller
         systemd.enable = true;
 
         network = {
@@ -44,7 +53,7 @@ in
       };
     };
 
-    networking.hostId = "7347e9d6";
+    networking.hostId = "7347e9d6"; # needed for ZFS
 
     age.secrets.hashedRootPassword.file = "${inputs.secrets}/hashedRootPassword.age";
 
@@ -57,7 +66,7 @@ in
     };
 
     services.openssh.hostKeys = lib.mkForce [{
-      path = "/persist${(toString hostKeyPath)}";
+      path = "/persist${(toString hostKeyPath)}"; # uses /persist instead of /nix/persist
       type = "ed25519";
     }];
 
@@ -71,6 +80,7 @@ in
         /export/music  10.1.10.8(ro,insecure,no_subtree_check,all_squash,anonuid=65534,anongid=65534)
       '';
     };
+    # open NFS ports
     networking.firewall.allowedTCPPorts = [ 2049 ];
 
     environment.etc."ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;

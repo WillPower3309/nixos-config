@@ -1,6 +1,8 @@
 { inputs, ... }:
 
 {
+  flake.homeConfigurations = inputs.self.lib.mkHomeManager "x86_64-linux" "will";
+
   flake.modules.homeManager.will = { config, pkgs, nixosConfig, ... }: {
     imports = with inputs.self.modules.homeManager; [
       android-development

@@ -1,7 +1,7 @@
 { inputs, ... }:
 
 {
-  flake.modules.homeManager.will = { pkgs, ... }: {
+  flake.modules.homeManager.will = { pkgs, config, ... }: {
     home = {
       packages = with pkgs; [
         blender
@@ -9,7 +9,7 @@
         orca-slicer
       ];
 
-      persistence."/nix/persist".directories = [ ".config/OrcaSlicer" ];
+      persistence."${config.constants.persistentDir}".directories = [ ".config/OrcaSlicer" ];
     };
   };
 }

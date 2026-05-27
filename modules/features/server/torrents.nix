@@ -18,8 +18,8 @@
         openPeerPorts = true; # TODO: on wireguard interface
 
         settings = {
-          download-dir = "/persist/transmission/download"; # TODO
-          incomplete-dir = "/persist/transmission/incomplete"; # TODO
+          download-dir = "${config.constants.persistentDir}/transmission/download"; # TODO
+          incomplete-dir = "${config.constants.persistentDir}/transmission/incomplete"; # TODO
           rpc-bind-address = config.constants.loopbackAddr;
           rpc-url = "/transmission/";
           rpc-host-whitelist-enabled = true;

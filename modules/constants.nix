@@ -1,6 +1,5 @@
-{ lib, ... }:
-let
-  constantsModule = { config, ... }: {
+{
+  flake.constants = { config, lib, ... }: {
     options.constants = lib.mkOption {
       type = lib.types.attrsOf lib.types.unspecified;
       default = { };
@@ -8,10 +7,9 @@ let
 
     config.constants = {
       loopbackAddr = "127.0.0.1";
-      persistentDir = if config.networking.hostName or "" == "server" then "/persist" else "/nix/persist";
+      persistentDir = if config.networking.hostName or "" == "server"
+        then "/persist"
+        else "/nix/persist";
     };
   };
-in {
-  flake.constantsModule = constantsModule;
-  flake.modules.nixos.constants = constantsModule;
 }

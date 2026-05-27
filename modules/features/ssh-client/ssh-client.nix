@@ -1,7 +1,7 @@
 { inputs, ... }:
 
 {
-  flake.modules.homeManager.will = { pkgs, ... }: {
+  flake.modules.homeManager.will = { pkgs, config, ... }: {
     programs.ssh = {
       enable = true;
 
@@ -34,7 +34,7 @@
     };
 
     home = {
-      persistence."/nix/persist".files = [
+      persistence."${config.constants.persistentDir}".files = [
         ".ssh/id_ed25519"
         ".ssh/known_hosts"
       ];

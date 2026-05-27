@@ -6,7 +6,7 @@
       boot
       impermanence
       nix
-    ] ++ [ inputs.self.modules.nixos.constants ];
+    ] ++ [ inputs.self.constants ];
 
     time.timeZone = "America/Toronto";
     networking = {

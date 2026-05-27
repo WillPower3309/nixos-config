@@ -3,7 +3,7 @@
 { config, ... }:
 
 let
-  configDir = "/nix/persist/home-assistant";
+  configDir = "${config.constants.persistentDir}/home-assistant";
 
 in {
   networking.hostName = "home-assistant";
@@ -36,7 +36,7 @@ in {
     };
   };
 
-  environment.persistence."/nix/persist" = {
+  environment.persistence."${config.constants.persistentDir}" = {
     hideMounts = true;
     directories = [
       "/var/log"

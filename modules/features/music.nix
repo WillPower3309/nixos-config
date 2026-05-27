@@ -1,11 +1,11 @@
 { inputs, ... }:
 
 {
-  flake.modules.homeManager.will = { pkgs, nixosConfig, ... }:
+  flake.modules.homeManager.will = { pkgs, nixosConfig, config, ... }:
 
   let
     hostName = nixosConfig.networking.hostName or "";
-    musicDir = if hostName == "desktop" then "/mnt/music" else "/nix/persist/home/will/Music";
+    musicDir = if hostName == "desktop" then "/mnt/music" else "${config.constants.persistentDir}/home/will/Music";
 
   in {
     services.mpd = {
@@ -38,7 +38,7 @@
 
     home = {
       packages = with pkgs; [ mpc ];
-      persistence."/nix/persist".directories = if hostName == "desktop" then [] else [ "Music" ];
+      persistence."${config.constants.persistentDir}".directories = if hostName == "desktop" then [] else [ "Music" ];
     };
   };
 }

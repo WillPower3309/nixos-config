@@ -1,10 +1,10 @@
 { inputs, ... }:
 
 {
-  flake.modules.homeManager.will = { pkgs, ... }: {
+  flake.modules.homeManager.will = { pkgs, config, ... }: {
     home = {
       packages = with pkgs; [ unityhub dotnet-sdk_8 ];
-      persistence."/nix/persist".directories = [
+      persistence."${config.constants.persistentDir}".directories = [
         "Unity"
         ".config/unity3d"
         ".config/unityhub"

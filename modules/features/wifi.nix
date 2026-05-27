@@ -1,12 +1,12 @@
 { inputs, ... }:
 
 {
-  flake.modules.nixos.wifi = {
+  flake.modules.nixos.wifi = { config, ... }: {
     networking.networkmanager = {
       enable = true;
       wifi.macAddress = "random";
     };
 
-    environment.persistence."/nix/persist".directories = [ "/etc/NetworkManager/system-connections" ];
+    environment.persistence."${config.constants.persistentDir}".directories = [ "/etc/NetworkManager/system-connections" ];
   };
 }

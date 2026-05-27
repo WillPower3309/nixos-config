@@ -25,7 +25,7 @@
       };
     };
 
-    environment.persistence."/persist".directories = [{
+    environment.persistence."${config.constants.persistentDir}".directories = [{
       directory = "/var/lib/private/";
       mode = "0700";
     }];

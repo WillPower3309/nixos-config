@@ -47,7 +47,7 @@ in
             enable = true;
             port = 2222;
             authorizedKeys = lib.map (key: "command=\"/bin/systemd-tty-ask-password-agent\",restrict,pty ${key}") config.users.users.root.openssh.authorizedKeys.keys;
-            hostKeys = [ (/persist + hostKeyPath) ];
+            hostKeys = [ (config.constants.persistentDir + (toString hostKeyPath)) ];
           };
         };
       };
@@ -66,7 +66,7 @@ in
     };
 
     services.openssh.hostKeys = lib.mkForce [{
-      path = "/persist${(toString hostKeyPath)}"; # uses /persist instead of /nix/persist
+      path = "${config.constants.persistentDir}${(toString hostKeyPath)}";
       type = "ed25519";
     }];
 

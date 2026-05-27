@@ -15,24 +15,24 @@
     services = {
       prowlarr = {
         enable = true;
-        dataDir = "/persist/var/lib/prowlarr";
+        dataDir = "${config.constants.persistentDir}/var/lib/prowlarr";
       };
       sonarr = {
         enable = true;
-        dataDir = "/persist/var/lib/sonarr";
+        dataDir = "${config.constants.persistentDir}/var/lib/sonarr";
       };
       radarr = {
         enable = true;
-        dataDir = "/persist/var/lib/radarr";
+        dataDir = "${config.constants.persistentDir}/var/lib/radarr";
       };
       readarr = {
         enable = true;
-        dataDir = "/persist/var/lib/readarr";
+        dataDir = "${config.constants.persistentDir}/var/lib/readarr";
         user = if config.services.calibre-server.enable then config.services.calibre-server.user else "readarr";
       };
       bazarr = {
         enable = true;
-        dataDir = "/persist/var/lib/bazarr";
+        dataDir = "${config.constants.persistentDir}/var/lib/bazarr";
       };
 
       nginx.virtualHosts = {

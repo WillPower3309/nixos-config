@@ -112,7 +112,7 @@
     '';
 
     environment = {
-      persistence."/nix/persist".directories = [
+      persistence."${config.constants.persistentDir}".directories = [
         # TODO: add below to HM
         { directory = "/home/kodi/.kodi"; user = "kodi"; group = "users"; }
         { directory = "/home/kodi/.cache"; user = "kodi"; group = "users"; }

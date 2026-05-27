@@ -118,6 +118,6 @@
   };
 
   flake.modules.homeManager.will = { config, pkgs, ... }: {
-    home.persistence."/nix/persist".directories = [ ".mozilla" ];
+    home.persistence."${config.constants.persistentDir}".directories = [ ".mozilla" ];
   };
 }

@@ -1,7 +1,7 @@
 { inputs, ... }:
 
 {
-  flake.modules.homeManager.will = { pkgs, ... }: {
+  flake.modules.homeManager.will = { pkgs, config, ... }: {
     home = {
       packages = with pkgs; [
         darktable
@@ -12,7 +12,7 @@
 
       # TODO: Store on nas
       # TODO: module
-      persistence."/nix/persist".files = [
+      persistence."${config.constants.persistentDir}".files = [
         ".config/darktable/data.db"
         ".config/darktable/library.db"
         ".config/darktable/darktablerc"

@@ -3,7 +3,7 @@
     services.gnome.evolution-data-server.enable = true;
   };
 
-  flake.modules.homeManager.will = { pkgs, ... }: {
+  flake.modules.homeManager.will = { pkgs, config, ... }: {
     home = {
       packages = with pkgs; [
         tutanota-desktop
@@ -11,7 +11,7 @@
         gnome-calendar
       ];
 
-      persistence."/nix/persist".directories = [
+      persistence."${config.constants.persistentDir}".directories = [
         ".config/evolution"
         ".cache/evolution"
       ];

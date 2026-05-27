@@ -12,8 +12,8 @@
 
     # TODO: do not run as root
     syncthingUser = if config.networking.hostName == "server" then "root" else "will";
-    folderDir = if config.networking.hostName == "server" then "/data" else "/nix/persist/home/${syncthingUser}";
-    dataDir = if config.networking.hostName == "server" then "/persist/syncthing" else folderDir;
+    folderDir = if config.networking.hostName == "server" then "/data" else "${config.constants.persistentDir}/home/${syncthingUser}";
+    dataDir = if config.networking.hostName == "server" then "${config.constants.persistentDir}/syncthing" else folderDir;
 
     baseDomain = config.networking.domain;
 

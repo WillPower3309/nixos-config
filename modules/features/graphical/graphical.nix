@@ -1,7 +1,7 @@
 { inputs, ... }:
 
 {
-  flake.modules.nixos.graphical = { pkgs, ... }: {
+  flake.modules.nixos.graphical = { pkgs, config, ... }: {
     imports = with inputs.self.modules.nixos; [
       games
       greetd
@@ -24,7 +24,7 @@
 
     programs.fuse.userAllowOther = true; # persistence (TODO: make one file)
 
-    age.identityPaths = [ "/nix/persist/etc/ssh/ssh_host_ed25519_key" ];
+    age.identityPaths = [ "${config.constants.persistentDir}/etc/ssh/ssh_host_ed25519_key" ];
 
     environment.systemPackages = with pkgs; [
       inputs.agenix.packages.x86_64-linux.default

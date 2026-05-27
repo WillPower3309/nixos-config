@@ -1,16 +1,11 @@
 { inputs, ... }:
 
 {
-  flake.modules.nixos.impermanence = { config, ... }:
-  let
-    # TODO: universal persistant dir, remove config usage
-    persistentDir = if config.networking.hostName == "server" then "/persist" else "/nix/persist";
-
-  in {
+  flake.modules.nixos.impermanence = { config, ... }: {
     imports = [ inputs.impermanence.nixosModules.impermanence ];
 
     environment = {
-      persistence.${persistentDir} = {
+      persistence.${config.constants.persistentDir} = {
         hideMounts = true;
         directories = [
           "/var/log"

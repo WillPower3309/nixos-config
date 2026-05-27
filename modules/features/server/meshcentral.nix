@@ -53,7 +53,7 @@
       };
     };
 
-    environment.persistence."/nix/persist".directories = [{
+    environment.persistence."${config.constants.persistentDir}".directories = [{
       directory = "/var/lib/private/meshcentral";
       user = "meshcentral";
       group = "meshcentral";

@@ -1,7 +1,7 @@
 { inputs, ... }:
 
 {
-  flake.modules.homeManager.will = {
+  flake.modules.homeManager.will = { config, ... }: {
     # Hide all .desktop, except for org.kde.kdeconnect.settings
     xdg.desktopEntries = {
       "org.kde.kdeconnect.sms" = {
@@ -26,6 +26,6 @@
       indicator = true;
     };
 
-    home.persistence."/nix/persist".directories = [ ".config/kdeconnect" ];
+    home.persistence."${config.constants.persistentDir}".directories = [ ".config/kdeconnect" ];
   };
 }

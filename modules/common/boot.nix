@@ -32,7 +32,7 @@
       };
     };
 
-    environment.persistence."/nix/persist".directories = [ config.boot.lanzaboote.pkiBundle ];
+    environment.persistence."${config.constants.persistentDir}".directories = [ config.boot.lanzaboote.pkiBundle ];
   };
 }
 

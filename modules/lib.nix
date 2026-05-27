@@ -10,7 +10,7 @@
       ${name} = inputs.nixpkgs.lib.nixosSystem {
         modules = [
           inputs.self.modules.nixos.${name}
-          { nixpkgs.hostPlatform = lib.mkDefault system; }
+          { nixpkgs.hostPlatform = lib.mkDefault system; nixpkgs.config.allowUnfree = true; }
         ];
       };
     };
@@ -23,6 +23,7 @@
           # They won't do anything — the real module is auto-imported by the
           # NixOS impermanence module when HM runs inside a NixOS eval.
           { options.home.persistence = lib.mkOption { type = lib.types.attrsOf lib.types.unspecified; default = { }; }; }
+          inputs.self.constants
           inputs.self.modules.homeManager.${name}
         ];
       };

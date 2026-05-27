@@ -31,12 +31,13 @@
 
     # create persistent home directory owned by user
     system.activationScripts.persistent-user-dir-creation.text = ''
-      install -d -o will -g users /nix/persist/home/will
+      install -d -o will -g users ${config.constants.persistentDir}/home/will
     '';
 
     home-manager = {
       useUserPackages = true;
       backupFileExtension = "backup";
+      sharedModules = [ inputs.self.constants ];
       users.will = {
         imports = [ inputs.self.modules.homeManager.will ];
       };
@@ -55,13 +56,13 @@
 
     xdg.mimeApps.enable = true;
 
-    age.identityPaths = [ "/nix/persist/home/will/.ssh/id_ed25519" ];
+    age.identityPaths = [ "${config.constants.persistentDir}/home/will/.ssh/id_ed25519" ];
 
     home = {
       username = "will";
       homeDirectory = "/home/will";
 
-      persistence."/nix/persist" = {
+      persistence."${config.constants.persistentDir}" = {
         directories = [
           "Downloads"
           "Pictures"

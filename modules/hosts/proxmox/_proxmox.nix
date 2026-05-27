@@ -99,7 +99,7 @@ in
             enable = true;
             port = 2222;
             authorizedKeys = lib.map (key: "command=\"/bin/systemd-tty-ask-password-agent\",restrict,pty ${key}") config.users.users.root.openssh.authorizedKeys.keys;
-            hostKeys = [ (/persist/etc/ssh/ssh_host_ed25519_key) ];
+            hostKeys = [ "${config.constants.persistentDir}/etc/ssh/ssh_host_ed25519_key" ];
           };
         };
       };
@@ -110,7 +110,7 @@ in
     age.secrets.proxmoxRsaPrivateKey.file = "${inputs.secrets}/proxmoxRsaPrivateKey.age";
 
     environment = {
-      persistence."/nix/persist".directories = [ "/var/lib/pve-cluster" ];
+      persistence."${config.constants.persistentDir}".directories = [ "/var/lib/pve-cluster" ];
 
       etc = {
         "ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;

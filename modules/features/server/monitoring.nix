@@ -3,7 +3,7 @@
 {
   flake.modules.nixos.monitoring = { config, pkgs, ... }: let
     baseDomain = "${config.networking.fqdn}";
-    lokiDataDir = "/persist/var/lib/loki";
+    lokiDataDir = "${config.constants.persistentDir}/var/lib/loki";
 
   in {
     age.secrets = {

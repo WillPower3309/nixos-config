@@ -4,7 +4,7 @@
   flake.modules.nixos.calibre = { config, pkgs, ... }: let
     baseDomain = config.networking.fqdn;
     libraryDir = "/data/books";
-    userDbDir = "/persist/etc/calibre-server"; # TODO: use proper persistence dir when migration to VM is complete
+    userDbDir = "${config.constants.persistentDir}/etc/calibre-server"; # TODO: use proper persistence dir when migration to VM is complete
     userDbFilePath = "${userDbDir}/users.sqlite";
 
   in {

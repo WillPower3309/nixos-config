@@ -79,7 +79,7 @@
           { command = "rapidshell"; }
           { command = "wlsunset -l 43.7 -L -79.3"; }
           # TODO: move to keepassxc module
-          { command = "cat ${config.age.secrets.keepassPassword.path} | keepassxc --pw-stdin /nix/persist/home/will/keepass/vault.kdbx"; }
+          { command = "cat ${config.age.secrets.keepassPassword.path} | keepassxc --pw-stdin ${config.constants.persistentDir}/home/will/keepass/vault.kdbx"; }
         ];
 
         window = {

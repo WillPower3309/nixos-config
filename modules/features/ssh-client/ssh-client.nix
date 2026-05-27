@@ -1,7 +1,7 @@
 { inputs, ... }:
 
 {
-  flake.modules.homeManager.ssh-client = { pkgs, ... }: {
+  flake.modules.homeManager.will = { pkgs, ... }: {
     programs.ssh = {
       enable = true;
 
@@ -38,7 +38,7 @@
         ".ssh/id_ed25519"
         ".ssh/known_hosts"
       ];
-      file.".ssh/id_ed25519.pub".source = ../id_ed25519.pub;
+      file.".ssh/id_ed25519.pub".source = ./id_ed25519.pub;
     };
   };
 }

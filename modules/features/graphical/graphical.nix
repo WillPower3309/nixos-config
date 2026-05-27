@@ -11,6 +11,7 @@
       plymouth
       screen-record
       sound
+      sway
       users
       wayland
       web-browsers
@@ -21,10 +22,7 @@
       extraPackages = [ pkgs.rocmPackages.clr.icd ]; # opencl TODO: just for darktable?
     };
 
-    programs = {
-      dconf.enable = true; # needed for sway
-      fuse.userAllowOther = true; # persistence (TODO: make one file)
-    };
+    programs.fuse.userAllowOther = true; # persistence (TODO: make one file)
 
     age.identityPaths = [ "/nix/persist/etc/ssh/ssh_host_ed25519_key" ];
 

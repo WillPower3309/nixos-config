@@ -1,7 +1,7 @@
 { inputs, ... }:
 
 {
-  flake.modules.homeManager.git = { pkgs, ... }: {
+  flake.modules.homeManager.will = { pkgs, ... }: {
     programs.git = {
       enable = true;
       settings.user = {

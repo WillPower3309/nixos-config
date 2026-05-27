@@ -1,7 +1,7 @@
 { inputs, ... }:
 
 {
-  flake.modules.homeManager.kde-connect = { pkgs, ... }: {
+  flake.modules.homeManager.will = {
     # Hide all .desktop, except for org.kde.kdeconnect.settings
     xdg.desktopEntries = {
       "org.kde.kdeconnect.sms" = {

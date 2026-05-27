@@ -1,7 +1,7 @@
 { inputs, ... }:
 
 {
-  flake.modules.homeManager.music = { pkgs, nixosConfig, ... }:
+  flake.modules.homeManager.will = { pkgs, nixosConfig, ... }:
 
   with nixosConfig.networking;
 

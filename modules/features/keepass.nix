@@ -1,7 +1,7 @@
 { inputs, ... }:
 
 {
-  flake.modules.homeManager.keepass = { pkgs, config, lib, ... }: {
+  flake.modules.homeManager.will = { pkgs, config, lib, ... }: {
     # TODO: https://www.reddit.com/r/NixOS/comments/1l9xbd9/how_to_declaratively_link_keepassxc_databases_to/
     home = {
       packages = with pkgs; [ keepassxc ];

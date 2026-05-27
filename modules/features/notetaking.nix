@@ -1,7 +1,7 @@
 { inputs, ... }:
 
 {
-  flake.modules.homeManager.notetaking = { pkgs, ... }: {
+  flake.modules.homeManager.will = { pkgs, ... }: {
     home = {
       packages = [ pkgs.obsidian ];
 

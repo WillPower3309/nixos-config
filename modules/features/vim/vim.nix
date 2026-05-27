@@ -1,7 +1,7 @@
 { inputs, ... }:
 
 {
-  flake.modules.homeManager.vim = { pkgs, ... }: {
+  flake.modules.homeManager.will = { pkgs, ... }: {
     programs.neovim = {
       enable = true;
       defaultEditor = true;

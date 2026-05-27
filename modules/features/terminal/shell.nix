@@ -1,7 +1,7 @@
 { inputs, ... }:
 
 {
-  flake.modules.homeManager.zsh = { nixosConfig, pkgs, lib, ... }:
+  flake.modules.homeManager.will = { nixosConfig, pkgs, lib, ... }:
 
   let
     nixosConfigPath = "~/Projects/nixos-config";

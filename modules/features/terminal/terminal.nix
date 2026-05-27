@@ -1,10 +1,10 @@
 { inputs, ... }:
 
 {
-  flake.modules.homeManager.foot = { pkgs, lib, ... }: {
+  flake.modules.homeManager.will = { pkgs, lib, ... }: {
     programs.foot = {
       enable = true;
-      # TODO: server.enable
+      #server.enable = true; TODO
 
       settings = {
         main = {

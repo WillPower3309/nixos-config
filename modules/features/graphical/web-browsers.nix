@@ -116,4 +116,8 @@
       };
     };
   };
+
+  flake.modules.homeManager.will = { config, pkgs, nixosConfig, ... }: {
+    home.persistence."/nix/persist".directories = [ ".mozilla" ];
+  };
 }

@@ -1,12 +1,14 @@
 { inputs, ... }:
 
 {
-  flake.modules.homeManager.sway = { lib, nixosConfig, pkgs, config, ... }:
+  flake.modules.nixos.sway = {
+    programs.dconf.enable = true;
+  };
 
+  flake.modules.homeManager.will = { lib, nixosConfig, pkgs, config, ... }:
   let
     isDesktop = nixosConfig.networking.hostName == "desktop";
-  in
-  {
+  in {
     home.packages = with pkgs; [
       autotiling
       slurp
@@ -16,7 +18,7 @@
 
     xdg.autostart.enable = true;
 
-    age.secrets.keepassPassword.file = ../secrets/keepass.age;
+    age.secrets.keepassPassword.file = "${inputs.secrets}/keepass.age";
 
     wayland.windowManager.sway = {
       enable = true;
@@ -28,8 +30,7 @@
       wrapperFeatures.gtk = true;
 
       config = {
-        # super key
-        modifier = "Mod4";
+        modifier = "Mod4"; # super key
 
         bars = [];
 
@@ -74,7 +75,6 @@
         seat.seat0.hide_cursor = "3000";
 
         startup = [
-          { command = "foot --server"; }
           { command = "autotiling"; }
           { command = "rapidshell"; }
           { command = "wlsunset -l 43.7 -L -79.3"; }

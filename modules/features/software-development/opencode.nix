@@ -1,7 +1,7 @@
 { inputs, ... }:
 
 {
-  flake.modules.homeManager.opencode = { pkgs, ... }: {
+  flake.modules.homeManager.will = { pkgs, ... }: {
     programs.opencode = {
       enable = true;
       settings = {

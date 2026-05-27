@@ -1,7 +1,7 @@
 { inputs, ... }:
 
 {
-  flake.modules.homeManager.video = { pkgs, ... }: {
+  flake.modules.homeManager.will = { pkgs, ... }: {
     programs.mpv = {
       enable = true;
       config = {

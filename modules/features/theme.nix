@@ -1,7 +1,7 @@
 { inputs, ... }:
 
 {
-  flake.modules.homeManager.theme = { pkgs, config, ... }: {
+  flake.modules.homeManager.will = { pkgs, config, ... }: {
     # TODO: make me work
     home.pointerCursor = {
       enable = true;

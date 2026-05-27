@@ -1,7 +1,7 @@
 { inputs, ... }:
 
 {
-  flake.modules.homeManager.discord = { pkgs, ... }: {
+  flake.modules.homeManager.will = { pkgs, ... }: {
     home = {
       packages = with pkgs; [ discord ];
 

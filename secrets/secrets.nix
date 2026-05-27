@@ -9,7 +9,7 @@ let
   guiSystems = [ systemDesktop systemLaptop ];
   systems = guiSystems ++ [ systemServer systemRouter systemLighthouse systemProxmox ];
 
-  userWill = builtins.readFile ../modules/home/id_ed25519.pub;
+  userWill = builtins.readFile ../modules/features/ssh-client/id_ed25519.pub;
   editors = [ userWill ];
 
 in
@@ -54,5 +54,7 @@ in
   "freshrssAdminPassword.age".publicKeys = [ systemServer ] ++ editors;
 
   "acme.age".publicKeys = [ systemServer ] ++ editors;
+
+  "keepass.age".publicKeys = [ userWill ];
 }
 

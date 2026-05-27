@@ -24,9 +24,10 @@
         shellAliases = {
           ls = "colorls";
           wake-tv = "${pkgs.wakeonlan}/bin/wakeonlan 52:b2:03:93:42:2e";
-          os-rebuild = "nixos-rebuild switch --flake ${nixosConfigPath}#${nixosConfig.networking.hostName}";
           fetch = "SPRITE=$(pokeget random --hide-name); HEIGHT=$(echo \"$SPRITE\" | wc -l); fastfetch --data-raw \"$SPRITE\"; echo \"$HEIGHT\"";
           # TODO: vertical align to sprite, can be done with `fastfetch -s Break:Break:OS:Host:Kernel:Uptime:Packages:DE:WM:CPU:GPU:Memory:Swap:Disk:LocalIp:Battery:PowerAdapter:Break:Colors`
+        } // lib.mkIf (nixosConfig != null) {
+          os-rebuild = "nixos-rebuild switch --flake ${nixosConfigPath}#${nixosConfig.networking.hostName}";
         };
 
         # show fetch on new terminal windows & set up transient prompt

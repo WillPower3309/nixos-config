@@ -20,7 +20,7 @@
         settings = {
           download-dir = "/persist/transmission/download"; # TODO
           incomplete-dir = "/persist/transmission/incomplete"; # TODO
-          rpc-bind-address = "127.0.0.1";
+          rpc-bind-address = config.constants.loopbackAddr;
           rpc-url = "/transmission/";
           rpc-host-whitelist-enabled = true;
           rpc-host-whitelist = address;

@@ -2,7 +2,6 @@
 
 {
   flake.modules.nixos.immich = { config, ... }: let
-    loopbackIp = "127.0.0.1"; # TODO: make constant
     baseDomain = config.networking.fqdn;
 
   in {
@@ -20,12 +19,12 @@
         useACMEHost = baseDomain;
         forceSSL = true;
         kTLS = true;
-        locations."/".proxyPass = "http://${loopbackIp}:${toString config.services.immich.port}";
+        locations."/".proxyPass = "http://${config.constants.loopbackAddr}:${toString config.services.immich.port}";
 
         extraConfig = ''
           client_max_body_size 50000M;
 
-          proxy_set_header Host "${loopbackIp}";
+          proxy_set_header Host "${config.constants.loopbackAddr}";
           proxy_set_header X-Real-IP         $remote_addr;
           proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
           proxy_set_header X-Forwarded-Proto $scheme;

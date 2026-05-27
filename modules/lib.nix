@@ -15,13 +15,15 @@
       };
     };
 
-    # TODO: unused
     mkHomeManager = system: name: {
       ${name} = inputs.home-manager.lib.homeManagerConfiguration {
         pkgs = inputs.nixpkgs.legacyPackages.${system};
         modules = [
+          # Stub so home.persistence definitions are accepted in standalone.
+          # They won't do anything — the real module is auto-imported by the
+          # NixOS impermanence module when HM runs inside a NixOS eval.
+          { options.home.persistence = lib.mkOption { type = lib.types.attrsOf lib.types.unspecified; default = { }; }; }
           inputs.self.modules.homeManager.${name}
-          { nixpkgs.config.allowUnfree = true; }
         ];
       };
     };

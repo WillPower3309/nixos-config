@@ -3,7 +3,6 @@
 {
   flake.modules.nixos.monitoring = { config, pkgs, ... }: let
     baseDomain = "${config.networking.fqdn}";
-    loopbackAddr = "127.0.0.1";
     lokiDataDir = "/persist/var/lib/loki";
 
   in {
@@ -27,7 +26,7 @@
         settings = {
           server = {
             http_port = 2342;
-            http_addr = loopbackAddr;
+            http_addr = config.constants.loopbackAddr;
             domain = "grafana.${baseDomain}";
           };
 
@@ -85,7 +84,7 @@
         scrapeConfigs = [{
           job_name = "${config.networking.hostName}-scrape";
           static_configs = [{
-            targets = [ "${loopbackAddr}:${toString config.services.prometheus.exporters.node.port}" ];
+            targets = [ "${config.constants.loopbackAddr}:${toString config.services.prometheus.exporters.node.port}" ];
           }];
         }];
       };
@@ -103,7 +102,7 @@
 
           ingester = {
             lifecycler = {
-              address = loopbackAddr;
+              address = config.constants.loopbackAddr;
               ring = {
                 kvstore.store = "inmemory";
                 replication_factor = 1;
@@ -165,7 +164,7 @@
           positions.filename = "/tmp/positions.yaml";
 
           clients = [{
-            url = "http://${loopbackAddr}:${toString config.services.loki.configuration.server.http_listen_port}/loki/api/v1/push";
+            url = "http://${config.constants.loopbackAddr}:${toString config.services.loki.configuration.server.http_listen_port}/loki/api/v1/push";
           }];
 
           scrape_configs = [{

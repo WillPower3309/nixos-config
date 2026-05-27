@@ -3,11 +3,9 @@
 {
   flake.modules.homeManager.will = { pkgs, nixosConfig, ... }:
 
-  with nixosConfig.networking;
-
-  # TODO: https://mpd.readthedocs.io/en/stable/user.html#satellite-setup
-  # TODO: xdg dirs?
-  let musicDir = if hostName == "desktop" then "/mnt/music" else "/nix/persist/home/will/Music";
+  let
+    hostName = nixosConfig.networking.hostName or "";
+    musicDir = if hostName == "desktop" then "/mnt/music" else "/nix/persist/home/will/Music";
 
   in {
     services.mpd = {
@@ -40,7 +38,6 @@
 
     home = {
       packages = with pkgs; [ mpc ];
-
       persistence."/nix/persist".directories = if hostName == "desktop" then [] else [ "Music" ];
     };
   };

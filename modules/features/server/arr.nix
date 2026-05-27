@@ -5,7 +5,7 @@
     baseDomain = config.networking.fqdn;
 
     createNginxProxy = port: {
-      locations."/".proxyPass = "http://127.0.0.1:${port}";
+      locations."/".proxyPass = "http://${config.constants.loopbackAddr}:${builtins.toString port}";
       useACMEHost = baseDomain;
       forceSSL = true;
       kTLS = true;

@@ -3,7 +3,7 @@
 {
   flake.nixosConfigurations = inputs.self.lib.mkNixos "x86_64-linux" "laptop";
 
-  flake.modules.nixos.laptop = { config, ... }: {
+  flake.modules.nixos.laptop = { config, lib, ... }: {
     networking.hostName = "laptop";
 
     imports = with inputs.self.modules.nixos; [
@@ -35,6 +35,14 @@
     security.pam.services = {
       polkit-1.fprintAuth = true;
       sudo.fprintAuth = true;
+    };
+
+    # set timezone on boot (in case of timezone change)
+    # TODO: set up to trigger again in networkmanager / wifi module
+    time.timeZone = lib.mkForce null;
+    services.tzupdate = {
+      enable = true;
+      timer.enable = false; # should be a oneshot
     };
 
     environment.etc."ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;

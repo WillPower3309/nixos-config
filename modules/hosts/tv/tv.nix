@@ -54,7 +54,7 @@
       users = {
         root = {
           password = "tv";
-          openssh.authorizedKeys.keys = [ (builtins.readFile ../../../modules/home/id_ed25519.pub) ];
+          openssh.authorizedKeys.keys = [ (builtins.readFile ../../features/ssh-client/id_ed25519.pub) ];
         };
         kodi = {
           isNormalUser = true;

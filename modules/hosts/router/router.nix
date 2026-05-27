@@ -3,7 +3,7 @@
 # TODO: set up reverse DNS pointer records (PTR) in unbound so devices can be recognized via hostname instead of IP
 # TODO: prometheus and grafana, map Prometheus metrics collection exporters to trace live CAKE drop rates and queue latencies onto Grafana
 let
-  authorizedKey = builtins.readFile ../../../modules/home/id_ed25519.pub;
+  authorizedKey = builtins.readFile ../../features/ssh-client/id_ed25519.pub;
 
   wanInterface = "wan0";
   lanInterface = "lan0";
@@ -246,7 +246,7 @@ in {
 
       settings = {
         server = {
-          interface = [ "127.0.0.1" ] ++ (lib.mapAttrsToList (name: net: "10.1.${toString net.id}.1") networks);
+          interface = [ config.constants.loopbackAddr ] ++ (lib.mapAttrsToList (name: net: "10.1.${toString net.id}.1") networks);
           access-control = [ "0.0.0.0/0 refuse" "127.0.0.0/8 allow" ]
             ++ (lib.mapAttrsToList (name: net: "10.1.${toString net.id}.0/24 allow") networks);
 

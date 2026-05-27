@@ -24,7 +24,7 @@
       };
 
       nginx.virtualHosts."calibre.${baseDomain}" = {
-        locations."/".proxyPass = "http://127.0.0.1:${toString config.services.calibre-server.port}";
+        locations."/".proxyPass = "http://${config.constants.loopbackAddr}:${toString config.services.calibre-server.port}";
         useACMEHost = baseDomain;
         forceSSL = true;
         kTLS = true;

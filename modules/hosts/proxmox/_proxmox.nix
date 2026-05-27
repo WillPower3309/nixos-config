@@ -1,7 +1,7 @@
 { inputs, ... }:
 
 let
-  authorizedKey = builtins.readFile ../../../modules/home/id_ed25519.pub;
+  authorizedKey = builtins.readFile ../../features/ssh-client/id_ed25519.pub;
   ipAddress = "10.1.10.3";
   rj45Interface0 = "eth0";
   rj45Interface1 = "eth1";

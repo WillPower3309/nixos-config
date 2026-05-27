@@ -11,7 +11,7 @@
 
         # options found at https://github.com/Ylianst/MeshCentral/blob/master/meshcentral-config-schema.json
         settings = {
-          domains."".certUrl = "https://127.0.0.1:${toString config.services.meshcentral.settings.settings.AliasPort}/";
+          domains."".certUrl = "https://${config.constants.loopbackAddr}:${toString config.services.meshcentral.settings.settings.AliasPort}/";
 
           settings = {
             Cert = "meshcentral.${baseDomain}";
@@ -19,7 +19,7 @@
             AliasPort = 443;
             RedirPort = 800;
             AgentPong = 300; # send data to agents every 300 seconds
-            TlsOffload = "127.0.0.1";
+            TlsOffload = config.constants.loopbackAddr;
           };
         };
       };
@@ -30,7 +30,7 @@
         kTLS = true;
 
         locations."/" = {
-          proxyPass = "http://127.0.0.1:${toString config.services.meshcentral.settings.settings.Port}";
+          proxyPass = "http://${config.constants.loopbackAddr}:${toString config.services.meshcentral.settings.settings.Port}";
 
           # 1. Allow websockets over HTTPS
           # 2. Use longer timeouts for websockets

@@ -33,7 +33,7 @@
           app_service_config_files = [ heisenbridgeRegistrationFilePath ];
 
           listeners = [{
-            bind_addresses = [ "127.0.0.1" ];
+            bind_addresses = [ config.constants.loopbackAddr ];
             port = clientPort;
             resources = [{
               compress = true;
@@ -71,7 +71,7 @@
       };
 
       nginx.virtualHosts."${address}" = {
-        locations."/".proxyPass = "http://127.0.0.1:${toString clientPort}";
+        locations."/".proxyPass = "http://${config.constants.loopbackAddr}:${toString clientPort}";
         useACMEHost = baseDomain;
         forceSSL = true;
         kTLS = true;

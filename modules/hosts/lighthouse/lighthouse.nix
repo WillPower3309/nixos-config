@@ -1,7 +1,7 @@
 { inputs, lib, ... }:
 
 let
-  authorizedKey = builtins.readFile ../../../modules/home/id_ed25519.pub;
+  authorizedKey = builtins.readFile ../../features/ssh-client/id_ed25519.pub;
 in
 {
   flake.nixosConfigurations = inputs.self.lib.mkNixos "x86_64-linux" "lighthouse";

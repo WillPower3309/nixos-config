@@ -3,7 +3,7 @@
 {
   flake.modules.nixos.plex = { config, lib, pkgs, ... }: let
     plexPort = 32400;
-    localAddress = "127.0.0.1:${toString plexPort}";
+    localAddress = "${config.constants.loopbackAddr}:${toString plexPort}";
     baseDomain = config.networking.fqdn;
     address = "plex.${baseDomain}";
 

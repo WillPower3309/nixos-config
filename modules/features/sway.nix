@@ -7,7 +7,7 @@
 
   flake.modules.homeManager.will = { lib, nixosConfig, pkgs, config, ... }:
   let
-    isDesktop = nixosConfig.networking.hostName == "desktop";
+    isDesktop = (nixosConfig.networking.hostName or "") == "desktop";
   in {
     home.packages = with pkgs; [
       autotiling

@@ -69,7 +69,7 @@
         ];
       };
 
-      stateVersion = nixosConfig.system.nixos.release;
+      stateVersion = if nixosConfig == null then "26.05" else nixosConfig.system.nixos.release;
     };
   };
 }

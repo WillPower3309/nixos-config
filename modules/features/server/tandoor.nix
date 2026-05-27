@@ -18,7 +18,7 @@
       };
 
       nginx.virtualHosts."${address}" = {
-        locations."/".proxyPass = "http://127.0.0.1:${toString config.services.tandoor-recipes.port}";
+        locations."/".proxyPass = "http://${config.constants.loopbackAddr}:${toString config.services.tandoor-recipes.port}";
         useACMEHost = baseDomain;
         forceSSL = true;
         kTLS = true;

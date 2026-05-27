@@ -8,6 +8,15 @@ let
 
   stripContext = builtins.unsafeDiscardStringContext;
 
+  # Map nix-store paths back to local repo paths
+  flakeStorePrefix = stripContext (toString flakeConfig.outPath) + "/";
+  toLocalPath = p:
+    let
+      storePath = stripContext (toString p);
+      relPath = builtins.substring (builtins.stringLength flakeStorePrefix) (builtins.stringLength storePath) storePath;
+    in
+    "./${relPath}";
+
   secretsFromHost = hostName:
     let
       hostConfig = builtins.getAttr hostName nixosConfigs;
@@ -18,7 +27,7 @@ let
       builtins.map (secretName:
         let
           secretConfig = builtins.getAttr secretName hostConfig.config.age.secrets;
-          file = "./secrets/${builtins.baseNameOf (stripContext (toString secretConfig.file))}";
+          file = toLocalPath secretConfig.file;
         in {
           inherit file;
           key = builtins.readFile ./modules/hosts/${hostName}/ssh_host_ed25519_key.pub;
@@ -36,7 +45,7 @@ let
       builtins.map (secretName:
         let
           secretConfig = builtins.getAttr secretName homeConfig.config.age.secrets;
-          file = "./secrets/${builtins.baseNameOf (stripContext (toString secretConfig.file))}";
+          file = toLocalPath secretConfig.file;
         in {
           inherit file;
         }

@@ -55,16 +55,6 @@ in
 
     networking.hostId = "7347e9d6"; # needed for ZFS
 
-    age.secrets.hashedRootPassword.file = "${inputs.secrets}/hashedRootPassword.age";
-
-    users = {
-      users.root = {
-        hashedPasswordFile = config.age.secrets.hashedRootPassword.path;
-        openssh.authorizedKeys.keys = [ (builtins.readFile ../../features/ssh-client/id_ed25519.pub) ];
-      };
-      mutableUsers = false;
-    };
-
     services.openssh.hostKeys = lib.mkForce [{
       path = "${config.constants.persistentDir}${(toString hostKeyPath)}";
       type = "ed25519";

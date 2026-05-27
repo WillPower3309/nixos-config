@@ -21,8 +21,8 @@
 
   in {
     age.secrets = {
-      syncthingKey.file = "${inputs.secrets}/${config.networking.hostName}SyncthingKey.age";
-      syncthingCert.file = "${inputs.secrets}/${config.networking.hostName}SyncthingCert.age";
+      syncthingKey.file = ./${config.networking.hostName}SyncthingKey.age;
+      syncthingCert.file = ./${config.networking.hostName}SyncthingCert.age;
     };
 
     services = {

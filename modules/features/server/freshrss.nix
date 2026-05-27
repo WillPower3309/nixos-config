@@ -7,7 +7,7 @@
 
   in {
     age.secrets.freshrssAdminPassword = {
-      file = "${inputs.secrets}/freshrssAdminPassword.age";
+      file = ./freshrssAdminPassword.age;
       owner = config.services.freshrss.user;
       group = config.users.users.${config.services.freshrss.user}.group;
     };

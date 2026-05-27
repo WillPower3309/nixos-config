@@ -9,7 +9,7 @@
 
   in {
     age.secrets.radicaleHtpasswd = {
-      file = "${inputs.secrets}/radicaleHtpasswd.age";
+      file = ./radicaleHtpasswd.age;
       owner = "radicale";
       group = "radicale";
     };

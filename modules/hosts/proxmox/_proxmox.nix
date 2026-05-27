@@ -71,16 +71,6 @@ in
       # TODO: fallback routing for mesh network: https://pve.proxmox.com/wiki/Full_Mesh_Network_for_Ceph_Server#Routed_Setup_(with_Fallback)
     };
 
-    age.secrets.hashedRootPassword.file = "${inputs.secrets}/hashedRootPassword.age";
-
-    users = {
-      users.root = {
-        hashedPasswordFile = config.age.secrets.hashedRootPassword.path;
-        openssh.authorizedKeys.keys = [ authorizedKey ];
-      };
-      mutableUsers = false;
-    };
-
     boot = {
       # needed for SR-IOV
       kernelModules = [ "vfio" "vfio_iommu_type1" "vfio_pci" ];
@@ -107,7 +97,7 @@ in
 
     hardware.enableAllFirmware = true;
 
-    age.secrets.proxmoxRsaPrivateKey.file = "${inputs.secrets}/proxmoxRsaPrivateKey.age";
+    age.secrets.proxmoxRsaPrivateKey.file = ./proxmoxRsaPrivateKey.age;
 
     environment = {
       persistence."${config.constants.persistentDir}".directories = [ "/var/lib/pve-cluster" ];

@@ -6,6 +6,7 @@
       boot
       impermanence
       nix
+      root-user
     ] ++ [ inputs.self.constants ];
 
     time.timeZone = "America/Toronto";

@@ -1,24 +1,19 @@
 { inputs, ... }:
 
 {
-  flake.modules.nixos.users = { config, pkgs, ... }: {
+  flake.modules.nixos.will-user = { config, pkgs, ... }: {
     imports = [
       inputs.agenix.nixosModules.age
       inputs.home-manager.nixosModules.home-manager
     ];
 
-    age.secrets = {
-      hashedWillPassword.file = "${inputs.secrets}/hashedWillPassword.age";
-      hashedRootPassword.file = "${inputs.secrets}/hashedRootPassword.age";
-    };
+    age.secrets.hashedWillPassword.file = ./hashedWillPassword.age;
 
     users = {
       mutableUsers = false;
       defaultUserShell = pkgs.zsh;
 
       users = {
-        root.hashedPasswordFile = config.age.secrets.hashedRootPassword.path;
-
         will = {
           isNormalUser = true;
           hashedPasswordFile = config.age.secrets.hashedWillPassword.path;
@@ -31,22 +26,21 @@
 
     # create persistent home directory owned by user
     system.activationScripts.persistent-user-dir-creation.text = ''
-      install -d -o will -g users ${config.constants.persistentDir}/home/will
+      install -d -o will -g users /nix/persist/home/will
     '';
 
     home-manager = {
       useUserPackages = true;
       backupFileExtension = "backup";
-      sharedModules = [ inputs.self.constants ];
       users.will = {
-        imports = [ inputs.self.modules.homeManager.will ];
+        imports = [ inputs.self.modules.homeManager.will inputs.self.constants ];
       };
     };
   };
 
   flake.homeConfigurations = inputs.self.lib.mkHomeManager "x86_64-linux" "will";
 
-  flake.modules.homeManager.will = { config, pkgs, nixosConfig, ... }: {
+  flake.modules.homeManager.will = { config, pkgs, lib, nixosConfig, ... }: {
     imports = [ inputs.agenix.homeManagerModules.default ];
 
     programs.home-manager.enable = true;
@@ -56,14 +50,14 @@
 
     xdg.mimeApps.enable = true;
 
-    age.identityPaths = [ "${config.constants.persistentDir}/home/will/.ssh/id_ed25519" ];
+    age.identityPaths = [ "/nix/persist/home/will/.ssh/id_ed25519" ];
 
     home = {
       username = "will";
       homeDirectory = "/home/will";
 
-      persistence."${config.constants.persistentDir}" = {
-        directories = [
+      persistence = lib.mkIf (nixosConfig != null) {
+        "/nix/persist".directories = [
           "Downloads"
           "Pictures"
           "Projects"

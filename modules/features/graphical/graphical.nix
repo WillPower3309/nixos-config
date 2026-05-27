@@ -12,7 +12,7 @@
       screen-record
       sound
       sway
-      users
+      will-user
       wayland
       web-browsers
     ] ++ [ inputs.agenix.nixosModules.age ];

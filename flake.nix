@@ -61,11 +61,6 @@
     };
 
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
-
-    secrets = {
-      flake = false;
-      url = "path:./secrets";
-    };
   };
 }
 

@@ -6,7 +6,7 @@
     address = "tandoor.${baseDomain}";
 
   in {
-    age.secrets.tandoorSecretKey.file = "${inputs.secrets}/tandoorSecretKey.age";
+    age.secrets.tandoorSecretKey.file = ./tandoorSecretKey.age;
 
     services = {
       tandoor-recipes = {

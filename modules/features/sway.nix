@@ -18,7 +18,7 @@
 
     xdg.autostart.enable = true;
 
-    age.secrets.keepassPassword.file = "${inputs.secrets}/keepass.age";
+    age.secrets.keepassPassword.file = ./keepass/keepass.age;
 
     wayland.windowManager.sway = {
       enable = true;

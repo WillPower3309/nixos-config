@@ -8,12 +8,12 @@
   in {
     age.secrets = {
       grafanaSecretKey = {
-        file = "${inputs.secrets}/grafanaSecretKey.age";
+        file = ./grafanaSecretKey.age;
         owner = "grafana";
         group = "grafana";
       };
       grafanaAdminPassword = {
-        file = "${inputs.secrets}/grafanaAdminPassword.age";
+        file = ./grafanaAdminPassword.age;
         owner = "grafana";
         group = "grafana";
       };

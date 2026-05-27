@@ -53,16 +53,6 @@ in {
       ssh-server
     ] ++ [ inputs.agenix.nixosModules.age ];
 
-    age.secrets.hashedRootPassword.file = "${inputs.secrets}/hashedRootPassword.age";
-
-    users = {
-      users.root = {
-        hashedPasswordFile = config.age.secrets.hashedRootPassword.path;
-        openssh.authorizedKeys.keys = [ authorizedKey ];
-      };
-      mutableUsers = false;
-    };
-
     powerManagement.cpuFreqGovernor = "powersave";
 
     hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;

@@ -5,17 +5,17 @@
 
     age.secrets = {
       nebulaCaCert = {
-        file = "${inputs.secrets}/nebulaCaCert.age";
+        file = ./nebulaCaCert.age;
         owner = "nebula-home";
         group = "nebula-home";
       };
       nebulaDeviceCert = {
-        file = "${inputs.secrets}/${config.networking.hostName}NebulaCert.age";
+        file = ./${config.networking.hostName}NebulaCert.age;
         owner = "nebula-home";
         group = "nebula-home";
       };
       nebulaDeviceKey = {
-        file = "${inputs.secrets}/${config.networking.hostName}NebulaKey.age";
+        file = ./${config.networking.hostName}NebulaKey.age;
         owner = "nebula-home";
         group = "nebula-home";
       };

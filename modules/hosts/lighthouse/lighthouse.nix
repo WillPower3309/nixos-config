@@ -50,17 +50,17 @@ in
 
     age.secrets = {
       nebulaCaCert = {
-        file = "${inputs.secrets}/nebulaCaCert.age";
+        file = ../../features/nebula/nebulaCaCert.age;
         owner = "nebula-home";
         group = "nebula-home";
       };
       lighthouseNebulaCert = {
-        file = "${inputs.secrets}/lighthouseNebulaCert.age";
+        file = ../../features/nebula/lighthouseNebulaCert.age;
         owner = "nebula-home";
         group = "nebula-home";
       };
       lighthouseNebulaKey = {
-        file = "${inputs.secrets}/lighthouseNebulaKey.age";
+        file = ../../features/nebula/lighthouseNebulaKey.age;
         owner = "nebula-home";
         group = "nebula-home";
       };

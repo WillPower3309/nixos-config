@@ -6,7 +6,7 @@
     acmeDataDir = "/var/lib/acme";
 
   in {
-    age.secrets.acme.file = "${inputs.secrets}/acme.age";
+    age.secrets.acme.file = ./acme.age;
 
     security.acme = {
       acceptTerms = true;

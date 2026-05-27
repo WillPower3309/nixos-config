@@ -482,8 +482,7 @@
         "nixpkgs": "nixpkgs_2",
         "pinenote-nixos": "pinenote-nixos",
         "proxmox-nixos": "proxmox-nixos",
-        "rapidshell": "rapidshell",
-        "secrets": "secrets"
+        "rapidshell": "rapidshell"
       }
     },
     "rust-overlay": {
@@ -506,18 +505,6 @@
         "repo": "rust-overlay",
         "type": "github"
       }
-    },
-    "secrets": {
-      "flake": false,
-      "locked": {
-        "path": "./secrets",
-        "type": "path"
-      },
-      "original": {
-        "path": "./secrets",
-        "type": "path"
-      },
-      "parent": []
     },
     "systems": {
       "locked": {

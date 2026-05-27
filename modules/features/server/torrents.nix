@@ -91,8 +91,8 @@
     };
 
     age.secrets = {
-      wireguardPrivateKey.file = "${inputs.secrets}/${config.networking.hostName}WireguardPrivateKey.age";
-      wireguardPeerPresharedKey.file = "${inputs.secrets}/${config.networking.hostName}WireguardPeerPresharedKey.age";
+      wireguardPrivateKey.file = ./${config.networking.hostName}WireguardPrivateKey.age;
+      wireguardPeerPresharedKey.file = ./${config.networking.hostName}WireguardPeerPresharedKey.age;
     };
 
     # TODO: do the below in networkd?

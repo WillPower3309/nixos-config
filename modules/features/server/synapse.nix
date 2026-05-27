@@ -12,7 +12,7 @@
     imports = [ inputs.self.modules.nixos.postgresql ];
 
     age.secrets.synapseSharedSecret = {
-      file = "${inputs.secrets}/synapseSharedSecret.age";
+      file = ./synapseSharedSecret.age;
       owner = "matrix-synapse";
       group = "matrix-synapse";
     };

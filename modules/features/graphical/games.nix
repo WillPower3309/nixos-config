@@ -4,7 +4,7 @@
     hardware.graphics.enable32Bit = true; # needed for proton games
   };
 
-  flake.modules.homeManager.will = { osConfig, pkgs, config, ... }: {
+  flake.modules.homeManager.will = { pkgs, config, ... }: {
     home = {
       packages = with pkgs; [
         gamemode

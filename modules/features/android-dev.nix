@@ -7,13 +7,26 @@
       kernelModules = [ "kvm_amd" ];
     };
 
-    # need home module too
-    users.users.will.extraGroups = [ "adbusers" ]; # TODO: still needed?
+    users.users.will.extraGroups = [ "adbusers" ];
 
-    # needed here due to https://discourse.nixos.org/t/too-many-open-files-when-the-gradle-cache-is-persisted-via-impermanence/51560/6
     environment = {
       systemPackages = [ pkgs.android-tools ];
       persistence."/nix/persist".users.will.directories = [ ".gradle" ];
+    };
+  };
+
+  flake.modules.homeManager.will = { pkgs, ... }: {
+    home = {
+      packages = with pkgs; [ android-studio android-tools ];
+
+      persistence."/nix/persist".directories = [
+        ".android"
+        ".java"
+        "Android"
+        ".cache/Google"
+        ".config/Google"
+        ".local/share/Google"
+      ];
     };
   };
 }

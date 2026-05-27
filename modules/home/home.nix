@@ -5,7 +5,6 @@
 
   flake.modules.homeManager.will = { config, pkgs, nixosConfig, ... }: {
     imports = with inputs.self.modules.homeManager; [
-      android-development
       cad
       discord
       document-viewer

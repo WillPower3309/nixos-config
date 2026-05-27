@@ -19,14 +19,12 @@ let
         let
           secretConfig = builtins.getAttr secretName hostConfig.config.age.secrets;
           file = "./secrets/${builtins.baseNameOf (stripContext (toString secretConfig.file))}";
-        in
-        {
+        in {
           inherit file;
           key = builtins.readFile ./modules/hosts/${hostName}/ssh_host_ed25519_key.pub;
         }
       ) (builtins.attrNames hostConfig.config.age.secrets)
-    else
-      [ ];
+    else [ ];
 
   secretsFromHome = homeName:
     let
@@ -39,13 +37,11 @@ let
         let
           secretConfig = builtins.getAttr secretName homeConfig.config.age.secrets;
           file = "./secrets/${builtins.baseNameOf (stripContext (toString secretConfig.file))}";
-        in
-        {
+        in {
           inherit file;
         }
       ) (builtins.attrNames homeConfig.config.age.secrets)
-    else
-      [ ];
+    else [ ];
 
   allSecrets = builtins.concatLists [
     (builtins.concatLists (builtins.map secretsFromHost (builtins.attrNames nixosConfigs)))

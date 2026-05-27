@@ -106,6 +106,7 @@ in
       };
     };
 
+    # TODO: why is this rsa?
     environment.etc."ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;
   };
 }

@@ -49,5 +49,7 @@ The default IP of the switch is `192.168.0.1`. To configure the switch (and move
 | 100 | Management |
 | 999 | WAN        |
 
-## Secrets
- Secrets are managed through agenix. The `./secrets.nix` file is located in the repository root, and iterates through the nixos and home-manager configurations to dynamically generate the path and public keys associated with each `.age` file across the repository. This can be validated with `nix eval --impure --file secrets.nix --json | nix run nixpkgs#jq .`.
+## Features
+
+### Secrets
+Secrets are managed through agenix. The `./secrets.nix` file is located in the repository root, and iterates through the nixos and home-manager configurations to dynamically generate the path and public keys associated with each `.age` file across the repository. This can be validated with `nix eval --impure --file secrets.nix --json | nix run nixpkgs#jq .`.

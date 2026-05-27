@@ -13,40 +13,35 @@
 
   in {
     services = {
+      prowlarr = {
+        enable = true;
+        dataDir = "/persist/var/lib/prowlarr";
+      };
       sonarr = {
         enable = true;
         dataDir = "/persist/var/lib/sonarr";
       };
-
       radarr = {
         enable = true;
         dataDir = "/persist/var/lib/radarr";
       };
-
       readarr = {
         enable = true;
         dataDir = "/persist/var/lib/readarr";
         user = if config.services.calibre-server.enable then config.services.calibre-server.user else "readarr";
       };
-
-      prowlarr.enable = true;
-
-      bazarr.enable = true;
+      bazarr = {
+        enable = true;
+        dataDir = "/persist/var/lib/bazarr";
+      };
 
       nginx.virtualHosts = {
-        "sonarr.${baseDomain}" = createNginxProxy "8989";
-        "radarr.${baseDomain}" = createNginxProxy "7878";
-        "readarr.${baseDomain}" = createNginxProxy "8787";
-        "prowlarr.${baseDomain}" = createNginxProxy "9696";
-        "bazarr.${baseDomain}" = createNginxProxy "6767";
+        "prowlarr.${baseDomain}" = createNginxProxy config.services.prowlarr.settings.server.port;
+        "sonarr.${baseDomain}" = createNginxProxy config.services.sonarr.settings.server.port;
+        "radarr.${baseDomain}" = createNginxProxy config.services.radarr.settings.server.port
+        "readarr.${baseDomain}" = createNginxProxy config.services.readarr.settings.server.port;
+        "bazarr.${baseDomain}" = createNginxProxy config.services.bazarr.listenPort;
       };
     };
-
-    environment.persistence."/persist".directories = [
-      "/var/lib/prowlarr"
-      "/var/lib/bazarr"
-    ];
-    systemd.services.prowlarr.serviceConfig.DynamicUser = lib.mkForce false;
-    systemd.services.bazarr.serviceConfig.DynamicUser = lib.mkForce false;
   };
 }

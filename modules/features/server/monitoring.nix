@@ -64,6 +64,8 @@
                 type = "loki";
               }
             ];
+            # TODO: dashboards
+            # TODO: alerting
           };
         };
       };
@@ -157,7 +159,7 @@
         configuration = {
           server = {
             http_listen_port = 28183;
-            grpc_listen_port = 0;
+            grpc_listen_port = 0; # dynamically assinged by system
           };
 
           positions.filename = "/tmp/positions.yaml";

@@ -2,15 +2,7 @@
 
 {
   flake.modules.nixos.polkit = { pkgs, lib, config, ... }: {
-    security = {
-      polkit.enable = true;
-      # fingerprint sensor, need to run `sudo fprintd-enroll USER`
-      # printd enabled by framework 16 nixos-hardware
-      pam.services = lib.mkIf (config.networking.hostName == "laptop") {
-        polkit-1.fprintAuth = true;
-        sudo.fprintAuth = true;
-      };
-    };
+    security.polkit.enable = true;
 
     # use polkit_gnome as authentication agent
     environment.systemPackages = with pkgs; [ polkit_gnome ];

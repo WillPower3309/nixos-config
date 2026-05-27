@@ -31,6 +31,12 @@
       cpu.amd.updateMicrocode = config.hardware.enableRedistributableFirmware;
     };
 
+    # fingerprint reader
+    security.pam.services = {
+      polkit-1.fprintAuth = true;
+      sudo.fprintAuth = true;
+    };
+
     environment.etc."ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;
   };
 }

@@ -38,7 +38,7 @@
       ca = config.age.secrets.nebulaCaCert.path; # ca.crt
       lighthouses = [ lighthouseNebulaAddress ];
       relays = [ lighthouseNebulaAddress ];
-      staticHostMap = { ${lighthouseNebulaAddress} = [ "lighthouse.willmckinnon.com:4242" ]; };
+      staticHostMap = { ${lighthouseNebulaAddress} = [ "lighthouse.willmckinnon.com:4242" ]; }; # TODO: dynamic from lighthouse conf
       listen.port = if config.networking.hostName == "server" then 4242 else 0; # TODO: fix me so server can have value of 0
       settings = {
         punchy = {
@@ -47,7 +47,7 @@
           delay = "1s";
           respond_delay = "5s";
         };
-        preferred_ranges = [ "10.1.10.0/24" ]; # prefer local network
+        preferred_ranges = [ "10.1.10.0/24" ]; # prefer local network # TODO: probably remove after split-brain DNS
         pki.disconnect_invalid = true; # close tunnels to hosts which are no longer trusted
       };
       firewall = {

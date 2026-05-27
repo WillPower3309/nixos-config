@@ -5,6 +5,7 @@
     baseDomain = "${config.networking.fqdn}";
     address = "synapse.${baseDomain}";
     clientPort = 8008;
+    # TODO: add upstream option
     heisenbridgeRegistrationFilePath = "/var/lib/heisenbridge/registration.yml";
 
   in {
@@ -45,6 +46,7 @@
         };
       };
 
+      # TODO: finish me: https://wiki.nixos.org/wiki/Matrix#Application_services_(a.k.a._bridges)
       mautrix-meta = { };
 
       heisenbridge = {
@@ -53,6 +55,7 @@
       };
 
       postgresql = {
+        # TODO: ensureDatabases config upstream to replace initialScript
         ensureUsers = [{
           name = config.services.matrix-synapse.settings.database.args.user;
           ensureClauses = { login = true; };
@@ -79,6 +82,7 @@
 
     system.activationScripts.synapse-dir-creation.text = "install -o matrix-synapse -g matrix-synapse -d ${config.services.matrix-synapse.dataDir}";
 
+    # TODO: remove me: needed by heisenbridge
     nixpkgs.config.permittedInsecurePackages = [ "olm-3.2.16" ];
   };
 }

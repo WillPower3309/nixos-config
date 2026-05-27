@@ -12,9 +12,6 @@
       slurp
       grim
       wlsunset
-      # TODO: use the below!
-      # swayidle
-      # kanshi
     ] ++ [ inputs.rapidshell.packages.${pkgs.system}.default ];
 
     xdg.autostart.enable = true;

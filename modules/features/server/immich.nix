@@ -2,7 +2,7 @@
 
 {
   flake.modules.nixos.immich = { config, ... }: let
-    loopbackIp = "127.0.0.1";
+    loopbackIp = "127.0.0.1"; # TODO: make constant
     baseDomain = config.networking.fqdn;
 
   in {

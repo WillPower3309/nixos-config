@@ -15,11 +15,11 @@
     services = {
       transmission = {
         enable = true;
-        openPeerPorts = true;
+        openPeerPorts = true; # TODO: on wireguard interface
 
         settings = {
-          download-dir = "/persist/transmission/download";
-          incomplete-dir = "/persist/transmission/incomplete";
+          download-dir = "/persist/transmission/download"; # TODO
+          incomplete-dir = "/persist/transmission/incomplete"; # TODO
           rpc-bind-address = "127.0.0.1";
           rpc-url = "/transmission/";
           rpc-host-whitelist-enabled = true;
@@ -27,6 +27,7 @@
 
           peer-port = 39894;
 
+          # auto extract rar
           script-torrent-done-enabled = true;
           script-torrent-done-filename = pkgs.writeText "extract.sh" ''
             #!/bin/bash
@@ -64,12 +65,14 @@
       };
     };
 
+    # add transmission to the wireguard network namespace
     systemd.services = {
       transmission = {
         after = [ "wireguard-${wgInterface}.service" ];
         serviceConfig.NetworkNamespacePath = "/var/run/netns/${wgNamespace}";
       };
 
+      # TODO: systemd socket based approach https://www.man7.org/linux/man-pages/man8/systemd-socket-proxyd.8.html
       transmission-namespace-forward = {
         after = [ "wireguard-${wgInterface}.service" "transmission.service" ];
         wantedBy = [ "transmission.service" ];
@@ -92,6 +95,7 @@
       wireguardPeerPresharedKey.file = "${inputs.secrets}/${config.networking.hostName}WireguardPeerPresharedKey.age";
     };
 
+    # TODO: do the below in networkd?
     networking.useNetworkd = lib.mkForce false;
     networking.wireguard.interfaces.${wgInterface} = {
       ips = [ wgIp ];

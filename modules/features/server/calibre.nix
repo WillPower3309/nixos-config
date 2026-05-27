@@ -4,17 +4,17 @@
   flake.modules.nixos.calibre = { config, pkgs, ... }: let
     baseDomain = config.networking.fqdn;
     libraryDir = "/data/books";
-    userDbDir = "/persist/etc/calibre-server";
+    userDbDir = "/persist/etc/calibre-server"; # TODO: use proper persistence dir when migration to VM is complete
     userDbFilePath = "${userDbDir}/users.sqlite";
 
   in {
     services = {
       calibre-server = {
         enable = true;
-        port = 8181;
+        port = 8181; # 8080 likely used by immich TODO: remove when migrate to VM
         host = "0.0.0.0";
         libraries = [ libraryDir ];
-        openFirewall = true;
+        openFirewall = true; # koreader needs port + IP address to connect to calibre
 
         auth = {
           enable = true;

@@ -23,6 +23,7 @@
         passwordFile = config.age.secrets.freshrssAdminPassword.path;
       };
 
+      # freshrss sets up some nginx config, add the ssl bits
       nginx.virtualHosts."${config.services.freshrss.virtualHost}" = {
         useACMEHost = baseDomain;
         forceSSL = true;

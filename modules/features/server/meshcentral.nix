@@ -9,6 +9,7 @@
       meshcentral = {
         enable = true;
 
+        # options found at https://github.com/Ylianst/MeshCentral/blob/master/meshcentral-config-schema.json
         settings = {
           domains."".certUrl = "https://127.0.0.1:${toString config.services.meshcentral.settings.settings.AliasPort}/";
 
@@ -17,7 +18,7 @@
             Port = 4430;
             AliasPort = 443;
             RedirPort = 800;
-            AgentPong = 300;
+            AgentPong = 300; # send data to agents every 300 seconds
             TlsOffload = "127.0.0.1";
           };
         };
@@ -31,6 +32,9 @@
         locations."/" = {
           proxyPass = "http://127.0.0.1:${toString config.services.meshcentral.settings.settings.Port}";
 
+          # 1. Allow websockets over HTTPS
+          # 2. Use longer timeouts for websockets
+          # 3. Inform MeshCentral of real host, port, and protocol
           extraConfig = ''
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection "upgrade";

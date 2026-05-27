@@ -43,7 +43,7 @@
             localAccounceEnabled = false;
             relaysEnabled = true; # needed for connecting to phone
           };
-
+          # TODO: more dynamic
           devices = {
             ${desktopDevice} = genDevice desktopDevice "QPGKBDU-6S4XWKH-DLNIZLR-RBRUSQ2-7RMMZS3-G2QB7RJ-ANZS36W-KTTAIQM";
             ${laptopDevice} = genDevice laptopDevice "TZHR5AI-RWOKMDR-RMZVPR5-3YF3HF5-FTADDX3-GDFYKEY-U6NK3RY-NQKLKA3";

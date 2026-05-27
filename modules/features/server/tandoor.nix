@@ -13,7 +13,7 @@
         enable = true;
         extraConfig = {
           SECRET_KEY_FILE = config.age.secrets.tandoorSecretKey.path;
-          GUNICORN_MEDIA = true;
+          GUNICORN_MEDIA = true; # TODO: use nginx?
         };
       };
 

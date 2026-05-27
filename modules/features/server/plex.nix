@@ -12,7 +12,7 @@
       plex = {
         enable = true;
         dataDir = "/data/plex";
-        openFirewall = false;
+        openFirewall = true;
       };
 
       nginx.virtualHosts."${address}" = {
@@ -21,6 +21,9 @@
         kTLS = true;
         locations."/".proxyPass = "http://${localAddress}";
 
+        # 1. clears the headers that plex uses to determine remote access
+        # 2. enables proxying of websockets
+        # 3. turns off buffering to reduce latency when watching video
         extraConfig = ''
           proxy_set_header Host "${localAddress}";
           proxy_set_header Referer "";
@@ -38,16 +41,13 @@
         '';
       };
 
+      # TODO: don't use root user, use diff key?
+      # TODO: have ~/.ssh/known_hosts generated for the tunnel remote, and remove `-o StrictHostKeyChecking=no`
       autossh.sessions = [{
         extraArguments = "-nNT -o ServerAliveInterval=10 -o ServerAliveCountMax=2 -R ${toString plexPort}:localhost:${toString plexPort} -o StrictHostKeyChecking=no root@lighthouse.willmckinnon.com -i /persist/etc/ssh/ssh_host_ed25519_key -p 2222";
         name = "plex-tunnel";
         user = "root";
       }];
-    };
-
-    networking.firewall = {
-      allowedTCPPorts = [ 3005 8324 32469 plexPort ];
-      allowedUDPPorts = [ 1900 5353 32410 32412 32413 32414 ];
     };
   };
 }

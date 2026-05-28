@@ -7,7 +7,7 @@
       packages = with pkgs; [ keepassxc ];
 
       file.".cache/keepassxc/keepassxc.ini".text = lib.generators.toINI { } {
-        General.LastActiveDatabase = "${config.constants.persistentDir}/home/will/keepass/vault.kdbx";
+        General.LastActiveDatabase = "${config.constants.persistentDir}${config.home.homeDirectory}/keepass/vault.kdbx";
       };
     };
 

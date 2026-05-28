@@ -50,14 +50,14 @@
 
     xdg.mimeApps.enable = true;
 
-    age.identityPaths = [ "/nix/persist/home/will/.ssh/id_ed25519" ];
+    age.identityPaths = [ "${config.constants.persistentDir}/home/will/.ssh/id_ed25519" ];
 
     home = {
       username = "will";
       homeDirectory = "/home/will";
 
-      persistence = lib.mkIf (nixosConfig != null) {
-        "/nix/persist".directories = [
+      persistence = {
+        "${config.constants.persistentDir}".directories = [
           "Downloads"
           "Pictures"
           "Projects"

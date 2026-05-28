@@ -4,7 +4,6 @@
   flake.modules.homeManager.will = { pkgs, lib, ... }: {
     programs.foot = {
       enable = true;
-      #server.enable = true; TODO
 
       settings = {
         main = {

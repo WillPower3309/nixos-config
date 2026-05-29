@@ -2,6 +2,9 @@
 
 {
   flake.modules.homeManager.will = { pkgs, config, lib, ... }: {
+
+    age.secrets.keepassPassword.file = ./keepass.age;
+
     # TODO: https://www.reddit.com/r/NixOS/comments/1l9xbd9/how_to_declaratively_link_keepassxc_databases_to/
     home = {
       packages = with pkgs; [ keepassxc ];
@@ -11,24 +14,34 @@
       };
     };
 
-    xdg.configFile."keepassxc/keepassxc.ini".text = lib.generators.toINI { } {
-      General = {
-        ConfigVersion = 2;
-        MinimizeAfterUnlock = true;
+    xdg = let desktopEntryName = "org.keepassxc.KeePassXC"; in {
+      desktopEntries."${desktopEntryName}" = {
+        name = "KeePassXC";
+        exec = "sh -c \"cat \\\\${config.age.secrets.keepassPassword.path} | keepassxc --pw-stdin ${config.constants.persistentDir}/home/will/keepass/vault.kdbx\"";
       };
-      Browser = {
-        Enabled = true;
-      };
-      GUI = {
-        ApplicationTheme = "dark";
-        MinimizeOnStartup = true;
-        MinimizeOnClose = true;
-        MinimizeToTray = true;
-        ShowTrayIcon = true;
-        TrayIconAppearance = "monochrome-light";
-      };
+      autostart.entries = lib.optionals config.xdg.autostart.enable [
+        "${pkgs.keepassxc}/share/applications/${desktopEntryName}.desktop"
+      ];
 
-      Security.IconDownloadFallback = true;
+      configFile."keepassxc/keepassxc.ini".text = lib.generators.toINI { } {
+        General = {
+          ConfigVersion = 2;
+          MinimizeAfterUnlock = true;
+        };
+        Browser = {
+          Enabled = true;
+        };
+        GUI = {
+          ApplicationTheme = "dark";
+          MinimizeOnStartup = true;
+          MinimizeOnClose = true;
+          MinimizeToTray = true;
+          ShowTrayIcon = true;
+          TrayIconAppearance = "monochrome-light";
+        };
+        Security.IconDownloadFallback = true;
+      };
     };
   };
 }
+

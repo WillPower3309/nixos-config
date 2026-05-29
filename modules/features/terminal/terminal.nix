@@ -1,7 +1,22 @@
 { inputs, ... }:
 
 {
-  flake.modules.homeManager.will = { pkgs, lib, ... }: {
+  flake.modules.homeManager.will = { config, pkgs, lib, ... }: {
+    xdg = {
+      desktopEntries = {
+        "foot" = {
+          name = "";
+          settings.NoDisplay = "true";
+        };
+        "foot-server" = {
+          name = "";
+          settings.NoDisplay = "true";
+        };
+        "footclient".name = "Foot";
+      };
+      autostart.entries = lib.optionals config.xdg.autostart.enable [ "${pkgs.foot}/share/applications/foot-server.desktop" ];
+    };
+
     programs.foot = {
       enable = true;
 

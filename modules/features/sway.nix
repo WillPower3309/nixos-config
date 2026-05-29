@@ -23,7 +23,12 @@
     wayland.windowManager.sway = {
       enable = true;
       package = pkgs.swayfx;
-      systemd.xdgAutostart = config.xdg.autostart.enable;
+
+      systemd = {
+        enable = config.xdg.autostart.enable; # needed for xdgAutostart
+        xdgAutostart = config.xdg.autostart.enable;
+        dbusImplementation = "broker"; # TODO: remove once upstream
+      };
 
       checkConfig = false;
 

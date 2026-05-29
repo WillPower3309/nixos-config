@@ -1,6 +1,7 @@
 { inputs, ... }:
 
 {
+  # TODO: validate with nix eval 'nix eval '.#homeConfigurations.will.config.programs.ssh.matchBlocks' --json'
   flake.modules.homeManager.will = { pkgs, config, ... }: {
     programs.ssh = {
       enable = true;

@@ -21,6 +21,8 @@
       cpu.amd.updateMicrocode = config.hardware.enableRedistributableFirmware;
     };
 
+    # TODO: convert to systemd.mounts as described in https://nixos.wiki/wiki/NFS ?
+    # TODO: move to photography module
     fileSystems."/mnt/photos" = {
       device = "10.1.10.6:/photos";
       fsType = "nfs";

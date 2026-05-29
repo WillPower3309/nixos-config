@@ -1,6 +1,7 @@
 { inputs, ... }:
 
 {
+  # TODO: is this needed for sway?
   flake.modules.nixos.polkit = { pkgs, lib, config, ... }: {
     security.polkit.enable = true;
 

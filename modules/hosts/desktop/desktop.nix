@@ -35,6 +35,7 @@
 
     environment.etc."ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;
 
+    # find the device.name with `wpctl status` followed by `wpctl inspect <id>`
     services.pipewire.wireplumber = {
       enable = true;
       extraConfig = {
@@ -49,6 +50,10 @@
         "53-default-input"."monitor.alsa.rules" = [{
           matches = [{ "device.name" = "alsa_card.usb-Focusrite_Scarlett_Solo_4th_Gen_S18HY203300821-00"; }];
           actions.update-props."device.profile" = "pro-audio";
+        }];
+        "54-scarlett-input-only"."monitor.audio.rules" = [{
+          matches = [{ "node.name" = "~alsa_output.usb-Focusrite_Scarlett_Solo_4th_Gen*"; }];
+          actions.update-props."node.disabled" = true;
         }];
       };
     };

@@ -1,35 +1,30 @@
 { inputs, ... }:
 
-{
-  # TODO: validate with nix eval 'nix eval '.#homeConfigurations.will.config.programs.ssh.matchBlocks' --json'
-  flake.modules.homeManager.will = { pkgs, config, ... }: {
+let
+  networks = inputs.self.networks;
+in {
+  flake.modules.homeManager.will = { pkgs, config, lib, nixosConfig, ... }: {
     programs.ssh = {
       enable = true;
 
-      matchBlocks = {
-        "server*" = {
-          hostname = "server.willmckinnon.com";
-          user = "root";
-        };
-
-        "server-boot" = {
-          port = 2222;
+      settings = builtins.listToAttrs (lib.concatMap
+        (net: map (reservation: {
+          name = "${reservation.hostname}*";
+          value = {
+            HostName = "${reservation.hostname}.willmckinnon.com";
+            User = "root";
+          };
+        }) net.dhcp.reservations)
+        (builtins.attrValues networks)
+      ) // {
+        "*-boot" = {
+          Port = 2222;
         };
 
         "lighthouse" = {
-          hostname = "lighthouse.willmckinnon.com";
-          user = "root";
-          port = 2222;
-        };
-
-        "router" = {
-          hostname = "10.1.10.1";
-          user = "root";
-        };
-
-        "tv" = {
-          hostname = "tv.willmckinnon.com";
-          user = "root";
+          HostName = "lighthouse.willmckinnon.com";
+          User = "root";
+          Port = 2222;
         };
       };
     };

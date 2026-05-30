@@ -4,7 +4,6 @@ let
   authorizedKey = builtins.readFile ../../features/ssh-client/id_ed25519.pub;
   ipAddress = "10.1.10.3";
   rj45Interface0 = "eth0";
-  rj45Interface1 = "eth1";
   sfpInterface0 = "sfp0";
   sfpInterface1 = "sfp1";
 
@@ -18,24 +17,24 @@ in
     imports = with inputs.self.modules.nixos; [
       common
       ssh-server
-    ] ++ [
-      inputs.proxmox-nixos.nixosModules.proxmox-ve
-      inputs.agenix.nixosModules.age
+    ] ++ with inputs; [
+      proxmox-nixos.nixosModules.proxmox-ve
+      agenix.nixosModules.age
     ];
 
     nixpkgs.overlays = [ inputs.proxmox-nixos.overlays.x86_64-linux ];
 
     # 1. Match by MAC, assign stable kernel-style name:
     #   38:05:28:31:AD / rj45Interface0: corosync
-    #   38:05:28:31:AD / rj45Interface1: intel AMT ethernet port (as it uses the I226-LM controller)
     #   38:05:28:31:AD / sfpInterface0: SR-IOV - used for host and VMs
     #   38:05:28:31:AD / sfpInterface1: unused
-    # 2. Trigger SR-IOV creation once the SFP driver registers sfpInterface0
-    # 3. Disable "spoof checking" and enables "trust" on VF 0 so the host can handle advanced network stacks
-    # 4. Enforce the embedded hardware switch to allow local VF-to-VF looping
+    # 2. Blacklist the 38:05:28:31:AD intel AMT ethernet port (prevent AMT issues)
+    # 3. Trigger SR-IOV creation once the SFP driver registers sfpInterface0
+    # 4. Disable "spoof checking" and enables "trust" on VF 0 so the host can handle advanced network stacks
+    # 5. Enforce the embedded hardware switch to allow local VF-to-VF looping
     services.udev.extraRules = ''
       ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="38:05:25:31:58:ac", NAME="${rj45Interface0}"
-      ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="38:05:25:31:58:ad", NAME="${rj45Interface1}"
+      ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="38:05:25:31:58:ab", NAME="${sfpInterface1}"
 
       ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="38:05:25:31:58:aa", NAME="${sfpInterface0}", RUN+="${pkgs.bash}/bin/bash -c '\
         cat /sys/class/net/%k/device/sriov_totalvfs > /sys/class/net/%k/device/sriov_numvfs && \
@@ -43,7 +42,7 @@ in
         ${pkgs.udev}/bin/udevadm trigger --attr-match=subsystem=net'"
       ACTION=="add", SUBSYSTEM=="net", KERNEL=="${sfpInterface0}v0", RUN+="${pkgs.iproute2}/bin/bridge link set dev %k hairpin on"
 
-      ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="38:05:25:31:58:ab", NAME="${sfpInterface1}"
+      ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="38:05:25:31:58:ad", RUN+="${pkgs.coreutils}/bin/sh -c 'echo 1 > /sys/class/net/%k/device/remove'"
     '';
 
     # use the first virtual function as the host's interface

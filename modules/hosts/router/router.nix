@@ -47,9 +47,9 @@ in {
         "net.core.rmem_max" = 1048576; # Fix Unbound socket receive buffer warnings safely
         "net.ipv4.ip_nonlocal_bind" = 1; # Allow applications to bind to any IP address without waiting for the interface link to be up
 
-        # deny martian packets TODO: once DNS is set up properly (otherwise this breaks nebula)
-        #"net.ipv4.conf.default.rp_filter" = 1;
-        #"net.ipv4.conf.all.rp_filter" = 1;
+        # deny martian packets
+        "net.ipv4.conf.default.rp_filter" = 1;
+        "net.ipv4.conf.all.rp_filter" = 1;
 
         # On WAN, allow IPv6 autoconfiguration and tempory address use.
         "net.ipv6.conf.${wanInterface}.accept_ra" = 2;
@@ -192,7 +192,7 @@ in {
               type filter hook input priority 0; policy drop;
 
               iifname "${lanInterface}.${toString networks.trusted.id}" accept comment "Allow trusted local network to access the router"
-              # TODO: needed given that we let local access router above? Or should I remove the above and also allow trusted to use dhcp and dns ports below
+              # TODO: we let local access router above -  should I remove the above and also allow trusted to use dhcp and dns ports below?
               iifname "${lanInterface}.${toString networks.trusted.id}" tcp dport 22 accept comment "Allow trusted local network to SSH to router"
 
               iifname "${lanInterface}.${toString networks.guest.id}" udp dport { ${toString config.services.unbound.settings.server.port}, 67 } accept comment "Allow guest DNS, DHCP"

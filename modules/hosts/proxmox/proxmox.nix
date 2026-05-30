@@ -2,24 +2,32 @@
 
 let
   authorizedKey = builtins.readFile ../../features/ssh-client/id_ed25519.pub;
-  ipAddress = "10.1.10.3";
   rj45Interface0 = "eth0";
   sfpInterface0 = "sfp0";
   sfpInterface1 = "sfp1";
 
+  hostName = "proxmox";
+  ipAddress = "10.1.10.3";
+  vf0MacAddress = "38:05:25:31:58:af"; # VFs randomize mac on boot: use static mac for ARP caches
+
   numGpuVfs = 2; # TODO: determine with `cat /sys/class/<>/<>/device/sriov_totalvfs`
 
-in
-{
+in {
   flake.nixosConfigurations = inputs.self.lib.mkNixos "x86_64-linux" "proxmox";
+
+  flake.networks.trusted.dhcp.reservations = [{
+    ip-address = ipAddress;
+    hostname = hostName;
+    hw-address = vf0MacAddress;
+  }];
 
   flake.modules.nixos.proxmox = { config, pkgs, lib, ... }: {
     imports = with inputs.self.modules.nixos; [
       common
       ssh-server
-    ] ++ with inputs; [
-      proxmox-nixos.nixosModules.proxmox-ve
-      agenix.nixosModules.age
+    ] ++ [
+      inputs.proxmox-nixos.nixosModules.proxmox-ve
+      inputs.agenix.nixosModules.age
     ];
 
     nixpkgs.overlays = [ inputs.proxmox-nixos.overlays.x86_64-linux ];
@@ -42,18 +50,17 @@ in
         ${pkgs.udev}/bin/udevadm trigger --attr-match=subsystem=net'"
       ACTION=="add", SUBSYSTEM=="net", KERNEL=="${sfpInterface0}v0", RUN+="${pkgs.iproute2}/bin/bridge link set dev %k hairpin on"
 
-      ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="38:05:25:31:58:ad", RUN+="${pkgs.coreutils}/bin/sh -c 'echo 1 > /sys/class/net/%k/device/remove'"
+      ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="38:05:25:31:58:ad", RUN+="${pkgs.bash}/bin/sh -c 'echo 1 > /sys/class/net/%k/device/remove'"
     '';
 
     # use the first virtual function as the host's interface
     networking = let hostInterface = "${sfpInterface0}v0"; in {
-      hostName = "proxmox";
+      inherit hostName;
       usePredictableInterfaceNames = false; # set interface names via services.udev.extraRules above
       useDHCP = false;
 
       interfaces."${hostInterface}" = {
-        # TODO: use "stable" instead?
-        macAddress = "38:05:25:31:58:af"; # VFs get a randomized mac on boot: set a static mac to be nice to ARP caches
+        macAddress = vf0MacAddress;
         ipv4.addresses = [{
           address = ipAddress;
           prefixLength = 24;
@@ -111,9 +118,9 @@ in
     };
 
     services.proxmox-ve = {
+      inherit ipAddress;
       enable = true;
       openFirewall = true;
-      ipAddress = ipAddress;
     };
   };
 }

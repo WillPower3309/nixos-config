@@ -1,8 +1,33 @@
 { lib, ... }:
 
-{
+let
+  reservationType = lib.types.submodule {
+    options = {
+      ip-address = lib.mkOption { type = lib.types.str; };
+      hostname = lib.mkOption { type = lib.types.str; };
+      hw-address = lib.mkOption { type = lib.types.str; };
+    };
+  };
+
+  dhcpType = lib.types.submodule {
+    options = {
+      enable = lib.mkOption { type = lib.types.bool; };
+      reservations = lib.mkOption {
+        type = lib.types.listOf reservationType;
+        default = [];
+      };
+    };
+  };
+
+  networkType = lib.types.submodule {
+    options = {
+      id = lib.mkOption { type = lib.types.int; };
+      dhcp = lib.mkOption { type = dhcpType; };
+    };
+  };
+in {
   options.flake.networks = lib.mkOption {
-    type = lib.types.attrsOf lib.types.unspecified;
+    type = lib.types.lazyAttrsOf networkType;
   };
 
   config.flake.networks = {

@@ -50,18 +50,9 @@
       firewall.allowedUDPPorts = [ 9 ];  # wake on LAN
     };
 
-    users = {
-      users = {
-        root = {
-          password = "tv";
-          openssh.authorizedKeys.keys = [ (builtins.readFile ../../features/ssh-client/id_ed25519.pub) ];
-        };
-        kodi = {
-          isNormalUser = true;
-          extraGroups = [ "video" "audio" "input" "render" "dialout" ];  # dialout needed for CEC serial device
-        };
-      };
-      mutableUsers = false;
+    users.users.kodi = {
+      isNormalUser = true;
+      extraGroups = [ "video" "audio" "input" "render" "dialout" ];  # dialout needed for CEC serial device
     };
 
     # script to start moonlight on tty2

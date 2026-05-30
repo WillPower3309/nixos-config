@@ -1,6 +1,5 @@
 { inputs, lib, ... }:
 
-# TODO: set up reverse DNS pointer records (PTR) in unbound so devices can be recognized via hostname instead of IP
 # TODO: prometheus and grafana, map Prometheus metrics collection exporters to trace live CAKE drop rates and queue latencies onto Grafana
 let
   authorizedKey = builtins.readFile ../../features/ssh-client/id_ed25519.pub;
@@ -9,38 +8,9 @@ let
   lanInterface = "lan0";
 
   # should be 90-95% of the true limit (needed for cake)
-  wanDownloadSpeed = "900mbit";
-  wanUploadSpeed = "900mbit";
+  wanBandwidth = "900M";
 
-  networks = {
-    trusted = {
-      id = 10;
-      dhcp = {
-        enable = true;
-        reservations = [
-          { ip-address = "10.1.10.5"; hw-address = "f8:27:2e:0c:02:ef"; hostname = "access-point"; }
-          { ip-address = "10.1.10.6"; hw-address = "9c:6b:00:19:ed:ff"; hostname = "server"; }
-          { ip-address = "10.1.10.7"; hw-address = "b8:27:eb:cd:8e:3a"; hostname = "home-assistant"; }
-          { ip-address = "10.1.10.8"; hw-address = "04:7c:16:76:a9:9c"; hostname = "desktop"; }
-          { ip-address = "10.1.10.9"; hw-address = "54:b2:03:93:42:2e"; hostname = "tv"; }
-          { ip-address = "10.1.10.10"; hw-address = "c0:f5:35:f4:95:bd"; hostname = "3d-printer"; }
-        ];
-      };
-    };
-    guest = {
-      id = 20;
-      dhcp = { enable = true; reservations = []; };
-    };
-    iot = {
-      id = 30;
-      dhcp = { enable = true; reservations = []; };
-    };
-    # TODO: this won't be needed once meshcentral and router are moved to proxmox
-    management = {
-      id = 100;
-      dhcp = { enable = false; reservations = []; };
-    };
-  };
+  networks = inputs.self.networks;
 
 in {
   flake.nixosConfigurations = inputs.self.lib.mkNixos "x86_64-linux" "router";
@@ -79,6 +49,13 @@ in {
         # On WAN, allow IPv6 autoconfiguration and tempory address use.
         "net.ipv6.conf.${wanInterface}.accept_ra" = 2;
         "net.ipv6.conf.${wanInterface}.autoconf" = 1;
+
+        # Softirq budget tuning — CAKE + IFB ingress adds per-packet overhead
+        "net.core.netdev_budget" = 600;         # default 300
+        "net.core.netdev_budget_usecs" = 8000;  # default 2000
+
+        # RPS flow table — spreads RX processing across CPUs
+        "net.core.rps_sock_flow_entries" = 32768;
       };
     };
 
@@ -89,6 +66,110 @@ in {
       ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="60:be:b4:00:85:2b", NAME="opt1"
     '';
 
+    systemd.network = {
+      enable = true;
+      wait-online = {
+        enable = true;
+        anyInterface = false;
+        extraArgs = [ "-i" "${wanInterface}" ];
+      };
+
+      netdevs = (lib.mapAttrs' (name: net: lib.nameValuePair "30-vlan${toString net.id}" {
+        netdevConfig = {
+          Kind = "vlan";
+          Name = "${lanInterface}.${toString net.id}";
+        };
+        vlanConfig.Id = net.id;
+      }) networks) // {
+        "40-ifb-wan" = {
+          netdevConfig = {
+            Kind = "ifb";
+            Name = "ifb-wan";
+          };
+        };
+      };
+
+      networks = {
+        "10-${wanInterface}" = {
+          matchConfig.Name = wanInterface;
+          networkConfig = {
+            DHCP = "ipv4";
+            IPv6PrivacyExtensions = "no";
+          };
+          linkConfig.RequiredForOnline = "yes";
+          qdiscConfig.Parent = "ingress";
+          cakeConfig = {
+            Bandwidth = wanBandwidth;
+            PriorityQueueingPreset = "besteffort";
+            FlowIsolationMode = "dual-src-host";
+            NAT = true;
+          };
+        };
+
+        "20-${lanInterface}" = {
+          matchConfig.Name = lanInterface;
+          networkConfig = {
+            VLAN = lib.mapAttrsToList (name: net: "${lanInterface}.${toString net.id}") networks;
+            ConfigureWithoutCarrier = true;
+          };
+          linkConfig.RequiredForOnline = "no";
+        };
+
+        "50-ifb-${wanInterface}" = {
+          matchConfig.Name = "ifb-wan";
+          linkConfig.RequiredForOnline = "no";
+          cakeConfig = {
+            Bandwidth = wanBandwidth;
+            PriorityQueueingPreset = "besteffort";
+            FlowIsolationMode = "dual-dst-host";
+          };
+        };
+      } // (lib.mapAttrs' (name: net: lib.nameValuePair "25-vlan${toString net.id}" {
+        matchConfig.Name = "${lanInterface}.${toString net.id}";
+        networkConfig.Address = "10.1.${toString net.id}.1/24";
+        linkConfig.RequiredForOnline = "no";
+      }) networks);
+    };
+
+    boot.kernelModules = [ "ifb" ];
+
+    # use cake to fix bufferbloat
+    # systemd.network above handles: ifb-wan device, ingress qdisc on wan0, CAKE on both interfaces
+    # This service only adds the tc filter to redirect ingress traffic from wan0 -> ifb-wan
+    # CAKE man page: "In Linux, ingress shaping is performed on the ifb device."
+    systemd.services.sqm-cake = {
+      description = "CAKE SQM — Ingress redirect filter";
+      after = [ "network-online.target" ];
+      wants = [ "network-online.target" ];
+      wantedBy = [ "multi-user.target" ];
+
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+        User = "root";
+      };
+
+      script = ''
+        # Spread RX processing across all CPUs so CAKE doesn't bottleneck on one core
+        ncpus=$(${pkgs.coreutils}/bin/nproc)
+        mask=$(${pkgs.coreutils}/bin/printf '%x' "$((2**ncpus - 1))")
+        for q in /sys/class/net/${wanInterface}/queues/rx-*/rps_cpus; do
+          echo "$mask" > "$q" 2>/dev/null || true
+        done
+        for q in /sys/class/net/${wanInterface}/queues/rx-*/rps_flow_cnt; do
+          echo 32768 > "$q" 2>/dev/null || true
+        done
+
+        # Redirect wan0 ingress to ifb-wan where CAKE (declared in systemd.network) shapes it
+        ${pkgs.iproute2}/bin/tc filter replace dev ${wanInterface} parent ffff: matchall \
+          action mirred egress redirect dev ifb-wan || true
+      '';
+
+      postStop = ''
+        ${pkgs.iproute2}/bin/tc filter del dev ${wanInterface} parent ffff: 2>/dev/null || true
+      '';
+    };
+
     networking = {
       usePredictableInterfaceNames = false; # set interface names via services.udev.extraRules above
       useDHCP = false; # define per interface instead
@@ -97,7 +178,7 @@ in {
 
       # TODO: read https://www.mankier.com/8/nft
       # TODO: from above, make sure I know what the following are: address families, hooks, tables, chains, rules, and sets
-      # TODO: add iot rules
+      # TODO: make this dynamic
       nftables = {
         enable = true;
         ruleset = ''
@@ -106,15 +187,17 @@ in {
               type filter hook input priority 0; policy drop;
 
               iifname "${lanInterface}.${toString networks.trusted.id}" accept comment "Allow trusted local network to access the router"
+              # TODO: needed given that we let local access router above? Or should I remove the above and also allow trusted to use dhcp and dns ports below
+              iifname "${lanInterface}.${toString networks.trusted.id}" tcp dport 22 accept comment "Allow trusted local network to SSH to router"
 
-              iifname "${lanInterface}.${toString networks.guest.id}" udp dport { 53, 67 } accept comment "Allow guest DNS, DHCP"
-              iifname "${lanInterface}.${toString networks.guest.id}" tcp dport 53 accept comment "Allow guest DNS over TCP"
+              iifname "${lanInterface}.${toString networks.guest.id}" udp dport { ${toString config.services.unbound.settings.server.port}, 67 } accept comment "Allow guest DNS, DHCP"
+              iifname "${lanInterface}.${toString networks.guest.id}" tcp dport ${toString config.services.unbound.settings.server.port} accept comment "Allow guest DNS over TCP"
 
               iifname "${wanInterface}" ct state { established, related } accept comment "Allow established traffic"
               iifname "${wanInterface}" icmp type { echo-request, destination-unreachable, time-exceeded } counter accept comment "Allow select ICMP"
               iifname "${wanInterface}" counter drop comment "Drop all other unsolicited traffic from wan"
+
               iifname "lo" accept comment "allow loopback"
-              tcp dport 22 accept comment "allow ssh"
             }
 
             chain forward {
@@ -145,47 +228,6 @@ in {
           }
         '';
       };
-    };
-
-    systemd.network = {
-      enable = true;
-      wait-online = {
-        enable = true;
-        anyInterface = false;
-        extraArgs = [ "-i" "${wanInterface}" ];
-      };
-
-      netdevs = lib.mapAttrs' (name: net: lib.nameValuePair "30-vlan${toString net.id}" {
-        netdevConfig = {
-          Kind = "vlan";
-          Name = "${lanInterface}.${toString net.id}";
-        };
-        vlanConfig.Id = net.id;
-      }) networks;
-
-      networks = {
-        "10-wan" = {
-          matchConfig.Name = wanInterface;
-          networkConfig = {
-            DHCP = "ipv4";
-            IPv6PrivacyExtensions = "no";
-          };
-          linkConfig.RequiredForOnline = "yes";
-        };
-
-        "20-lan0" = {
-          matchConfig.Name = lanInterface;
-          networkConfig = {
-            VLAN = lib.mapAttrsToList (name: net: "${lanInterface}.${toString net.id}") networks;
-            ConfigureWithoutCarrier = true;
-          };
-          linkConfig.RequiredForOnline = "no";
-        };
-      } // (lib.mapAttrs' (name: net: lib.nameValuePair "25-vlan${toString net.id}" {
-        matchConfig.Name = "${lanInterface}.${toString net.id}";
-        networkConfig.Address = "10.1.${toString net.id}.1/24";
-        linkConfig.RequiredForOnline = "no";
-      }) networks);
     };
 
     services.kea.dhcp4 = {
@@ -236,100 +278,47 @@ in {
 
       settings = {
         server = {
-          interface = [ config.constants.loopbackAddr ] ++ (lib.mapAttrsToList (name: net: "10.1.${toString net.id}.1") networks);
+          interface = [ config.constants.loopbackAddr ] ++ (lib.mapAttrsToList (_: net: "10.1.${toString net.id}.1") networks);
           access-control = [ "0.0.0.0/0 refuse" "127.0.0.0/8 allow" ]
-            ++ (lib.mapAttrsToList (name: net: "10.1.${toString net.id}.0/24 allow") networks);
+            ++ (lib.mapAttrsToList (_: net: "10.1.${toString net.id}.0/24 allow") networks);
 
           port = 53;
           hide-identity = true;
           hide-version = true;
           qname-minimisation = true;
-
           harden-glue = true;
           harden-dnssec-stripped = true;
           use-caps-for-id = false;
           prefetch = true;
           edns-buffer-size = 1232;
-
           ip-freebind = true;
           so-reuseport = true;
           so-rcvbuf = "1m"; # Safe to use with net.core.rmem_max elevated via sysctl
 
           private-domain = config.networking.domain;
-          local-zone = [ ''"${config.networking.domain}" typetransparent'' ];
+          local-zone = [ "${config.networking.domain} typetransparent" ];
           local-data = [
-            # TODO: iterate through network dhcp reservations (or should I set based on hostname automatically?)
-            ''"tv.${config.networking.domain} IN A 10.1.10.9"''
+            ''"router.${config.networking.domain} IN A 10.1.10.1"''
+          ] ++ lib.pipe networks [
+            (networks: lib.mapAttrsToList (_: net: net.dhcp.reservations) networks)
+            (reservations: lib.lists.flatten reservations)
+            (reservations: lib.lists.flatten (map (reservation: [
+              ''"${reservation.hostname}.${config.networking.domain} IN A ${reservation.ip-address}"''
+              ''"*.${reservation.hostname}.${config.networking.domain} IN A ${reservation.ip-address}"''
+            ]) reservations))
           ];
         };
 
         forward-zone = [{
           name = ".";
-
           forward-first = false;
           forward-tls-upstream = true;
-
-          # TODO: use mullvad
           forward-addr = [
-            "1.1.1.1@853#cloudflare-dns.com"
-            "1.0.0.1@853#cloudflare-dns.com"
+            "194.242.2.6@853#family.dns.mullvad.net"
+            "194.242.2.4@853#base.dns.mullvad.net"
           ];
         }];
       };
-    };
-
-    boot.kernelModules = [ "ifb" ];
-
-    # use cake to fix bufferbloat
-    # TODO: download speed is cut in half?
-    systemd.services.sqm-cake = {
-      description = "CAKE SQM Network Shaper on WAN and Virtual Ingress IFB Interfaces";
-      after = [ "network-online.target" ];
-      wants = [ "network-online.target" ];
-      wantedBy = [ "multi-user.target" ];
-
-      serviceConfig = {
-        Type = "oneshot";
-        RemainAfterExit = true;
-        User = "root";
-      };
-
-      script = ''
-        ${pkgs.iproute2}/bin/ip link add name ifb-wan type ifb || true
-        ${pkgs.iproute2}/bin/ip link set dev ifb-wan up
-
-        ${pkgs.iproute2}/bin/tc qdisc del dev ${wanInterface} ingress 2>/dev/null || true
-        ${pkgs.iproute2}/bin/tc qdisc del dev ifb-wan root 2>/dev/null || true
-
-        ${pkgs.iproute2}/bin/tc qdisc add dev ${wanInterface} handle ffff: ingress
-        ${pkgs.iproute2}/bin/tc filter add dev ${wanInterface} parent ffff: matchall \
-          action mirred egress redirect dev ifb-wan
-
-        ${pkgs.iproute2}/bin/tc qdisc add dev ifb-wan root cake \
-          bandwidth ${wanDownloadSpeed} \
-          ethernet \
-          besteffort \
-          dual-dsthost \
-          ingress
-
-        ${pkgs.iproute2}/bin/tc qdisc del dev ${wanInterface} root 2>/dev/null || true
-
-        ${pkgs.iproute2}/bin/tc qdisc add dev ${wanInterface} root cake \
-          bandwidth ${wanUploadSpeed} \
-          ethernet \
-          besteffort \
-          dual-srchost \
-          nat
-      '';
-
-      postStop = ''
-        echo "Tearing down CAKE SQM network interfaces..."
-        ${pkgs.iproute2}/bin/tc qdisc del dev ${wanInterface} root 2>/dev/null || true
-        ${pkgs.iproute2}/bin/tc qdisc del dev ${wanInterface} ingress 2>/dev/null || true
-        ${pkgs.iproute2}/bin/tc qdisc del dev ifb-wan root 2>/dev/null || true
-        ${pkgs.iproute2}/bin/ip link set dev ifb-wan down 2>/dev/null || true
-        ${pkgs.iproute2}/bin/ip link del dev ifb-wan 2>/dev/null || true
-      '';
     };
 
     environment.etc."ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;

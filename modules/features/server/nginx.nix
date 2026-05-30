@@ -32,7 +32,9 @@
       };
     };
 
-    environment.persistence."${config.constants.persistentDir}".directories = [{ directory = acmeDataDir; user = "acme"; group = "acme"; }];
+    environment.persistence."${config.constants.persistentDir}".directories = [
+      { directory = acmeDataDir; user = "acme"; group = "acme"; }
+    ];
 
     users.groups.acme.members = [ "nginx" ];
 

@@ -44,7 +44,7 @@
       # TODO: don't use root user, use diff key?
       # TODO: have ~/.ssh/known_hosts generated for the tunnel remote, and remove `-o StrictHostKeyChecking=no`
       autossh.sessions = [{
-        extraArguments = "-nNT -o ServerAliveInterval=10 -o ServerAliveCountMax=2 -R ${toString plexPort}:localhost:${toString plexPort} -o StrictHostKeyChecking=no root@lighthouse.willmckinnon.com -i ${config.constants.persistentDir}/etc/ssh/ssh_host_ed25519_key -p 2222";
+        extraArguments = "-nNT -o ServerAliveInterval=10 -o ServerAliveCountMax=2 -R ${toString plexPort}:localhost:${toString plexPort} -o StrictHostKeyChecking=no root@lighthouse.${config.networking.domain} -i ${config.constants.persistentDir}/etc/ssh/ssh_host_ed25519_key -p 2222";
         name = "plex-tunnel";
         user = "root";
       }];

@@ -17,6 +17,7 @@
     xdg = let desktopEntryName = "org.keepassxc.KeePassXC"; in {
       desktopEntries."${desktopEntryName}" = {
         name = "KeePassXC";
+        # TODO: not working
         exec = "sh -c \"cat \\\\${config.age.secrets.keepassPassword.path} | keepassxc --pw-stdin ${config.constants.persistentDir}/home/will/keepass/vault.kdbx\"";
       };
       autostart.entries = lib.optionals config.xdg.autostart.enable [

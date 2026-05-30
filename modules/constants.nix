@@ -6,6 +6,7 @@
     };
 
     config.constants = {
+      domain = "willmckinnon.com";
       loopbackAddr = "127.0.0.1";
       persistentDir = if config.networking.hostName or "" == "server"
         then "/persist"

@@ -11,7 +11,7 @@
     security.acme = {
       acceptTerms = true;
       defaults = {
-        email = "contact@willmckinnon.com";
+        email = "contact@${config.networking.domain}";
         environmentFile = config.age.secrets.acme.path;
         dnsProvider = "cloudflare";
       };

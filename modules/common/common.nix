@@ -11,7 +11,7 @@
 
     time.timeZone = "America/Toronto";
     networking = {
-      domain = "willmckinnon.com";
+      domain = config.constants.domain;
       useNetworkd = true;
       wireless.enable = lib.mkDefault false;
     };

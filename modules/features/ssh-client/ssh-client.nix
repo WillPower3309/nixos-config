@@ -1,8 +1,6 @@
 { inputs, ... }:
 
-let
-  networks = inputs.self.networks;
-in {
+{
   flake.modules.homeManager.will = { pkgs, config, lib, nixosConfig, ... }: {
     programs.ssh = {
       enable = true;
@@ -11,18 +9,18 @@ in {
         (net: map (reservation: {
           name = "${reservation.hostname}*";
           value = {
-            HostName = "${reservation.hostname}.willmckinnon.com";
+            HostName = "${reservation.hostname}.${config.constants.domain}";
             User = "root";
           };
         }) net.dhcp.reservations)
-        (builtins.attrValues networks)
+        (builtins.attrValues inputs.self.networks)
       ) // {
         "*-boot" = {
           Port = 2222;
         };
 
         "lighthouse" = {
-          HostName = "lighthouse.willmckinnon.com";
+          HostName = "lighthouse.${config.constants.domain}";
           User = "root";
           Port = 2222;
         };

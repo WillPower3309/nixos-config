@@ -31,6 +31,7 @@ in
 
     boot = {
       lanzaboote.enable = false;
+      zfs.forceImportRoot = false;
       supportedFilesystems = [ "zfs" ];
 
       # TODO: get nebula in initrd, good docs:

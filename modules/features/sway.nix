@@ -14,7 +14,7 @@
       slurp
       grim
       wlsunset
-    ] ++ [ inputs.rapidshell.packages.${pkgs.system}.default ];
+    ] ++ [ inputs.rapidshell.packages.${pkgs.stdenv.hostPlatform.system}.default ];
 
     xdg.autostart.enable = true;
 

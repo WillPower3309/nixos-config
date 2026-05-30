@@ -11,7 +11,7 @@
     users = {
       users.root = {
         hashedPasswordFile = config.age.secrets.hashedRootPassword.path;
-        openssh.authorizedKeys.keys = [ (builtins.readFile ../../features/ssh-client/id_ed25519.pub) ];
+        openssh.authorizedKeys.keys = [ (builtins.readFile ../../ssh-client/id_ed25519.pub) ];
       };
       mutableUsers = false;
     };

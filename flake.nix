@@ -17,8 +17,8 @@
   inputs = {
     nixpkgs.url = "nixpkgs/nixpkgs-unstable";
 
-    import-tree.url = "github:denful/import-tree";
     flake-parts.url = "github:hercules-ci/flake-parts";
+    import-tree.url = "github:denful/import-tree";
 
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -60,7 +60,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
+    nixos-hardware = {
+      url = "github:NixOS/nixos-hardware/master";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 }
 

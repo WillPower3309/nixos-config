@@ -4,6 +4,7 @@
   flake.modules.homeManager.will = { pkgs, config, lib, nixosConfig, ... }: {
     programs.ssh = {
       enable = true;
+      enableDefaultConfig = false;
 
       settings = builtins.listToAttrs (lib.concatMap
         (net: map (reservation: {

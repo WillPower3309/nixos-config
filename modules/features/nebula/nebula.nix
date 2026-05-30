@@ -47,7 +47,7 @@
           delay = "1s";
           respond_delay = "5s";
         };
-        preferred_ranges = [ "10.1.10.0/24" ]; # prefer local network # TODO: probably remove after split-brain DNS
+        preferred_ranges = [ "192.168.100.0/24" ]; # prefer nebula network since split brain DNS is set up
         pki.disconnect_invalid = true; # close tunnels to hosts which are no longer trusted
       };
       firewall = {

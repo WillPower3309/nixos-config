@@ -12,6 +12,11 @@ let
 
   networks = inputs.self.networks;
 
+  allReservations = lib.pipe networks [
+    (networks: lib.mapAttrsToList (_: net: net.dhcp.reservations) networks)
+    (reservations: lib.lists.flatten reservations)
+  ];
+
 in {
   flake.nixosConfigurations = inputs.self.lib.mkNixos "x86_64-linux" "router";
 
@@ -296,17 +301,16 @@ in {
           so-rcvbuf = "1m"; # Safe to use with net.core.rmem_max elevated via sysctl
 
           private-domain = config.networking.domain;
-          local-zone = [ "${config.networking.domain} typetransparent" ];
+
+          local-zone = [
+            "${config.networking.domain} typetransparent"
+          ] ++ map (reservation: "${reservation.hostname}.${config.networking.domain} redirect") allReservations;
+
           local-data = [
             ''"router.${config.networking.domain} IN A 10.1.10.1"''
-          ] ++ lib.pipe networks [
-            (networks: lib.mapAttrsToList (_: net: net.dhcp.reservations) networks)
-            (reservations: lib.lists.flatten reservations)
-            (reservations: lib.lists.flatten (map (reservation: [
-              ''"${reservation.hostname}.${config.networking.domain} IN A ${reservation.ip-address}"''
-              ''"*.${reservation.hostname}.${config.networking.domain} IN A ${reservation.ip-address}"''
-            ]) reservations))
-          ];
+          ] ++ map (reservation:
+            ''"${reservation.hostname}.${config.networking.domain} IN A ${reservation.ip-address}"''
+          ) allReservations;
         };
 
         forward-zone = [{

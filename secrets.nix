@@ -3,12 +3,10 @@ let
   nixosConfigs = flakeConfig.nixosConfigurations;
   homeConfigs = flakeConfig.homeConfigurations;
 
-  userWill = builtins.readFile ./modules/features/ssh-client/id_ed25519.pub;
-  editors = [ userWill ];
+  editors = [ builtins.readFile ./modules/features/ssh-client/id_ed25519.pub ];
 
   stripContext = builtins.unsafeDiscardStringContext;
 
-  # Map nix-store paths back to local repo paths
   flakeStorePrefix = stripContext (toString flakeConfig.outPath) + "/";
   toLocalPath = p:
     let
@@ -17,50 +15,27 @@ let
     in
     "./${relPath}";
 
-  secretsFromHost = hostName:
+  collectSecrets = config: extraFn:
     let
-      hostConfig = builtins.getAttr hostName nixosConfigs;
-      hasAgeSecrets = builtins.hasAttr "age" hostConfig.config
-        && builtins.hasAttr "secrets" hostConfig.config.age;
+      ageSecrets = config.config.age.secrets or { };
     in
-    if hasAgeSecrets then
-      builtins.map (secretName:
-        let
-          secretConfig = builtins.getAttr secretName hostConfig.config.age.secrets;
-          file = toLocalPath secretConfig.file;
-        in {
-          inherit file;
-          key = builtins.readFile ./modules/hosts/${hostName}/ssh_host_ed25519_key.pub;
-        }
-      ) (builtins.attrNames hostConfig.config.age.secrets)
-    else [ ];
+    map (name:
+      let
+        secretConfig = builtins.getAttr name ageSecrets;
+        file = toLocalPath secretConfig.file;
+      in
+      { inherit file; } // extraFn name
+    ) (builtins.attrNames ageSecrets);
 
-  secretsFromHome = homeName:
-    let
-      homeConfig = builtins.getAttr homeName homeConfigs;
-      hasAgeSecrets = builtins.hasAttr "age" homeConfig.config
-        && builtins.hasAttr "secrets" homeConfig.config.age;
-    in
-    if hasAgeSecrets then
-      builtins.map (secretName:
-        let
-          secretConfig = builtins.getAttr secretName homeConfig.config.age.secrets;
-          file = toLocalPath secretConfig.file;
-        in {
-          inherit file;
-        }
-      ) (builtins.attrNames homeConfig.config.age.secrets)
-    else [ ];
-
-  allSecrets = builtins.concatLists [
-    (builtins.concatLists (builtins.map secretsFromHost (builtins.attrNames nixosConfigs)))
-    (builtins.concatLists (builtins.map secretsFromHome (builtins.attrNames homeConfigs)))
-  ];
-
-  groupedSecrets = builtins.groupBy (item: item.file) allSecrets;
+  allSecrets = builtins.concatLists (
+    map (name: collectSecrets (builtins.getAttr name nixosConfigs) (_: {
+      key = builtins.readFile ./modules/hosts/${name}/ssh_host_ed25519_key.pub;
+    })) (builtins.attrNames nixosConfigs)
+    ++ map (name: collectSecrets (builtins.getAttr name homeConfigs) (_: { })) (builtins.attrNames homeConfigs)
+  );
 
 in builtins.mapAttrs (fileString: occurrences: {
   publicKeys = (builtins.filter (k: k != null)
     (map (occurrence: occurrence.key or null) occurrences)) ++ editors;
-}) groupedSecrets
+}) builtins.groupBy (item: item.file) allSecrets;
 

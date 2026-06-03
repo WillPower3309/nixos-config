@@ -3,7 +3,7 @@ let
   nixosConfigs = flakeConfig.nixosConfigurations;
   homeConfigs = flakeConfig.homeConfigurations;
 
-  editors = [ builtins.readFile ./modules/features/ssh-client/id_ed25519.pub ];
+  editors = [ (builtins.readFile ./modules/features/ssh-client/id_ed25519.pub) ];
 
   stripContext = builtins.unsafeDiscardStringContext;
 
@@ -37,5 +37,5 @@ let
 in builtins.mapAttrs (fileString: occurrences: {
   publicKeys = (builtins.filter (k: k != null)
     (map (occurrence: occurrence.key or null) occurrences)) ++ editors;
-}) builtins.groupBy (item: item.file) allSecrets;
+}) (builtins.groupBy (item: item.file) allSecrets)
 

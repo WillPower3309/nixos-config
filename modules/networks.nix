@@ -23,6 +23,18 @@ let
     options = {
       id = lib.mkOption { type = lib.types.int; };
       dhcp = lib.mkOption { type = dhcpType; };
+      internet = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+      };
+      dns = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+      };
+      routerSsh = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+      };
     };
   };
 in {
@@ -33,6 +45,9 @@ in {
   config.flake.networks = {
     trusted = {
       id = 10;
+      internet = true;
+      routerSsh = true;
+      dns = true;
       dhcp = {
         enable = true;
         reservations = [
@@ -47,13 +62,16 @@ in {
     };
     guest = {
       id = 20;
+      internet = true;
+      dns = true;
       dhcp = { enable = true; reservations = []; };
     };
     iot = {
       id = 30;
+      dns = true;
       dhcp = { enable = true; reservations = []; };
     };
-    # TODO: this won't be needed once meshcentral and router are moved to proxmox
+    # TODO: this won't be needed once meshcentral and router are moved to proxmox - will all networks here then need dhcp? Can remove that option perhaps
     management = {
       id = 100;
       dhcp = { enable = false; reservations = []; };

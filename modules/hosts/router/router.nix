@@ -285,7 +285,7 @@ in {
         server = {
           interface = [ config.constants.loopbackAddr ] ++ (lib.mapAttrsToList (_: net: "10.1.${toString net.id}.1") networks);
           access-control = [ "0.0.0.0/0 refuse" "127.0.0.0/8 allow" ]
-            ++ (lib.mapAttrsToList (_: net: "10.1.${toString net.id}.0/24 allow") networks);
+            ++ (lib.mapAttrsToList (_: net: "10.1.${toString net.id}.0/24 allow") (lib.filterAttrs (_: net: net.dns) networks));
 
           port = 53;
           hide-identity = true;

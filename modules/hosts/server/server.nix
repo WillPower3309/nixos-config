@@ -47,7 +47,9 @@ in
           ssh = {
             enable = true;
             port = 2222;
-            authorizedKeys = lib.map (key: "command=\"/bin/systemd-tty-ask-password-agent\",restrict,pty ${key}") config.users.users.root.openssh.authorizedKeys.keys;
+            authorizedKeys = lib.map (
+              key: "command=\"/bin/systemd-tty-ask-password-agent\",restrict,pty ${key}"
+            ) config.users.users.root.openssh.authorizedKeys.keys;
             hostKeys = [ (config.constants.persistentDir + (toString hostKeyPath)) ];
           };
         };

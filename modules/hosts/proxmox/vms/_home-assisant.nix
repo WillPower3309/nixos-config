@@ -10,9 +10,9 @@ in {
 
   virtualisation = {
     proxmox = {
-      node = "pve0";
+      node = "pve0"; # TODO: do I have to?
       autoInstall = true;
-      vmid = 101; # TODO: set this dynamically?
+      vmid = 101; # TODO: set this dynamically? Is this required?
       memory = 1024;
       cores = 1;
       sockets = 1;

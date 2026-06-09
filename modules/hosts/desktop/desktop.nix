@@ -45,17 +45,17 @@
           matches = [{ "device.name" = "~alsa_card.pci-*"; }];
           actions.update-props."device.disabled" = "true";
         }];
-        "52-default-output"."monitor.alsa.rules" = [{
+        "52-topping-profile"."monitor.alsa.rules" = [{
           matches = [{ "device.name" = "alsa_card.usb-Topping_DX5_II-00"; }];
           actions.update-props."device.profile" = "pro-audio";
         }];
-        "53-default-input"."monitor.alsa.rules" = [{
+        "53-topping-default"."monitor.audio.rules" = [{
+          matches = [{ "node.name" = "~alsa_output.usb-Topping_DX5_II*"; }];
+          actions.update-props."priority.session" = 2000;
+        }];
+        "54-scarlett-profile"."monitor.alsa.rules" = [{
           matches = [{ "device.name" = "alsa_card.usb-Focusrite_Scarlett_Solo_4th_Gen_S18HY203300821-00"; }];
           actions.update-props."device.profile" = "pro-audio";
-        }];
-        "54-scarlett-input-only"."monitor.audio.rules" = [{
-          matches = [{ "node.name" = "~alsa_output.usb-Focusrite_Scarlett_Solo_4th_Gen*"; }];
-          actions.update-props."node.disabled" = true;
         }];
       };
     };

@@ -20,13 +20,14 @@
       firmware = [(pkgs.runCommand "custom-firmware" {} ''
         mkdir -p $out/lib/firmware/{amdgpu,mediatek,rtl_nic}
 
-        # AMD GPU — Radeon RX 7900 XT (Navi 31) + Raphael iGPU
+        # AMD GPU — Radeon RX 7900 XT (Navi 31)
         ${lib.concatStringsSep "\n" (map (g: "cp ${pkgs.linux-firmware}/lib/firmware/amdgpu/${g} $out/lib/firmware/amdgpu/") [
-          "gc_10_3_6*"   "gc_11_0_0*"
-          "sdma_5_2*"    "sdma_6_0*"
-          "vcn_3*"       "vcn_4_0*"
-          "dcn_3_1_5*"   "dcn_3_2*"
-          "psp_13_0_0*"  "smu_13_0_0*"
+          "gc_11_0_0*"
+          "sdma_6_0*"
+          "vcn_4_0*"
+          "dcn_3_2*"
+          "psp_13_0_0*"
+          "smu_13_0_0*"
         ])}
 
         # Mediatek MT7922 WiFi + BT

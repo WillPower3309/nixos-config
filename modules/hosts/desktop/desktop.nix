@@ -17,8 +17,27 @@
     boot.initrd.availableKernelModules = [ "xhci_pci" "ahci" "nvme" "usbhid" "amdgpu" ];
 
     hardware = {
-      enableAllFirmware = true;
-      cpu.amd.updateMicrocode = config.hardware.enableRedistributableFirmware;
+      firmware = [(pkgs.runCommand "custom-firmware" {} ''
+        mkdir -p $out/lib/firmware/{amdgpu,mediatek,rtl_nic}
+
+        # AMD GPU — Radeon RX 7900 XT (Navi 31) + Raphael iGPU
+        ${lib.concatStringsSep "\n" (map (g: "cp ${pkgs.linux-firmware}/lib/firmware/amdgpu/${g} $out/lib/firmware/amdgpu/") [
+          "ip_discovery.bin"
+          "gc_10_3_6*"   "gc_11_0_0*"
+          "sdma_5_2*"    "sdma_6_0*"
+          "vcn_3*"       "vcn_4_0*"
+          "dcn_3_1_5*"   "dcn_3_2*"
+          "psp_13_0_0*"  "smu_13_0_0*"
+        ])}
+
+        # Mediatek MT7922 WiFi + BT
+        cp ${pkgs.linux-firmware}/lib/firmware/mediatek/{*MT7922*,*MT7961*} $out/lib/firmware/mediatek/
+
+        # Realtek RTL8125 ethernet
+        cp ${pkgs.linux-firmware}/lib/firmware/rtl_nic/rtl8125* $out/lib/firmware/rtl_nic/
+      '')];
+
+      cpu.amd.updateMicrocode = true;
     };
 
     # TODO: convert to systemd.mounts as described in https://nixos.wiki/wiki/NFS ?

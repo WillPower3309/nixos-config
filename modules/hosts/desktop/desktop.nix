@@ -22,7 +22,6 @@
 
         # AMD GPU — Radeon RX 7900 XT (Navi 31) + Raphael iGPU
         ${lib.concatStringsSep "\n" (map (g: "cp ${pkgs.linux-firmware}/lib/firmware/amdgpu/${g} $out/lib/firmware/amdgpu/") [
-          "ip_discovery.bin"
           "gc_10_3_6*"   "gc_11_0_0*"
           "sdma_5_2*"    "sdma_6_0*"
           "vcn_3*"       "vcn_4_0*"

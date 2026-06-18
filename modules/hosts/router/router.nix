@@ -258,9 +258,10 @@ in {
         subnet4 = lib.mapAttrsToList (name: net: {
           id = net.id;
           subnet = "10.1.${toString net.id}.0/24";
-          pools = if net.dhcp.enable then [{
-            # set a reservation = number of reservations + 2 (router & switch)
-            pool = "10.1.${toString net.id}.${toString (builtins.length net.dhcp.reservations + 2)} - 10.1.${toString net.id}.254";
+          pools = if net.dhcp.enable then let
+            maxHost = builtins.foldl' (a: b: if a > b then a else b) 0 (map (r: lib.toInt (lib.last (lib.splitString "." r.ip-address))) net.dhcp.reservations);
+          in [{
+            pool = "10.1.${toString net.id}.${toString (maxHost + 1)} - 10.1.${toString net.id}.254";
           }] else [ ];
 
           reservations-in-subnet = net.dhcp.enable;

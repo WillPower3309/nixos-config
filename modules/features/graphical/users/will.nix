@@ -24,7 +24,7 @@
 
     # create persistent home directory owned by user
     system.activationScripts.persistent-user-dir-creation.text = ''
-      install -d -o will -g users /nix/persist/home/will
+      install -d -o will -g users ${config.constants.persistentDir}/will
     '';
 
     home-manager = {

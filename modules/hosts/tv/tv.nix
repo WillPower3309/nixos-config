@@ -1,6 +1,6 @@
 { inputs, lib, ... }:
 
-{
+let user = "htpc"; in {
   flake.nixosConfigurations = inputs.self.lib.mkNixos "x86_64-linux" "tv";
 
   flake.modules.nixos.tv = { config, pkgs, lib, ... }: {
@@ -12,15 +12,7 @@
     boot = {
       lanzaboote.enable = false; # TODO: enable
       initrd.availableKernelModules = [ "xhci_pci" "nvme" "usb_storage" ];
-      kernelParams = [
-        "vt.global_cursor_default=0"
-        "i915.fastboot=1"
-        "i915.enable_psr=0"
-        "video=efifb:off"
-      ];
     };
-
-    services.udev.packages = [ pkgs.game-devices-udev-rules ];
 
     hardware = {
       cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
@@ -38,76 +30,33 @@
     };
     powerManagement.cpuFreqGovernor = "powersave";
 
-    services = {
-      pulseaudio.enable = false;
-      pipewire.enable = false;
-    };
-
     networking = {
       hostName = "tv";
       wireless.enable = false;
       interfaces.eno1.wakeOnLan.enable = true;
-      firewall.allowedUDPPorts = [ 9 ];  # wake on LAN
+      firewall.allowedUDPPorts = [ 9 ]; # wake on LAN
     };
 
-    users.users.kodi = {
+    users.users."${user}" = {
       isNormalUser = true;
-      extraGroups = [ "video" "audio" "input" "render" "dialout" ];  # dialout needed for CEC serial device
+      # TODO: are all of these needed?
+      extraGroups = [ "video" "audio" "input" "render" "dialout" ]; # dialout needed for CEC serial device
     };
 
-    # script to start moonlight on tty2
-    systemd.services."getty@tty2".enable = false; # prevent login prompts from interfering
-    environment.systemPackages = let
-      moonlight-kodi-wrapper = pkgs.writeShellScriptBin "launch-moonlight" ''
-        KODI_PID=$(pidof kodi.bin)
-        if [ -n "$KODI_PID" ]; then
-          kill -STOP "$KODI_PID"
-        fi
+    environment.systemPackages = with pkgs; [
+      plex-htpc
+      # TODO: add vacuumtube (youtube tv client)
+    ];
 
-        export QT_QPA_PLATFORM=linuxfb
-        export MOONLIGHT_HWDEC=vaapi
-        export LIBVA_DRIVER_NAME=iHD
-
-        openvt -c 2 -s -f -- ${pkgs.moonlight-qt}/bin/moonlight
-
-        chvt 1
-        if [ -n "$KODI_PID" ]; then
-          kill -CONT "$KODI_PID"
-        fi
-      '';
-    in [ moonlight-kodi-wrapper pkgs.libcec pkgs.polkit ];
-    environment.variables = {
-      ML_AUDIO = "sdl";
-      SDL_AUDIODRIVER = "alsa";
+    # TODO: use plasma bigscreen or jovian (https://jovian-experiments.github.io/Jovian-NixOS/configuration.html)
+    services.cage = {
+      inherit user;
+      enable = true;
+      program = "${pkgs.plex-htpc}/bin/plex-htpc";
     };
-    security.wrappers.chvt = {
-      source = "${pkgs.kbd}/bin/chvt";
-      owner = "root";
-      group = "root";
-      setuid = true;
-    };
-
-    # TODO: custom plugins https://discourse.nixos.org/t/how-to-add-custom-kodi-plugins-yet-another-how-to-use-a-custom-derivation-in-my-flake-post/46238
-    # remove nixpkgs.config.kodi.enableAdvancedLauncher = true
-    # https://github.com/jurialmunkey/skin.arctic.fuse.3
-    # https://github.com/croneter/PlexKodiConnect
-    nixpkgs.config.kodi.enableAdvancedLauncher = true;
-
-    services.getty.autologinUser = "kodi";
-    environment.loginShellInit = let kodi-package = pkgs.kodi-gbm.withPackages(kodiPkgs: with kodiPkgs; [
-      inputstream-adaptive
-      joystick
-    ]);
-    in ''
-      [[ "$(tty)" = "/dev/tty1" ]] && ${kodi-package}/bin/kodi-standalone
-    '';
 
     environment = {
-      persistence."${config.constants.persistentDir}".directories = [
-        # TODO: add below to HM
-        { directory = "/home/kodi/.kodi"; user = "kodi"; group = "users"; }
-        { directory = "/home/kodi/.cache"; user = "kodi"; group = "users"; }
-      ];
+      persistence."${config.constants.persistentDir}".directories = [ "/home/${user}/local/share/plex" ];
       etc."ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;
     };
   };

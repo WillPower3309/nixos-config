@@ -17,12 +17,9 @@
       web-browsers
     ] ++ [ inputs.agenix.nixosModules.age ];
 
-    hardware.graphics = {
-      enable = true;
-      extraPackages = [ pkgs.rocmPackages.clr.icd ]; # opencl TODO: just for darktable?
-    };
+    hardware.graphics.enable = true;
 
-    programs.fuse.userAllowOther = true; # persistence (TODO: make one file)
+    programs.fuse.userAllowOther = true; # persistence (TODO: it it needed? make one file?)
 
     age.identityPaths = [ "${config.constants.persistentDir}/etc/ssh/ssh_host_ed25519_key" ];
 

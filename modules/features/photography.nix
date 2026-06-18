@@ -1,6 +1,10 @@
 { inputs, ... }:
 
 {
+  flake.modules.nixos.photography = { pkgs, ... }: {
+    hardware.graphics.extraPackages = [ pkgs.rocmPackages.clr.icd ]; # opencl - used by darktable
+  };
+
   flake.modules.homeManager.will = { pkgs, config, ... }: {
     home = {
       packages = with pkgs; [

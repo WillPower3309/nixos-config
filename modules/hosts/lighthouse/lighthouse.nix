@@ -71,13 +71,10 @@ in
       allowedTCPPorts = [ 32400 ];
     };
 
-    users = {
-      users.root.openssh.authorizedKeys.keys = [
-        authorizedKey
-        (builtins.readFile ../../../modules/hosts/server/ssh_host_ed25519_key.pub)
-      ];
-      mutableUsers = false;
-    };
+    users.users.root.openssh.authorizedKeys.keys = [
+      authorizedKey
+      (builtins.readFile ../../../modules/hosts/server/ssh_host_ed25519_key.pub)
+    ];
 
     services = {
       openssh = {

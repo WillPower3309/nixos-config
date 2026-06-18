@@ -15,6 +15,7 @@
       useNetworkd = true;
       wireless.enable = lib.mkDefault false;
     };
+    users.mutableUsers = false;
     system.stateVersion = config.system.nixos.release;
   };
 }

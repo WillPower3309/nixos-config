@@ -10,9 +10,7 @@
     age.secrets.hashedWillPassword.file = ./hashedWillPassword.age;
 
     users = {
-      mutableUsers = false;
       defaultUserShell = pkgs.zsh;
-
       users = {
         will = {
           isNormalUser = true;

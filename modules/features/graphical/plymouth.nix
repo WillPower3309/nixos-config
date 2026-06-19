@@ -2,7 +2,9 @@
   flake.modules.nixos.plymouth = {
     boot = {
       plymouth.enable = true;
-      kernelParams = [ "quiet" "udev.log_level=3" "plymouth.use-simpledrm=0" ];
+
+      initrd.kernelModules = [ "simpledrm" ]; # TODO: needed?
+      kernelParams = [ "quiet" "plymouth.use-simpledrm" "amdgpu.seamless=1" ];
       consoleLogLevel = 0;
       loader.timeout = 0;
     };

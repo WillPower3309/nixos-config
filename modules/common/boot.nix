@@ -22,6 +22,7 @@
           consoleMode = "max";
           edk2-uefi-shell.enable = true;
         };
+        efi.canTouchEfiVariables = true;
       };
 
       initrd.systemd.enable = true;

@@ -13,7 +13,7 @@ let
   networks = inputs.self.networks;
 
   allReservations = lib.pipe networks [
-    (networks: lib.mapAttrsToList (_: net: net.dhcp.reservations) networks)
+    (networks: lib.mapAttrsToList (_: net: net.reservations) networks)
     (reservations: lib.lists.flatten reservations)
   ];
 
@@ -258,16 +258,18 @@ in {
         subnet4 = lib.mapAttrsToList (name: net: {
           id = net.id;
           subnet = "10.1.${toString net.id}.0/24";
-          pools = if net.dhcp.enable then let
-            maxHost = builtins.foldl' (a: b: if a > b then a else b) 0 (map (r: lib.toInt (lib.last (lib.splitString "." r.ip-address))) net.dhcp.reservations);
+          pools = let
+            maxHost = builtins.foldl' (a: b: if a > b then a else b) 0 (map (
+              r: lib.toInt (lib.last (lib.splitString "." r.ip-address))
+            ) net.reservations);
           in [{
             pool = "10.1.${toString net.id}.${toString (maxHost + 1)} - 10.1.${toString net.id}.254";
-          }] else [ ];
+          }];
 
-          reservations-in-subnet = net.dhcp.enable;
+          reservations-in-subnet = true;
           reservations-global = false;
-          reservations-out-of-pool = net.dhcp.enable;
-          reservations = net.dhcp.reservations;
+          reservations-out-of-pool = true;
+          reservations = net.reservations;
 
           option-data = if net.dhcp.enable then [
             { name = "routers"; data = "10.1.${toString net.id}.1"; }

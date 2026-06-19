@@ -13,7 +13,7 @@
             HostName = "${reservation.hostname}.${config.constants.domain}";
             User = "root";
           };
-        }) net.dhcp.reservations)
+        }) net.reservations)
         (builtins.attrValues inputs.self.networks)
       ) // {
         "*-boot" = {

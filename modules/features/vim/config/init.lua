@@ -252,7 +252,6 @@ function CustomTabline()
 end
 
 -- Empty since all the info is in the tabline now
--- TODO Add LSP info in statusline at some point
 function CustomStatusline()
     return ''
 end

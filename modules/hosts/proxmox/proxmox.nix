@@ -25,7 +25,7 @@ let
 in {
   flake.nixosConfigurations = inputs.self.lib.mkNixos "x86_64-linux" "proxmox";
 
-  flake.networks.trusted.dhcp.reservations = [{
+  flake.networks.trusted.reservations = [{
     ip-address = ipAddress;
     hostname = hostName;
     hw-address = "${sfp0MacAddress}";
@@ -61,7 +61,7 @@ in {
       useDHCP = false;
     };
 
-    # systemd won't start pve-guests until every VF .device unit is active (VF create is async)
+    # don't start pve-guests until every VF .device unit is active (VF create is async)
     systemd.services."pve-guests" = {
       requires = vfDeviceUnits;
       after = vfDeviceUnits;
@@ -90,7 +90,6 @@ in {
       kernelModules = [ "vfio" "vfio_iommu_type1" "vfio_pci" "thunderbolt_net" ];
       kernelParams = [ "intel_iommu=on" "iommu=pt" ];
 
-      # TODO: this doesn't seem to work
       initrd = {
         kernelModules = [ "i40e" ];
         systemd.network = {

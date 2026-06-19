@@ -5,7 +5,6 @@
 
     age.secrets.keepassPassword.file = ./keepass.age;
 
-    # TODO: https://www.reddit.com/r/NixOS/comments/1l9xbd9/how_to_declaratively_link_keepassxc_databases_to/
     home = {
       packages = with pkgs; [ keepassxc ];
 

@@ -42,8 +42,6 @@
     imports = [ inputs.agenix.homeManagerModules.default ];
 
     programs.home-manager.enable = true;
-
-    # TODO: already declared in nix.nix file, don't double declare
     nixpkgs.config.allowUnfree = true;
 
     xdg.mimeApps.enable = true;

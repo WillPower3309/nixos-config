@@ -3,7 +3,7 @@
 {
   flake.nixosConfigurations = inputs.self.lib.mkNixos "x86_64-linux" "laptop";
 
-  flake.modules.nixos.laptop = { config, lib, ... }: {
+  flake.modules.nixos.laptop = { config, lib, pkgs, ... }: {
     networking.hostName = "laptop";
 
     imports = with inputs.self.modules.nixos; [
@@ -30,6 +30,8 @@
       enableAllFirmware = true;
       cpu.amd.updateMicrocode = config.hardware.enableRedistributableFirmware;
     };
+
+    environment.systemPackages = [ pkgs.brightnessctl ];
 
     # fingerprint reader
     security.pam.services = {

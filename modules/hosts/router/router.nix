@@ -79,12 +79,12 @@ in {
         extraArgs = [ "-i" "${wanInterface}" ];
       };
 
-      netdevs = (lib.mapAttrs' (name: net: lib.nameValuePair "30-vlan${toString net.id}" {
+      netdevs = (lib.mapAttrs' (id: net: lib.nameValuePair "30-vlan${id}" {
         netdevConfig = {
           Kind = "vlan";
-          Name = "${lanInterface}.${toString net.id}";
+          Name = "${lanInterface}.${id}";
         };
-        vlanConfig.Id = net.id;
+        vlanConfig.Id = lib.toInt id;
       }) networks) // {
         "40-ifb-wan" = {
           netdevConfig = {
@@ -114,7 +114,7 @@ in {
         "20-${lanInterface}" = {
           matchConfig.Name = lanInterface;
           networkConfig = {
-            VLAN = lib.mapAttrsToList (name: net: "${lanInterface}.${toString net.id}") networks;
+            VLAN = map (id: "${lanInterface}.${id}") (builtins.attrNames networks);
             ConfigureWithoutCarrier = true;
           };
           linkConfig.RequiredForOnline = "no";
@@ -129,9 +129,9 @@ in {
             FlowIsolationMode = "dual-dst-host";
           };
         };
-      } // (lib.mapAttrs' (name: net: lib.nameValuePair "25-vlan${toString net.id}" {
-        matchConfig.Name = "${lanInterface}.${toString net.id}";
-        networkConfig.Address = "10.1.${toString net.id}.1/24";
+      } // (lib.mapAttrs' (id: net: lib.nameValuePair "25-vlan${id}" {
+        matchConfig.Name = "${lanInterface}.${id}";
+        networkConfig.Address = "10.1.${id}.1/24";
         linkConfig.RequiredForOnline = "no";
       }) networks);
     };
@@ -183,20 +183,38 @@ in {
 
       # TODO: read https://www.mankier.com/8/nft
       # TODO: from above, make sure I know what the following are: address families, hooks, tables, chains, rules, and sets
-      # TODO: make this dynamic
       nftables = {
         enable = true;
-        ruleset = ''
+        ruleset = let
+          dnsPort = toString config.services.unbound.settings.server.port;
+
+          interface = id: "${lanInterface}.${id}";
+
+          allInterfaces = map interface (builtins.attrNames networks);
+          dnsInterfaces = map interface (builtins.attrNames (lib.filterAttrs (id: net: net.dns) networks));
+          internetInterfaces = map interface (builtins.attrNames (lib.filterAttrs (id: net: net.internet) networks));
+          trustedInterfaces = map interface (builtins.attrNames (lib.filterAttrs (id: net: net.trusted) networks));
+          mgmtInterface = "${lanInterface}.100";
+
+          fmt = interfaces:
+            if interfaces == [] then ""
+            else if builtins.length interfaces == 1 then "${builtins.head interfaces}"
+            else "{ ${lib.concatStringsSep ", " interfaces} }";
+        in ''
           table ip filter {
             chain input {
               type filter hook input priority 0; policy drop;
 
-              iifname "${lanInterface}.${toString networks.trusted.id}" accept comment "Allow trusted local network to access the router"
-              # TODO: we let local access router above -  should I remove the above and also allow trusted to use dhcp and dns ports below?
-              iifname "${lanInterface}.${toString networks.trusted.id}" tcp dport 22 accept comment "Allow trusted local network to SSH to router"
+              iifname ${fmt allInterfaces} udp dport 67 accept comment "Allow DHCP"
 
-              iifname "${lanInterface}.${toString networks.guest.id}" udp dport { ${toString config.services.unbound.settings.server.port}, 67 } accept comment "Allow guest DNS, DHCP"
-              iifname "${lanInterface}.${toString networks.guest.id}" tcp dport ${toString config.services.unbound.settings.server.port} accept comment "Allow guest DNS over TCP"
+              ${lib.optionalString (dnsInterfaces != []) ''
+                iifname ${fmt dnsInterfaces} udp dport ${dnsPort} accept comment "Allow DNS"
+                iifname ${fmt dnsInterfaces} tcp dport ${dnsPort} accept comment "Allow DNS over TCP"
+              ''}
+
+              ${lib.optionalString (trustedInterfaces != []) ''
+                iifname ${fmt trustedInterfaces} tcp dport 22 accept comment "Allow SSH"
+              ''}
 
               iifname "${wanInterface}" ct state { established, related } accept comment "Allow established traffic"
               iifname "${wanInterface}" icmp type { echo-request, destination-unreachable, time-exceeded } counter accept comment "Allow select ICMP"
@@ -208,11 +226,15 @@ in {
             chain forward {
               type filter hook forward priority 0; policy drop;
 
-              iifname { "${lanInterface}.${toString networks.trusted.id}", "${lanInterface}.${toString networks.guest.id}" } oifname { "${wanInterface}" } accept comment "Allow LANs to WAN"
-              iifname { "${wanInterface}" } oifname { "${lanInterface}.${toString networks.trusted.id}", "${lanInterface}.${toString networks.guest.id}" } ct state { established, related } accept comment "Allow established back to LANs"
+              ${lib.optionalString (internetInterfaces != []) ''
+                iifname ${fmt internetInterfaces} oifname "${wanInterface}" accept comment "Allow internet enabled VLANs to WAN"
+                iifname "${wanInterface}" oifname ${fmt internetInterfaces} ct state { established, related } accept comment "Allow established back to internet enabled VLANs"
+              ''}
 
-              iifname { "${lanInterface}.${toString networks.trusted.id}" } oifname { "${lanInterface}.${toString networks.management.id}" } counter accept comment "Allow trusted to management"
-              iifname { "${lanInterface}.${toString networks.management.id}" } oifname { "${lanInterface}.${toString networks.trusted.id}" } ct state { established, related } counter accept comment "Allow established & related back to trusted"
+              ${lib.optionalString (trustedInterfaces != []) ''
+                iifname ${fmt trustedInterfaces} oifname "${mgmtInterface}" counter accept comment "Allow trusted to management"
+                iifname "${mgmtInterface}" oifname ${fmt trustedInterfaces} ct state { established, related } counter accept comment "Allow established back from management to trusted"
+              ''}
             }
           }
 
@@ -239,7 +261,7 @@ in {
       enable = true;
       settings = {
         interfaces-config = {
-          interfaces = lib.mapAttrsToList (name: net: "${lanInterface}.${toString net.id}") (lib.filterAttrs (name: net: net.dhcp.enable) networks);
+          interfaces = map (id: "${lanInterface}.${id}") (builtins.attrNames networks);
           re-detect = true; # actively re-detect interfaces if they are re-created by networkd
           dhcp-socket-type = "raw"; # capture packets at the link-layer, surviving interface toggles
         };
@@ -255,15 +277,15 @@ in {
         renew-timer = 1000;
         rebind-timer = 2000;
 
-        subnet4 = lib.mapAttrsToList (name: net: {
-          id = net.id;
-          subnet = "10.1.${toString net.id}.0/24";
+        subnet4 = lib.mapAttrsToList (id: net: {
+          id = lib.toInt id;
+          subnet = "10.1.${id}.0/24";
           pools = let
             maxHost = builtins.foldl' (a: b: if a > b then a else b) 0 (map (
               r: lib.toInt (lib.last (lib.splitString "." r.ip-address))
             ) net.reservations);
           in [{
-            pool = "10.1.${toString net.id}.${toString (maxHost + 1)} - 10.1.${toString net.id}.254";
+            pool = "10.1.${id}.${toString (maxHost + 1)} - 10.1.${id}.254";
           }];
 
           reservations-in-subnet = true;
@@ -271,10 +293,10 @@ in {
           reservations-out-of-pool = true;
           reservations = net.reservations;
 
-          option-data = if net.dhcp.enable then [
-            { name = "routers"; data = "10.1.${toString net.id}.1"; }
-            { name = "domain-name-servers"; data = "10.1.${toString net.id}.1"; }
-          ] else [ ];
+          option-data = [
+            { name = "routers"; data = "10.1.${id}.1"; }
+            { name = "domain-name-servers"; data = "10.1.${id}.1"; }
+          ];
         }) networks;
       };
     };
@@ -286,9 +308,9 @@ in {
 
       settings = {
         server = {
-          interface = [ config.constants.loopbackAddr ] ++ (lib.mapAttrsToList (_: net: "10.1.${toString net.id}.1") networks);
+          interface = [ config.constants.loopbackAddr ] ++ (map (id: "10.1.${id}.1") (builtins.attrNames networks));
           access-control = [ "0.0.0.0/0 refuse" "127.0.0.0/8 allow" ]
-            ++ (lib.mapAttrsToList (_: net: "10.1.${toString net.id}.0/24 allow") (lib.filterAttrs (_: net: net.dns) networks));
+            ++ (map (id: "10.1.${id}.0/24 allow") (builtins.attrNames (lib.filterAttrs (id: net: net.dns) networks)));
 
           port = 53;
           hide-identity = true;

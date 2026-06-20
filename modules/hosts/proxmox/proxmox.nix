@@ -25,7 +25,7 @@ let
 in {
   flake.nixosConfigurations = inputs.self.lib.mkNixos "x86_64-linux" "proxmox";
 
-  flake.networks.trusted.reservations = [{
+  flake.networks."10".reservations = [{
     ip-address = ipAddress;
     hostname = hostName;
     hw-address = "${sfp0MacAddress}";

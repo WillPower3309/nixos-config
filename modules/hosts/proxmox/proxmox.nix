@@ -10,16 +10,6 @@ let
   ipAddress = "10.1.10.3";
   numSfpVfs = 16;
 
-  # The i40e PF at 0000:03:00.0 exposes VFs as 0000:03:02.0 through
-  # 0000:03:(02 + ceil(N/8) - 1).(N % 8).
-  vfDeviceUnits = builtins.genList (idx:
-    let
-      dev = 2 + builtins.div idx 8;
-      func = builtins.sub idx (8 * builtins.div idx 8); # no mod operator in nix ;-;
-    in
-      "sys-devices-pci0000:00-0000:00:06.2-0000:03:0${toString dev}.${toString func}.device"
-  ) numSfpVfs;
-
 # TODO: router VF will need `trust on`
 # TODO: NTP (https://pve.proxmox.com/wiki/Time_Synchronization)
 in {
@@ -62,7 +52,16 @@ in {
     };
 
     # don't start pve-guests until every VF .device unit is active (VF create is async)
-    systemd.services."pve-guests" = {
+    systemd.services."pve-guests" = let
+      # The i40e PF at 0000:03:00.0 exposes VFs as 0000:03:02.0 through 0000:03:(02 + ceil(N/8) - 1).(N % 8).
+      vfDeviceUnits = builtins.genList (idx:
+        let
+          dev = 2 + builtins.div idx 8;
+          func = builtins.sub idx (8 * builtins.div idx 8); # no mod operator in nix
+        in
+          "sys-devices-pci0000:00-0000:00:06.2-0000:03:0${toString dev}.${toString func}.device"
+      ) numSfpVfs;
+    in {
       requires = vfDeviceUnits;
       after = vfDeviceUnits;
     };
@@ -74,14 +73,14 @@ in {
       networks = {
         "10-${sfpInterface0}" = {
           matchConfig.MACAddress = sfp0MacAddress; # match macAddress to ensure it works in initrd conf too
-          networkConfig.DHCP = "no";
-          addresses = [{ addressConfig.Address = "${ipAddress}/24"; }];
-          routes = [{ routeConfig.Gateway = "10.1.10.1"; }];
+          DHCP = "no";
+          address = [ "${ipAddress}/24" ];
+          gateway = [ "10.1.10.1" ];
         };
         "20-${rj45Interface0}" = {
           matchConfig.Name = rj45Interface0;
-          networkConfig.DHCP = "no";
-          addresses = [{ addressConfig.Address = "10.1.90.1/24"; }];
+          DHCP = "no";
+          address = [ "10.1.90.1/24" ];
         };
       };
     };
@@ -92,16 +91,19 @@ in {
 
       initrd = {
         kernelModules = [ "i40e" ];
-        systemd.network = {
+        systemd = {
           enable = true;
-          networks."10-${sfpInterface0}" = config.systemd.network.networks."10-${sfpInterface0}";
+          network = {
+            enable = true;
+            networks."10-${sfpInterface0}" = config.systemd.network.networks."10-${sfpInterface0}";
+          };
+          users.root.shell = "${pkgs.util-linux}/bin/nologin"; # block interactive shell access
         };
         network = {
           enable = true;
           ssh = {
             enable = true;
             port = config.constants.sshBootPort;
-            shell = "${pkgs.util-linux}/bin/nologin"; # block interactive shell access
             authorizedKeys = lib.map (key:
               "command=\"/bin/systemd-tty-ask-password-agent\",restrict,pty ${key}"
             ) config.users.users.root.openssh.authorizedKeys.keys;

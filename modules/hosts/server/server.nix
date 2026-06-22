@@ -40,14 +40,16 @@ in
       # TODO: secrets? different host key?
       initrd = {
         kernelModules = [ "igc" ];  # intel ethernet controller
-        systemd.enable = true;
+        systemd = {
+          enable = true;
+          users.root.shell = "${pkgs.util-linux}/bin/nologin"; # block interactive shell access
+        };
 
         network = {
           enable = true;
           ssh = {
             enable = true;
             port = config.constants.sshBootPort;
-            shell = "${pkgs.util-linux}/bin/nologin"; # block interactive shell access
             authorizedKeys = lib.map (
               key: "command=\"/bin/systemd-tty-ask-password-agent\",restrict,pty ${key}"
             ) config.users.users.root.openssh.authorizedKeys.keys;

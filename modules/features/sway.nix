@@ -16,15 +16,12 @@
       wlsunset
     ] ++ [ inputs.rapidshell.packages.${pkgs.stdenv.hostPlatform.system}.default ];
 
-    xdg.autostart.enable = true;
-
     wayland.windowManager.sway = {
       enable = true;
       package = pkgs.swayfx;
 
       systemd = {
-        enable = config.xdg.autostart.enable; # needed for xdgAutostart
-        xdgAutostart = config.xdg.autostart.enable;
+        enable = true;
         dbusImplementation = "broker"; # TODO: remove once upstream
       };
 

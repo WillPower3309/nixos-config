@@ -12,9 +12,23 @@
           name = "";
           settings.NoDisplay = "true";
         };
-        "footclient".name = "Foot";
       };
-      autostart.entries = lib.optionals config.xdg.autostart.enable [ "${pkgs.foot}/share/applications/foot-server.desktop" ];
+    };
+
+    systemd.user.services.foot-server = {
+      Unit = {
+        Description = "Foot terminal emulator (server)";
+        Documentation = "man:foot(1)";
+        PartOf = [ "graphical-session.target" ];
+      };
+      Service = {
+        ExecStart = "${pkgs.foot}/bin/foot --server";
+        Restart = "on-failure";
+        RestartSec = "2";
+      };
+      Install = {
+        WantedBy = [ "graphical-session.target" ];
+      };
     };
 
     programs.foot = {

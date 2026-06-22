@@ -11,7 +11,11 @@ let user = "htpc"; in {
 
     boot = {
       lanzaboote.enable = false; # TODO: enable
-      initrd.availableKernelModules = [ "xhci_pci" "nvme" "usb_storage" ];
+      initrd = {
+        availableKernelModules = [ "xhci_pci" "nvme" "usb_storage" ];
+        kernelModules = [ "i915" ];
+      };
+      kernelParams = [ "i915.enable_psr=0" ];
     };
 
     hardware = {
@@ -33,8 +37,6 @@ let user = "htpc"; in {
     networking = {
       hostName = "tv";
       wireless.enable = false;
-      interfaces.eno1.wakeOnLan.enable = true;
-      firewall.allowedUDPPorts = [ 9 ]; # wake on LAN
     };
 
     users.users."${user}" = {
@@ -53,10 +55,32 @@ let user = "htpc"; in {
       inherit user;
       enable = true;
       program = "${pkgs.plex-htpc}/bin/plex-htpc";
+      extraArguments = [ "-d" "-s" ];
     };
 
+    # needed for plex-htpc — bubblewrap checks permitted caps from pam_systemd's
+    # PR_SET_KEEPCAPS and fails; setuid wrapper enters the setuid code path instead
+    security.wrappers.bwrap = {
+      setuid = true;
+      owner = "root";
+      group = "root";
+      source = "${pkgs.bubblewrap}/bin/bwrap";
+    };
+    nixpkgs.overlays = [
+      (final: prev: {
+        bubblewrap = prev.bubblewrap.overrideAttrs (old: {
+          mesonFlags = (old.mesonFlags or [ ]) ++ [ "-Dsupport_setuid=true" ];
+        });
+        buildFHSEnv = prev.buildFHSEnv.override {
+          bubblewrap = "/run/wrappers";
+        };
+      })
+    ];
+
     environment = {
-      persistence."${config.constants.persistentDir}".directories = [ "/home/${user}/local/share/plex" ];
+      persistence."${config.constants.persistentDir}".directories = [{
+        inherit user; directory = "/home/${user}";
+      }];
       etc."ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;
     };
   };

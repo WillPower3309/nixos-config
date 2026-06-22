@@ -7,19 +7,29 @@
       enableDefaultConfig = false;
 
       settings = builtins.listToAttrs (lib.concatMap
-        (net: map (reservation: {
-          name = "${reservation.hostname}*";
-          value = {
-            HostName = "${reservation.hostname}.${config.constants.domain}";
-            User = "root";
-          };
-        }) net.reservations)
+        (net: lib.concatMap (reservation: let
+          HostName = "${reservation.hostname}.${config.constants.domain}";
+          User = "root";
+        in [
+          {
+            name = "${reservation.hostname}";
+            value = {
+              inherit HostName;
+              inherit User;
+            };
+          }
+          {
+            # TODO: collector pattern instead?
+            name = "${reservation.hostname}-boot";
+            value = {
+              inherit HostName;
+              inherit User;
+              Port = config.constants.sshBootPort;
+            };
+          }
+        ]) net.reservations)
         (builtins.attrValues inputs.self.networks)
       ) // {
-        "*-boot" = {
-          Port = 2222;
-        };
-
         "lighthouse" = {
           HostName = "lighthouse.${config.constants.domain}";
           User = "root";

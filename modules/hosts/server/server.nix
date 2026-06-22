@@ -46,7 +46,8 @@ in
           enable = true;
           ssh = {
             enable = true;
-            port = 2222;
+            port = config.constants.sshBootPort;
+            shell = "${pkgs.util-linux}/bin/nologin"; # block interactive shell access
             authorizedKeys = lib.map (
               key: "command=\"/bin/systemd-tty-ask-password-agent\",restrict,pty ${key}"
             ) config.users.users.root.openssh.authorizedKeys.keys;

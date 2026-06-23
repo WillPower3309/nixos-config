@@ -38,6 +38,7 @@
         main = {
           font = lib.mkForce "MesloLGS NF:size=10";
           dpi-aware = lib.mkForce "yes";
+          pad = "16x16";
         };
 
         cursor = {

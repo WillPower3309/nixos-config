@@ -5,7 +5,6 @@
 
   let
     nixosConfigPath = "~/Projects/nixos-config";
-
   in {
     # TODO: transient prompt
     programs = {
@@ -24,14 +23,22 @@
         shellAliases = {
           ls = "colorls";
           wake-tv = "${pkgs.wakeonlan}/bin/wakeonlan 52:b2:03:93:42:2e";
-          fetch = "SPRITE=$(pokeget random --hide-name); HEIGHT=$(echo \"$SPRITE\" | wc -l); fastfetch --data-raw \"$SPRITE\"; echo \"$HEIGHT\"";
-          # TODO: vertical align to sprite, can be done with `fastfetch -s Break:Break:OS:Host:Kernel:Uptime:Packages:DE:WM:CPU:GPU:Memory:Swap:Disk:LocalIp:Battery:PowerAdapter:Break:Colors`
         } // lib.optionalAttrs (nixosConfig != null) {
           os-rebuild = "nixos-rebuild switch --flake ${nixosConfigPath}#${nixosConfig.networking.hostName}";
         };
 
         # show fetch on new terminal windows & set up transient prompt
         initContent = lib.mkOrder 1500 ''
+          fetch() {
+            SPRITE=$(${pkgs.pokeget-rs}/bin/pokeget random --hide-name)
+            INFO=$(script -qc "${pkgs.fastfetch}/bin/fastfetch --logo none" /dev/null 2>/dev/null | tr -d '\015' | sed '$d')
+            sprite_height=$(echo "$SPRITE" | wc -l)
+            info_height=$(echo "$INFO" | wc -l)
+            [ "$sprite_height" -lt "$info_height" ] && for ((i=0; i<(info_height-sprite_height)/2; i++)); do SPRITE=$'\n'"$SPRITE"; done
+            [ "$info_height" -lt "$sprite_height" ] && for ((i=0; i<(sprite_height-info_height)/2; i++)); do INFO=$'\n'"$INFO"; done
+            paste -d $'\t' <(echo "$SPRITE") <(echo "$INFO") | sed $'s/\t/   /g'
+          }
+
           if [[ $TERM != "dumb" ]]; then
             fetch
             eval "$(starship init zsh)"
@@ -114,7 +121,5 @@
         };
       };
     };
-
-    home.packages = [ pkgs.pokeget-rs ]; # TODO: use ${pkgs.pokeget-rs/bin/pokeget} in fetch alias
   };
 }

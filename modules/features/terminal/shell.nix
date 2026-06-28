@@ -30,12 +30,17 @@
         # show fetch on new terminal windows & set up transient prompt
         initContent = lib.mkOrder 1500 ''
           fetch() {
-            SPRITE=$(${pkgs.pokeget-rs}/bin/pokeget random --hide-name)
-            INFO=$(script -qc "${pkgs.fastfetch}/bin/fastfetch --logo none" /dev/null 2>/dev/null | tr -d '\015' | sed '$d')
-            sprite_height=$(echo "$SPRITE" | wc -l)
-            info_height=$(echo "$INFO" | wc -l)
-            [ "$sprite_height" -lt "$info_height" ] && for ((i=0; i<(info_height-sprite_height)/2; i++)); do SPRITE=$'\n'"$SPRITE"; done
-            [ "$info_height" -lt "$sprite_height" ] && for ((i=0; i<(sprite_height-info_height)/2; i++)); do INFO=$'\n'"$INFO"; done
+            setopt localoptions nomonitor
+            local tmp_sprite=/tmp/pokeget-sprite tmp_info=/tmp/pokeget-info
+            ${pkgs.pokeget-rs}/bin/pokeget random --hide-name > "$tmp_sprite" &
+            ${pkgs.fastfetch}/bin/fastfetch --pipe false --logo none > "$tmp_info" &
+            wait
+            SPRITE=$(<"$tmp_sprite")
+            INFO=$(<"$tmp_info")
+            sprite_height=$(( ''${#''${(f)SPRITE}} ))
+            info_height=$(( ''${#''${(f)INFO}} ))
+            [ "$sprite_height" -lt "$info_height" ] && repeat $(((info_height-sprite_height)/2)) SPRITE=$'\n'"$SPRITE"
+            [ "$info_height" -lt "$sprite_height" ] && repeat $(((sprite_height-info_height)/2)) INFO=$'\n'"$INFO"
             paste -d $'\t' <(echo "$SPRITE") <(echo "$INFO") | sed $'s/\t/   /g'
           }
 

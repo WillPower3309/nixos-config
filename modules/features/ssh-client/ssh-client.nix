@@ -13,17 +13,13 @@
         in [
           {
             name = "${reservation.hostname}";
-            value = {
-              inherit HostName;
-              inherit User;
-            };
+            value = { inherit HostName User; };
           }
           {
             # TODO: collector pattern instead?
             name = "${reservation.hostname}-boot";
             value = {
-              inherit HostName;
-              inherit User;
+              inherit HostName User;
               Port = config.constants.sshBootPort;
             };
           }

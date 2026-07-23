@@ -1,7 +1,7 @@
 { inputs, ... }:
 
 {
-  flake.modules.nixos.proxmox = {
+  flake.modules.nixos.node0 = {
     imports = [ inputs.disko.nixosModules.disko ];
 
     disko.devices = {

@@ -43,8 +43,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    proxmox-nixos.url = "github:SaumonNet/proxmox-nixos";
-
     pinenote-nixos = {
       url = "github:WeraPea/pinenote-nixos";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -62,6 +60,11 @@
 
     nixos-hardware = {
       url = "github:NixOS/nixos-hardware/master";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    microvm = {
+      url = "github:microvm-nix/microvm.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };

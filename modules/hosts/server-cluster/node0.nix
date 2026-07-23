@@ -5,10 +5,9 @@ let
   rj45Interface = "eth0";
   sfpInterface = "sfp0";
   sfpMacAddress = "38:05:25:31:58:aa";
-  hostName = "proxmox";
+  hostName = "node0";
   ipAddress = "10.1.10.3";
   numSfpVfs = 16;
-  sfpVfDeviceId = "8086:154c";
 
   # The i40e PF at 0000:03:00.0 exposes VFs as 0000:03:02.0 through
   # 0000:03:(02 + ceil(N/8) - 1).(N % 8).
@@ -24,28 +23,23 @@ let
 # TODO: router VF will need `trust on`
 # TODO: NTP (https://pve.proxmox.com/wiki/Time_Synchronization)
 in {
-  flake.nixosConfigurations = inputs.self.lib.mkNixos "x86_64-linux" "proxmox";
+  flake.nixosConfigurations = inputs.self.lib.mkNixos "x86_64-linux" hostName;
 
   flake.networks."10".reservations = [{
     ip-address = ipAddress;
     hostname = hostName;
-    hw-address = "${sfpMacAddress}";
+    hw-address = sfpMacAddress;
   }];
 
-  flake.modules.nixos.proxmox = { config, pkgs, lib, ... }: {
+  flake.modules.nixos."${hostName}" = { config, pkgs, lib, ... }: {
     imports = with inputs.self.modules.nixos; [
       common
       ssh-server
-    ] ++ [
-      inputs.proxmox-nixos.nixosModules.proxmox-ve
-      inputs.agenix.nixosModules.age
     ];
-
-    nixpkgs.overlays = [ inputs.proxmox-nixos.overlays.x86_64-linux ];
 
     # 38:05:25:31:58:aa -> SR-IOV PF (host + VMs)
     # 38:05:25:31:58:ab -> (BLACKLISTED) unused SFP port
-    # 38:05:25:31:58:ac -> corosync
+    # 38:05:25:31:58:ac -> nomad cluster networking
     # 38:05:25:31:58:ad -> (BLACKLISTED) intel AMT ethernet port
     # auto-authorize connected USB4 devices so network interfaces appear without manual intervention
     services.udev.extraRules = ''
@@ -62,37 +56,7 @@ in {
       useDHCP = false;
     };
 
-    systemd.services."pve-guests" = {
-      after = [ "pvedaemon.service" ];
-      unitConfig.JobTimeoutSec = 300;
-
-      # TODO: add mappings for the other nodes in the cluster
-      # TODO: configuration for subsystem-id not correct != 8086:0000
-      # TODO: configuration for iommugroup not correct != 16-34
-      preStart = let
-        waitAndMap = p: ''
-          if [ ! -e /sys/bus/pci/devices/${p.bdf} ]; then
-            for i in $(seq 1 30); do
-              if [ -e /sys/bus/pci/devices/${p.bdf} ]; then
-                break
-              fi
-              sleep 1
-            done
-            if [ ! -e /sys/bus/pci/devices/${p.bdf} ]; then
-              echo "VF ${p.bdf} never appeared" >&2
-              exit 1
-            fi
-          fi
-      ${pkgs.proxmox-ve}/bin/pvesh create /cluster/mapping/pci \
-          --id sfp-vf-${toString p.idx} \
-          --map "node=${hostName},path=${p.bdf},id=${sfpVfDeviceId}" \
-          || ${pkgs.proxmox-ve}/bin/pvesh set /cluster/mapping/pci/sfp-vf-${toString p.idx} \
-              --map "node=${hostName},path=${p.bdf},id=${sfpVfDeviceId}"
-        '';
-      in lib.concatStringsSep "\n" (builtins.map waitAndMap sfpVfPcis);
-    };
-
-    # TODO: USB4 mesh network: https://fangpenlin.com/posts/2024/01/14/high-speed-usb4-mesh-network/
+    # TODO: seaweedfs USB4 mesh network: https://fangpenlin.com/posts/2024/01/14/high-speed-usb4-mesh-network/
     # TODO: fallback routing for mesh network: https://pve.proxmox.com/wiki/Full_Mesh_Network_for_Ceph_Server#Routed_Setup_(with_Fallback)
     systemd.network = {
       enable = true;
@@ -141,28 +105,6 @@ in {
 
     hardware.enableAllFirmware = true;
 
-    age.secrets.proxmoxRsaPrivateKey.file = ./proxmoxRsaPrivateKey.age;
-
-    environment = {
-      persistence."${config.constants.persistentDir}".directories = [
-        "/var/lib/pve-cluster"
-        "/etc/corosync"
-        "/var/lib/vz" # VM disk image storage
-      ];
-
-      etc = {
-        "ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;
-
-        # used by pveproxy
-        "ssh/ssh_host_rsa_key.pub".source = ./ssh_host_rsa_key.pub;
-        "ssh/ssh_host_rsa_key".source = config.age.secrets.proxmoxRsaPrivateKey.path;
-      };
-    };
-
-    services.proxmox-ve = {
-      inherit ipAddress;
-      enable = true;
-      openFirewall = true;
-    };
+    environment.etc."ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;
   };
 }

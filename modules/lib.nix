@@ -9,8 +9,8 @@
     mkNixos = system: name: {
       ${name} = inputs.nixpkgs.lib.nixosSystem {
         modules = [
+          { nixpkgs.hostPlatform = system; }
           inputs.self.modules.nixos.${name}
-          { nixpkgs.hostPlatform = lib.mkDefault system; nixpkgs.config.allowUnfree = true; }
         ];
       };
     };
@@ -28,5 +28,7 @@
         ];
       };
     };
+
+    mkMicrovmPackage = system: name: (inputs.self.lib.mkNixos system name).${name}.config.microvm.runner.qemu;
   };
 }

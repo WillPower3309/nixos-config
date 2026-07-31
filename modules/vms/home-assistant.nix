@@ -1,6 +1,6 @@
 { inputs, ... }:
 
-let name = "home-assistant"; in {
+let name = "home-assistant"; port = 8123; in {
   flake.packages.x86_64-linux."${name}-vm" = inputs.self.lib.mkMicrovmPackage "x86_64-linux" name;
 
   flake.modules.nixos.${name} = { config, ... }: {
@@ -15,11 +15,22 @@ let name = "home-assistant"; in {
         id = "ha";
         mac = "02:00:00:00:00:01";
       }];
+      # TODO: Move to seaweedfs
+      volumes = [{
+        image = "var-lib-containers.img"; # TODO: where is this on the hypervisor?
+        mountPoint = "/var/lib/containers"; # image is too big to store in microvm memory
+        size = 8192;
+      }];
       # TODO: https://microvm-nix.github.io/microvm.nix/shares.html#writable-nixstore-overlay
       shares = [{
         tag = "ro-store";
         source = "/nix/store";
         mountPoint = "/nix/.ro-store";
+      }];
+      forwardPorts = [{
+        from = "host";
+        host = { inherit port; };
+        guest = { inherit port; };
       }];
     };
 
@@ -36,5 +47,7 @@ let name = "home-assistant"; in {
         extraOptions = [ "--network=host" ];
       };
     };
+
+    networking.firewall.allowedTCPPorts = [ port ];
   };
 }

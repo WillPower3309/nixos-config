@@ -3,11 +3,6 @@
   description = "Will McKinnon's personal nix configuration";
 
   outputs = inputs: inputs.flake-parts.lib.mkFlake { inherit inputs; } {
-    # Import the flake-parts modules extra which declares flake.modules
-    # with a mergeable type (lazyAttrsOf (lazyAttrsOf deferredModule))
-    # so that import-tree's many submodules can each contribute
-    # flake.modules.nixos.<name> without hitting the freeformType's
-    # "unique raw" constraint.
     imports = [
       inputs.flake-parts.flakeModules.modules
       (inputs.import-tree ./modules)

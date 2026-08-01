@@ -16,7 +16,7 @@
       power
       syncthing
       wifi
-    ] ++ [ inputs.nixos-hardware.nixosModules.framework-16-7040-amd ];
+    ];
 
     boot = {
       initrd = {
@@ -24,14 +24,30 @@
         kernelModules = [ "dm-snapshot" "amdgpu" ];
       };
       kernelModules = [ "kvm-amd" ];
+      kernelParams = [ "amdgpu.dcdebugmask=0x10" ]; # PSR hang workaround for Framework 16
+      extraModulePackages = [ config.boot.kernelPackages.framework-laptop-kmod ];
     };
 
     hardware = {
       enableAllFirmware = true;
       cpu.amd.updateMicrocode = config.hardware.enableRedistributableFirmware;
+      amdgpu.initrd.enable = true;
+      sensor.iio.enable = true;
+      keyboard.qmk.enable = true;
     };
 
-    environment.systemPackages = [ pkgs.brightnessctl ];
+    services = {
+      fwupd.enable = true;
+      fstrim.enable = true;
+      fprintd.enable = true;
+    };
+
+    services.udev.extraRules = ''
+      # Allow access to the keyboard modules for programming
+      KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="32ac", ATTRS{idProduct}=="0012", MODE="0660", GROUP="users", TAG+="uaccess", TAG+="udev-acl"
+    '';
+
+    environment.systemPackages = [ pkgs.framework-tool ];
 
     # fingerprint reader
     security.pam.services = {
@@ -47,7 +63,16 @@
       timer.enable = false; # should be a oneshot
     };
 
-    environment.etc."ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;
+    environment.etc = {
+      "ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;
+      "libinput/local-overrides.quirks".text = ''
+        [Framework Laptop 16 Keyboard Module]
+        MatchName=Framework Laptop 16 Keyboard Module*
+        MatchUdevType=keyboard
+        MatchDMIModalias=dmi:*svnFramework:pnLaptop16*
+        AttrKeyboardIntegration=internal
+      '';
+    };
   };
 }
 

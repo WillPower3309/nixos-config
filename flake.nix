@@ -43,11 +43,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    pinenote-nixos = {
-      url = "github:WeraPea/pinenote-nixos";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     rapidshell = {
       url = "github:willpower3309/rapidshell";
       inputs.nixpkgs.follows = "nixpkgs";

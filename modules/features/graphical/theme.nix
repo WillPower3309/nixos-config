@@ -16,11 +16,7 @@
     gtk = {
       enable = true;
       # TODO: font = {};
-      theme = {
-        name = "Arc-Dark";
-        # TODO: gtkThemeFromScheme, manually defined w colors? (nix-colors)
-        package = pkgs.arc-theme;
-      };
+      # TODO: theme: gtkThemeFromScheme, manually defined w colors? (nix-colors)
 
       iconTheme = {
         name = "Tela";

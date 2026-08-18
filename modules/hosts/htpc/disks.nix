@@ -1,7 +1,7 @@
 { inputs, ... }:
 
 {
-  flake.modules.nixos.tv = {
+  flake.modules.nixos.htpc = {
     imports = [ inputs.disko.nixosModules.disko ];
 
     disko.devices = {

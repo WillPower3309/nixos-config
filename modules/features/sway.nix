@@ -194,6 +194,7 @@
 
       # SwayFX settings
       extraConfig = ''
+        animation_duration_ms 250
         shadows enable
         corner_radius 12
         for_window [app_id="foot"] blur enable

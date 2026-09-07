@@ -47,7 +47,10 @@
       KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="32ac", ATTRS{idProduct}=="0012", MODE="0660", GROUP="users", TAG+="uaccess", TAG+="udev-acl"
     '';
 
-    environment.systemPackages = [ pkgs.framework-tool ];
+    environment.systemPackages = with pkgs; [
+      brightnessctl
+      framework-tool
+    ];
 
     # fingerprint reader
     security.pam.services = {

@@ -348,11 +348,11 @@
         "systems": "systems_3"
       },
       "locked": {
-        "lastModified": 1766781252,
-        "narHash": "sha256-sS2PK8Q1Pnsj4f2lZA2gJMvhDLL5mG/6hvs8EgO9IRE=",
+        "lastModified": 1788838836,
+        "narHash": "sha256-zEQyKbWVsm4MOSajui8Z0UVDPi8i34V6zqsywXq3Zmc=",
         "owner": "willpower3309",
         "repo": "rapidshell",
-        "rev": "9a9ada0b366d9fba82978964936e1ebcaee4c3a6",
+        "rev": "8b003ac14cfe5f76b5125d209d5a39cc75dd483c",
         "type": "github"
       },
       "original": {

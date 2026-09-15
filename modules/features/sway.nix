@@ -62,7 +62,9 @@
             pos = "0 1080";
             # TODO: causes flickering
             #adaptive_sync = "on";
-            render_bit_depth = "10";
+            # 10-bit breaks PipeWire screen share: browsers only support 8-bit
+            # {BGRA,BGRx,RGBA,RGBx}, negotiation fails with "no more input formats"
+            render_bit_depth = "8";
             scale = "1";
           };
           # LG 34 inch ultrawide

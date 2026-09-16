@@ -3,7 +3,7 @@
 {
   flake.nixosConfigurations = inputs.self.lib.mkNixos "x86_64-linux" "desktop";
 
-  flake.modules.nixos.desktop = { config, pkgs, lib, ... }: {
+  flake.modules.nixos.desktop = { config, lib, pkgs, ... }: {
     networking.hostName = "desktop";
 
     imports = with inputs.self.modules.nixos; [
@@ -14,47 +14,71 @@
       syncthing
     ];
 
-    boot.initrd.availableKernelModules = [ "xhci_pci" "ahci" "nvme" "usbhid" "amdgpu" ];
+    boot.initrd = {
+      availableKernelModules = [ "nvme" ];
+      kernelModules = [ "amdgpu" ];
+    };
 
     hardware = {
-      firmware = [(pkgs.runCommand "custom-firmware" {} ''
-        mkdir -p $out/lib/firmware/{amdgpu,mediatek,rtl_nic}
-
-        # AMD GPU — Radeon RX 7900 XT (Navi 31)
-        ${lib.concatStringsSep "\n" (map (g: "cp ${pkgs.linux-firmware}/lib/firmware/amdgpu/${g} $out/lib/firmware/amdgpu/") [
-          "gc_11_0_0*"
-          "sdma_6_0*"
-          "vcn_4_0*"
-          "dcn_3_2*"
-          "psp_13_0_0*"
-          "smu_13_0_0*"
-        ])}
-
-        # Mediatek MT7922 WiFi + BT
-        cp ${pkgs.linux-firmware}/lib/firmware/mediatek/{*MT7922*,*MT7961*} $out/lib/firmware/mediatek/
-
-        # Realtek RTL8125 ethernet
-        cp ${pkgs.linux-firmware}/lib/firmware/rtl_nic/rtl8125* $out/lib/firmware/rtl_nic/
-      '')];
-
-      cpu.amd.updateMicrocode = true;
+      enableAllFirmware = true;
+      cpu.amd.updateMicrocode = config.hardware.enableRedistributableFirmware;
+      amdgpu.initrd.enable = true;
     };
 
-    # TODO: convert to systemd.mounts as described in https://nixos.wiki/wiki/NFS ?
-    # TODO: move to photography module
-    fileSystems."/mnt/photos" = {
-      device = "10.1.10.6:/photos";
-      fsType = "nfs";
-      options = [ "x-systemd.automount" "noauto" "x-systemd.idle-timeout=600" ];
+    users.users.llamacpp = {
+      isSystemUser = true;
+      group = "llamacpp";
+      # ROCm needs /dev/dri which is gated by the video/render groups
+      extraGroups = [ "video" "render" ];
+    };
+    users.groups.llamacpp = { };
+
+    services.llama-cpp = {
+      enable = true;
+      package = pkgs.llama-cpp-rocm;
+      settings = {
+        # model pulled from HF at runtime into the persisted state dir
+        "models-preset" = (pkgs.formats.ini { }).generate "llama-models.ini" {
+          "qwen3.8" = {
+            hf-repo = "lmstudio-community/Qwen3.8-27B-GGUF";
+            hf-file = "Qwen3.8-27B-Q4_K_M.gguf";
+            alias = "qwen3.8";
+          };
+        };
+        # offload every layer to VRAM
+        "gpu-layers" = "all";
+        "ctx-size" = 32768;
+        # flash attention + q8_0 KV cache to keep the context window in VRAM
+        "flash-attn" = "on";
+        "cache-type-k" = "q8_0";
+        "cache-type-v" = "q8_0";
+        "ubatch-size" = 1024;
+        "batch-size" = 2048;
+        # speculative decoding using Qwen's multi-token-prediction (MTP) heads
+        "spec-type" = "draft-mtp";
+      };
     };
 
-    fileSystems."/mnt/music" = {
-      device = "10.1.10.6:/music";
-      fsType = "nfs";
-      options = [ "x-systemd.automount" "noauto" "x-systemd.idle-timeout=600" ];
-    };
+    # persist the module's state/cache dirs across boot (impermanence)
+    environment.persistence."${config.constants.persistentDir}".directories = [
+      { directory = "/var/lib/llama-cpp"; user = "llamacpp"; group = "llamacpp"; }
+      { directory = "/var/cache/llama-cpp"; user = "llamacpp"; group = "llamacpp"; }
+    ];
 
-    environment.etc."ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;
+    # the module hardens with a DynamicUser; ROCm needs the video/render
+    # groups for /dev/dri, so run as our system user instead
+    systemd.services.llama-cpp = {
+      serviceConfig = {
+        User = "llamacpp";
+        Group = "llamacpp";
+        DynamicUser = lib.mkForce false;
+        # the 7900xtx is not officially supported by ROCm, point at the closest arch
+        Environment = [
+          "HSA_OVERRIDE_GFX_VERSION=11.0.0"
+          "ROC_ENABLE_PRE_VEGA=0"
+        ];
+      };
+    };
 
     # find the device.name with `wpctl status` followed by `wpctl inspect <id>`
     services.pipewire.wireplumber = {

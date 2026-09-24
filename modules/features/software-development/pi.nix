@@ -11,8 +11,11 @@
       models.providers.${config.programs.pi-coding-agent.settings.defaultProvider} = {
         baseUrl = "http://localhost:8080/v1";
         api = "openai-completions";
-        apiKey = "llama-cpp";
-        models = [ { id = config.programs.pi-coding-agent.settings.defaultModel; } ];
+        apiKey = config.programs.pi-coding-agent.settings.defaultProvider;
+        models = [{
+          id = config.programs.pi-coding-agent.settings.defaultModel;
+          contextWindow = 64000;
+        }];
       };
     };
 

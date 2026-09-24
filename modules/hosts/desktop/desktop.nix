@@ -19,6 +19,8 @@
       kernelModules = [ "amdgpu" ];
     };
 
+    boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
+
     hardware = {
       enableAllFirmware = true;
       cpu.amd.updateMicrocode = config.hardware.enableRedistributableFirmware;
@@ -37,25 +39,33 @@
       enable = true;
       package = pkgs.llama-cpp-rocm;
       settings = {
-        # model pulled from HF at runtime into the persisted state dir
-        "models-preset" = (pkgs.formats.ini { }).generate "llama-models.ini" {
+        models-preset = (pkgs.formats.ini { }).generate "llama-models.ini" {
           "qwen3.8" = {
-            hf-repo = "lmstudio-community/Qwen3.8-27B-GGUF";
-            hf-file = "Qwen3.8-27B-Q4_K_M.gguf";
+            hf-repo = "unsloth/Qwen3.8-27B-GGUF";
+            hf-file = "Qwen3.8-27B-UD-Q4_K_M.gguf";
             alias = "qwen3.8";
           };
         };
-        # offload every layer to VRAM
-        "gpu-layers" = "all";
-        "ctx-size" = 32768;
-        # flash attention + q8_0 KV cache to keep the context window in VRAM
-        "flash-attn" = "on";
-        "cache-type-k" = "q8_0";
-        "cache-type-v" = "q8_0";
-        "ubatch-size" = 1024;
-        "batch-size" = 2048;
-        # speculative decoding using Qwen's multi-token-prediction (MTP) heads
-        "spec-type" = "draft-mtp";
+
+        gpu-layers = "-1";
+        ctx-size = 64000;
+
+        flash-attn = "on";
+        cache-type-k = "q4_0";
+        cache-type-v = "q4_0";
+
+        spec-type = "draft-mtp";
+        spec-draft-n-max = 2;
+
+        ubatch-size = 512;
+        batch-size = 512;
+
+        temperature = 1.0;
+        top-p = 0.95;
+        top-k = 20;
+        min-p = 0.05;
+        repeat-penalty = 1.0;
+        presence-penalty = 0.0;
       };
     };
 

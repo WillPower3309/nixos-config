@@ -194,7 +194,6 @@ in {
           dnsInterfaces = map interface (builtins.attrNames (lib.filterAttrs (id: net: net.dns) networks));
           internetInterfaces = map interface (builtins.attrNames (lib.filterAttrs (id: net: net.internet) networks));
           trustedInterfaces = map interface (builtins.attrNames (lib.filterAttrs (id: net: net.trusted) networks));
-          mgmtInterface = "${lanInterface}.100";
 
           fmt = interfaces:
             if interfaces == [] then ""
@@ -232,8 +231,8 @@ in {
               ''}
 
               ${lib.optionalString (trustedInterfaces != []) ''
-                iifname ${fmt trustedInterfaces} oifname "${mgmtInterface}" counter accept comment "Allow trusted to management"
-                iifname "${mgmtInterface}" oifname ${fmt trustedInterfaces} ct state { established, related } counter accept comment "Allow established back from management to trusted"
+                iifname ${fmt trustedInterfaces} oifname != ${fmt trustedInterfaces} counter accept comment "Allow trusted to any other interface"
+                iifname != ${fmt trustedInterfaces} oifname ${fmt trustedInterfaces} ct state { established, related } counter accept comment "Allow established back to trusted"
               ''}
             }
           }

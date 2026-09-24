@@ -53,8 +53,8 @@ in {
       dns = true;
     };
     # iot
-    "30" = { }; # TODO: does it need DNS?
-    # management (TODO: remove this and firewall rules when moved to VMs)
+    "30" = { };
+    # management (TODO: remove this when moved to VMs)
     "100" = { };
   };
 }

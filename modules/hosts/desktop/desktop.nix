@@ -57,8 +57,10 @@
         spec-type = "draft-mtp";
         spec-draft-n-max = 2;
 
-        ubatch-size = 512;
-        batch-size = 512;
+        reasoning-effort = "medium";
+
+        ubatch-size = 1024;
+        batch-size = 1024;
 
         temperature = 1.0;
         top-p = 0.95;

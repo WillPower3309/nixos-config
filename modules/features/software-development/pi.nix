@@ -23,5 +23,16 @@
         }];
       };
     };
+
+    home.file."${config.programs.pi-coding-agent.configDir}/mcp.json".text = ''
+      {
+        "mcpServers": {
+          "parallel-search": {
+            "url": "https://search.parallel.ai/mcp",
+            "description": "Web search"
+          }
+        }
+      }
+    '';
   };
 }

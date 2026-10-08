@@ -40,7 +40,7 @@
         "sonarr.${baseDomain}" = createNginxProxy config.services.sonarr.settings.server.port;
         "radarr.${baseDomain}" = createNginxProxy config.services.radarr.settings.server.port;
         "readarr.${baseDomain}" = createNginxProxy config.services.readarr.settings.server.port;
-        "bazarr.${baseDomain}" = createNginxProxy config.services.bazarr.listenPort;
+        "bazarr.${baseDomain}" = createNginxProxy config.services.bazarr.settings.general.port;
       };
     };
   };

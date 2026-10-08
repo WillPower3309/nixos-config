@@ -9,7 +9,7 @@ My personal nixos config
 
 ### Generic x86 (remote installation)
 1. Boot nixos through the installation media and note its IP address
-2. Generate a key pair for the given host, and move the public key to a tmp directory:
+2. Generate a key pair for the given host, and move the private key to a tmp directory:
 ```
 root=$(mktemp -d)
 mkdir -p ${root}/nix/persist/etc/ssh

@@ -73,7 +73,7 @@ in
 
     users.users.root.openssh.authorizedKeys.keys = [
       authorizedKey
-      (builtins.readFile ../../../modules/hosts/server/ssh_host_ed25519_key.pub)
+      (inputs.self.lib.hostPubKey "server")
     ];
 
     services = {

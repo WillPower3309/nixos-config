@@ -21,6 +21,8 @@
 
     boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
+    environment.etc."ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;
+
     hardware = {
       enableAllFirmware = true;
       cpu.amd.updateMicrocode = config.hardware.enableRedistributableFirmware;

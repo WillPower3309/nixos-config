@@ -29,7 +29,7 @@ let
 
   allSecrets = builtins.concatLists (
     map (name: collectSecrets (builtins.getAttr name nixosConfigs) (_: {
-      key = builtins.readFile ./modules/hosts/${name}/ssh_host_ed25519_key.pub;
+      key = flakeConfig.lib.hostPubKey name;
     })) (builtins.attrNames nixosConfigs)
     ++ map (name: collectSecrets (builtins.getAttr name homeConfigs) (_: { })) (builtins.attrNames homeConfigs)
   );

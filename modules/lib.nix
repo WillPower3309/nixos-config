@@ -27,6 +27,9 @@
       };
     };
 
+    hostPubKey = name: builtins.readFile
+      inputs.self.nixosConfigurations.${name}.config.environment.etc."ssh/ssh_host_ed25519_key.pub".source;
+
     mkMicrovmPackage = system: name: (inputs.self.lib.mkNixos system name).${name}.config.microvm.runner.qemu;
   };
 }

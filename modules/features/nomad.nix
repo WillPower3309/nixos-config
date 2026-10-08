@@ -1,8 +1,6 @@
 { config, inputs, lib, ... }:
 
 let
-  # nomad cluster nodes, keyed by hostname; every node is both a server and a client
-  # interface: the node's NIC on the cluster network, address: its address there (both configured in the host's own module)
   nodes = {
     node0 = { interface = "eth0"; address = "10.1.90.1"; };
   };
@@ -19,42 +17,67 @@ in {
     node = nodes.${config.networking.hostName} or (throw "${config.networking.hostName} is not a nomad node (see modules/features/nomad.nix)");
     seconds = s: s * 1000000000; # nomad API durations are in nanoseconds
 
-    # Nomad job (API JSON, for `nomad job run -json`) running a microvm under the raw_exec driver.
     # Adapted from https://github.com/astro/skyflake/blob/main/vm/nomad-job.nix
     mkMicrovmJob = name: vmSystem: let
-      inherit (microvms.${name}) nomad;
+      inherit (microvms.${name}) nomad vfs;
       vm = vmSystem.config;
-      # The VM's only NIC is the VF claimed below, added to qemu's args at runtime (microvm-run ignores its own
-      # arguments) so the VM definition stays host-independent; `nix run .#<name>-vm` runs it without a NIC.
-      # note: qemu only enables PCIe, which the vfio-pci device needs, because of the guest's ro-store share
+      # The VM's NICs are the VFs claimed below, added to qemu's args at runtime (microvm-run ignores its own
+      # arguments) so the VM definition stays host-independent; `nix run .#<name>-vm` runs it without NICs.
+      # note: qemu only enables PCIe, which the vfio-pci devices need, because of the guest's ro-store share
       vfioArgs = pkgs.writeShellScript "vfio-args" ''
-        echo "-device vfio-pci,host=$MICROVM_VFIO_PCI,multifunction=on"
+        for addr in $MICROVM_VFIO_PCIS; do
+          echo "-device vfio-pci,host=$addr"
+        done
       '';
       runner = (vmSystem.extendModules {
         modules = [{ microvm.extraArgsScript = "${vfioArgs}"; }];
       }).config.microvm.runner.qemu;
       workDir = "/var/lib/microvms/${name}"; # holds volume images and the qemu control socket
+      # runs as root to configure the VFs on their PF, then starts qemu as the microvm user
       hypervisor = pkgs.writeShellScript "${name}-hypervisor" ''
         set -e
-        mkdir -p ${workDir}
+        export PATH=${lib.makeBinPath [ pkgs.coreutils pkgs.util-linux pkgs.iproute2 ]}:$PATH
+        install -d -o microvm -g kvm -m 0750 ${workDir}
         cd ${workDir}
 
-        # use the first VF on this node no running qemu has. If two VMs start at once and pick the same one, the
-        # loser's qemu fails to open it (vfio devices are exclusive) and nomad restarts it onto the next
-        vf=
-        for addr in $(cat /etc/microvm-vfs); do
-          if ! ${pkgs.procps}/bin/pgrep -f "vfio-pci,host=$addr," >/dev/null; then
-            vf=$addr
-            break
-          fi
-        done
-        if [ -z "$vf" ]; then
+        # A VF is claimed by holding a flock on its lock file, so two VMs starting at once can't both take (and
+        # configure) the same one. The fds aren't close-on-exec, so qemu inherits them and the claim lasts as long
+        # as the VM; the kernel releases it when the last holder exits, so a crashed VM never leaks a VF.
+        mkdir -p /run/microvm-vfs
+        claim_vf() {
+          local addr fd
+          for addr in $(cat /etc/microvm-vfs); do
+            exec {fd}>"/run/microvm-vfs/$addr.lock"
+            if flock -n "$fd"; then
+              claimed=$addr
+              return
+            fi
+            exec {fd}>&-
+          done
           echo "No free VF on this node" >&2
-          exit 1 # nomad restarts, then reschedules the allocation
-        fi
-        echo "Using VF $vf" >&2
+          exit 1 # releases any VFs already claimed; nomad restarts, then reschedules the allocation
+        }
 
-        MICROVM_VFIO_PCI="$vf" ${runner}/bin/microvm-run &
+        # set the VF's MAC and port VLAN (0 = none), overwriting whatever the last VM to use it left
+        configure_vf() {
+          local addr=$1 mac=$2 vlan=$3 fn idx= pf
+          pf=$(ls /sys/bus/pci/devices/$addr/physfn/net)
+          for fn in /sys/bus/pci/devices/$addr/physfn/virtfn*; do
+            if [ "$(basename "$(readlink "$fn")")" = "$addr" ]; then idx=''${fn##*virtfn}; fi
+          done
+          ip link set dev "$pf" vf "$idx" mac "$mac" vlan "$vlan"
+        }
+
+        claimed_vfs=
+        ${lib.concatMapStrings (vf: ''
+          claim_vf
+          configure_vf "$claimed" ${vf.mac} ${toString (if vf.vlan == null then 0 else vf.vlan)}
+          claimed_vfs="$claimed_vfs $claimed"
+        '') vfs}
+        echo "Using VFs:$claimed_vfs" >&2
+
+        MICROVM_VFIO_PCIS="$claimed_vfs" setpriv --reuid=microvm --regid=kvm --init-groups --inh-caps=-all \
+          ${runner}/bin/microvm-run &
         pid=$!
 
         # nomad sends SIGCONT (see KillSignal) so the guest can shut down cleanly
@@ -96,8 +119,7 @@ in {
           }) nomad.constraints;
           Tasks = [{
             Name = "hypervisor";
-            Driver = "raw_exec";
-            User = "microvm";
+            Driver = "raw_exec"; # as root (the agent's user), see hypervisor above
             Config.command = "${hypervisor}";
             Leader = true;
             KillSignal = "SIGCONT";
@@ -112,7 +134,7 @@ in {
     });
   in {
     options.nomad.vfs = lib.mkOption {
-      description = "SR-IOV virtual functions on this node for the microvms scheduled here, each claiming a free one at startup as its only NIC";
+      description = "SR-IOV virtual functions on this node for the microvms scheduled here, which claim free ones at startup as their NICs (see flake.microvms.<name>.vfs)";
       type = lib.types.listOf (lib.types.submodule {
         options = {
           pciAddress = lib.mkOption { type = lib.types.str; example = "0000:03:02.0"; };
@@ -134,7 +156,9 @@ in {
         dropPrivileges = false; # raw_exec tasks run as the microvm user
         enableDocker = false;
         settings = {
+          # TODO: enable ACLs; without them anyone reaching the HTTP API can run raw_exec jobs as root
           bind_addr = "0.0.0.0";
+          addresses = lib.genAttrs [ "rpc" "serf" ] (_: node.address);
           advertise = lib.genAttrs [ "http" "rpc" "serf" ] (_: node.address);
           server = {
             enabled = true;
@@ -151,9 +175,10 @@ in {
       };
 
       # bind the VFs to vfio-pci as they appear (requires sriov_drivers_autoprobe=0 on the PF so the host
-      # driver doesn't claim them first), and tag them so their systemd device units appear once bound
+      # driver doesn't claim them first), and tag them so their systemd device units appear once bound.
       services.udev.extraRules = lib.concatMapStrings (vf: ''
-        ACTION=="add", SUBSYSTEM=="pci", KERNEL=="${vf.pciAddress}", TAG+="systemd", ATTR{driver_override}="vfio-pci", RUN+="${pkgs.bash}/bin/sh -c '${pkgs.kmod}/bin/modprobe vfio-pci && echo %k > /sys/bus/pci/drivers_probe'"
+        ACTION=="add", SUBSYSTEM=="pci", KERNEL=="${vf.pciAddress}", ATTR{driver_override}="vfio-pci", RUN+="${pkgs.bash}/bin/sh -c '${pkgs.kmod}/bin/modprobe vfio-pci && echo %k > /sys/bus/pci/drivers_probe'"
+        SUBSYSTEM=="pci", KERNEL=="${vf.pciAddress}", DRIVER=="vfio-pci", TAG+="systemd"
       '') cfg.vfs + ''
         SUBSYSTEM=="vfio", GROUP="kvm", MODE="0660"
       '';

@@ -3,9 +3,10 @@
 let
   hostName = "home-assistant";
   macAddress = "02:00:00:00:00:01";
+  persistentDir = "/persist";
 
 in {
-  flake.microvms.${hostName} = { };
+  flake.microvms.${hostName}.vfs = [{ mac = macAddress; vlan = 10; }];
 
   flake.networks."10".reservations = [{
     ip-address = "10.1.10.11";
@@ -21,7 +22,6 @@ in {
 
     networking = {
       inherit hostName;
-      interfaces.eth0 = { inherit macAddress; };
       firewall.allowedTCPPorts = [ 8123 ];
     };
 
@@ -29,11 +29,18 @@ in {
       vcpu = 1;
       mem = 4096;
       # TODO: Move to seaweedfs
-      volumes = [{
-        image = "var-lib-containers.img"; # relative to the nomad job's workDir, /var/lib/microvms/home-assistant (persisted)
-        mountPoint = "/var/lib/containers"; # image is too big to store in microvm memory
-        size = 8192;
-      }];
+      volumes = [
+        {
+          image = "var-lib-containers.img";
+          mountPoint = "/var/lib/containers";
+          size = 8192;
+        }
+        {
+          image = "persist.img";
+          mountPoint = persistentDir;
+          size = 64;
+        }
+      ];
     };
 
     virtualisation.oci-containers = {
@@ -43,6 +50,7 @@ in {
         # Note: The image will not be updated on rebuilds, unless the version label changes
         image = "ghcr.io/home-assistant/home-assistant:stable";
         extraOptions = [ "--network=host" ];
+        volumes = [ "${persistentDir}:/config" ];
       };
     };
   };

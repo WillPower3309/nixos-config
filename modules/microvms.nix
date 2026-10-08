@@ -16,8 +16,28 @@ let
     };
   };
 
+  vfType = lib.types.submodule {
+    options = {
+      mac = lib.mkOption {
+        type = lib.types.str;
+        description = "MAC address the host sets on the VF (the guest can't change it)";
+      };
+      vlan = lib.mkOption {
+        type = lib.types.nullOr (lib.types.ints.between 1 4094);
+        default = null;
+        description = "port VLAN the NIC tags/untags in hardware, confining the guest to it. null leaves the VF on the raw trunk, where the guest can tag any VLAN";
+      };
+    };
+  };
+
   microvmType = lib.types.submodule {
     options = {
+      vfs = lib.mkOption {
+        type = lib.types.listOf vfType;
+        default = [];
+        description = "SR-IOV VFs passed through as the VM's NICs, in order (see modules/features/nomad.nix)";
+      };
+
       nomad.constraints = lib.mkOption {
         type = lib.types.listOf constraintType;
         default = [];
@@ -26,7 +46,6 @@ let
     };
   };
 in {
-  # microvms defined in modules/vms/, keyed by the name of their flake.modules.nixos entry
   options.flake.microvms = lib.mkOption {
     type = lib.types.lazyAttrsOf microvmType;
     default = {};

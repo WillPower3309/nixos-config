@@ -3,15 +3,18 @@
 let
   authorizedKey = builtins.readFile ../../features/ssh-client/id_ed25519.pub;
   lanInterface = "sfp0";
+  lanVlan = 10;
+  lanVlanInterface = "${lanInterface}.${toString lanVlan}";
   clusterInterface = "eth0";
   numSfpVfs = 16;
 
+  # lanMacAddress should point to an SR-IOV capable PF
   nodes = {
     node0 = {
       lanIpAddress = "10.1.10.3";
-      lanMacAddress = "38:05:25:31:58:aa"; # SR-IOV PF (host + VMs)
+      lanMacAddress = "38:05:25:31:58:aa";
       clusterIpAddress = "10.1.90.1";
-      clusterMacAddress = "38:05:25:31:58:ac"; # nomad cluster networking
+      clusterMacAddress = "38:05:25:31:58:ac";
     };
   };
 
@@ -46,10 +49,10 @@ in {
       nomad
     ];
 
-    # any other physical ethernet device is removed from the PCI bus
+    # any unused physical ethernet device is removed from the PCI bus
     # auto-authorize connected USB4 devices so network interfaces appear without manual intervention
     services.udev.extraRules = ''
-      ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="${node.lanMacAddress}", NAME="${lanInterface}", RUN+="${pkgs.bash}/bin/sh -c 'echo 0 > /sys/class/net/${lanInterface}/device/sriov_drivers_autoprobe && echo ${toString numSfpVfs} > /sys/class/net/${lanInterface}/device/sriov_numvfs'"
+      ACTION=="add", SUBSYSTEM=="net", ENV{DEVTYPE}!="vlan", ATTR{address}=="${node.lanMacAddress}", NAME="${lanInterface}", RUN+="${pkgs.bash}/bin/sh -c 'echo 0 > /sys/class/net/${lanInterface}/device/sriov_drivers_autoprobe && echo ${toString numSfpVfs} > /sys/class/net/${lanInterface}/device/sriov_numvfs'"
       ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="${node.clusterMacAddress}", NAME="${clusterInterface}"
       ACTION=="add", SUBSYSTEM=="net", KERNEL=="eth*", ATTR{address}!="${node.lanMacAddress}|${node.clusterMacAddress}", TEST=="device/remove", RUN+="${pkgs.bash}/bin/sh -c 'echo 1 > /sys/class/net/%k/device/remove'"
       ACTION=="add", SUBSYSTEM=="thunderbolt", ATTR{authorized}=="0", ATTR{authorized}="1"
@@ -59,7 +62,7 @@ in {
     nomad.vfs = sfpVfPcis;
 
     # nomad web UI / API from the LAN (cluster ports stay on ${clusterInterface}, see modules/features/nomad.nix)
-    networking.firewall.interfaces.${lanInterface}.allowedTCPPorts = [ 4646 ];
+    networking.firewall.interfaces.${lanVlanInterface}.allowedTCPPorts = [ 4646 ];
 
     networking = {
       inherit hostName;
@@ -71,9 +74,28 @@ in {
     # TODO: fallback routing for mesh network: https://pve.proxmox.com/wiki/Full_Mesh_Network_for_Ceph_Server#Routed_Setup_(with_Fallback)
     systemd.network = {
       enable = true;
+      netdevs."20-${lanVlanInterface}" = {
+        netdevConfig = {
+          Kind = "vlan";
+          Name = lanVlanInterface;
+        };
+        vlanConfig.Id = lanVlan;
+      };
       networks = {
         "10-${lanInterface}" = {
-          matchConfig.MACAddress = node.lanMacAddress; # match macAddress to ensure it works in initrd conf too
+          # match macAddress to ensure it works in initrd conf too; Type excludes the VLAN interface, which shares it
+          matchConfig = {
+            MACAddress = node.lanMacAddress;
+            Type = "ether";
+          };
+          networkConfig = {
+            VLAN = [ lanVlanInterface ];
+            LinkLocalAddressing = "no";
+          };
+          linkConfig.RequiredForOnline = "carrier";
+        };
+        "15-${lanVlanInterface}" = {
+          matchConfig.Name = lanVlanInterface;
           DHCP = "no";
           address = [ "${node.lanIpAddress}/24" ];
           gateway = [ "10.1.10.1" ];
@@ -91,12 +113,16 @@ in {
       kernelParams = [ "intel_iommu=on" "iommu=pt" ];
 
       initrd = {
-        kernelModules = [ "i40e" ];
+        kernelModules = [ "i40e" "8021q" ];
         systemd = {
           enable = true;
           network = {
             enable = true;
-            networks."10-${lanInterface}" = config.systemd.network.networks."10-${lanInterface}";
+            netdevs."20-${lanVlanInterface}" = config.systemd.network.netdevs."20-${lanVlanInterface}";
+            networks = {
+              "10-${lanInterface}" = config.systemd.network.networks."10-${lanInterface}";
+              "15-${lanVlanInterface}" = config.systemd.network.networks."15-${lanVlanInterface}";
+            };
           };
           users.root.shell = "${pkgs.util-linux}/bin/nologin"; # block interactive shell access
         };

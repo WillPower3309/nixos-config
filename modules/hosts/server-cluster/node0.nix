@@ -17,7 +17,7 @@ let
       func = builtins.sub idx (8 * builtins.div idx 8);
       bdf = "0000:03:0${toString dev}.${toString func}";
     in
-      { inherit idx bdf; deviceUnit = "sys-devices-pci0000:00-0000:00:06.2-${bdf}.device"; }
+      { pciAddress = bdf; deviceUnit = "sys-devices-pci0000:00-0000:00:06.2-${bdf}.device"; }
   ) numSfpVfs;
 
 # TODO: router VF will need `trust on`
@@ -35,6 +35,7 @@ in {
     imports = with inputs.self.modules.nixos; [
       common
       ssh-server
+      nomad
     ];
 
     # 38:05:25:31:58:aa -> SR-IOV PF (host + VMs)
@@ -43,12 +44,19 @@ in {
     # 38:05:25:31:58:ad -> (BLACKLISTED) intel AMT ethernet port
     # auto-authorize connected USB4 devices so network interfaces appear without manual intervention
     services.udev.extraRules = ''
-      ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="${sfpMacAddress}", NAME="${sfpInterface}", RUN+="${pkgs.bash}/bin/sh -c '${pkgs.coreutils}/bin/echo ${toString numSfpVfs} > /sys/class/net/${sfpInterface}/device/sriov_numvfs'"
+      ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="${sfpMacAddress}", NAME="${sfpInterface}", RUN+="${pkgs.bash}/bin/sh -c 'echo 0 > /sys/class/net/${sfpInterface}/device/sriov_drivers_autoprobe && echo ${toString numSfpVfs} > /sys/class/net/${sfpInterface}/device/sriov_numvfs'"
       ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="38:05:25:31:58:ac", NAME="${rj45Interface}"
       ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="38:05:25:31:58:ab", RUN+="${pkgs.bash}/bin/sh -c 'echo 1 > /sys/class/net/%k/device/remove'"
       ACTION=="add", SUBSYSTEM=="net", ATTR{address}=="38:05:25:31:58:ad", RUN+="${pkgs.bash}/bin/sh -c 'echo 1 > /sys/class/net/%k/device/remove'"
       ACTION=="add", SUBSYSTEM=="thunderbolt", ATTR{authorized}=="0", ATTR{authorized}="1"
     '';
+
+    # VFs are bound to vfio-pci (not the host's iavf driver) and passed through to the microvms.
+    # Their MACs are deliberately not set here: i40e then lets each guest set its own (see modules/vms/_common.nix)
+    nomad.vfs = sfpVfPcis;
+
+    # nomad web UI / API from the LAN (cluster ports stay on ${rj45Interface}, see modules/features/nomad.nix)
+    networking.firewall.interfaces.${sfpInterface}.allowedTCPPorts = [ 4646 ];
 
     networking = {
       inherit hostName;

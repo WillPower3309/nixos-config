@@ -2,7 +2,7 @@
 My personal nixos config
 
 ## Features
-- **Secrets** are managed through [agenix](https://github.com/ryantm/agenix). The `./secrets.nix` file is located in the repository root, and iterates through the nixos and home-manager configurations to dynamically generate the path and public keys associated with each `.age` file across the repository
+- **Secrets** are managed through [agenix](https://github.com/ryantm/agenix). The `./agenix-rules.nix` file is located in the repository root, and iterates through the nixos and home-manager configurations to dynamically generate the path and public keys associated with each `.age` file across the repository
 - **Deployments** are performed with [deploy-rs](https://github.com/serokell/deploy-rs). This configuration is dynamically generated for all hosts in `./modules/deploy.nix`
 
 ## Installation

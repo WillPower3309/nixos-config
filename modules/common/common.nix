@@ -28,7 +28,7 @@
       publicKey = inputs.self.lib.hostPubKey name;
     }) inputs.self.nixosConfigurations;
 
-    # secrets.nix and knownHosts read each host's public key from here
+    # agenix-rules.nix and knownHosts read each host's public key from here
     assertions = [{
       assertion = config.environment.etc ? "ssh/ssh_host_ed25519_key.pub";
       message = ''environment.etc."ssh/ssh_host_ed25519_key.pub".source must point to the host's public key'';

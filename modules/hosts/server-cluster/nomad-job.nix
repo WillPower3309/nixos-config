@@ -2,18 +2,20 @@
 
 let
   pkgs = inputs.nixpkgs.legacyPackages."x86_64-linux";
-  # every microvm from modules/vms/ is scheduled on the cluster (see modules/microvms.nix)
-  microvms = config.flake.microvms;
-  vmSystems = lib.mapAttrs (name: _: (inputs.self.lib.mkNixos "x86_64-linux" name).${name}) microvms;
-in {
+  # the same nomad the nodes run (services.nomad.package defaults to it), which is unfree
+  nomad = (import inputs.nixpkgs {
+    system = "x86_64-linux";
+    config.allowUnfreePredicate = pkg: lib.getName pkg == "nomad";
+  }).nomad;
+
   # Builds the nomad job spec (and the hypervisor script) that runs the microvm
   # Inspired by https://github.com/astro/skyflake/blob/main/nixos-modules/nomad-job.nix
-  config.flake.lib.mkNomadJob = { name, vmSystem, vfs, constraints }:
+  mkNomadJob = name: microvm:
     let
       seconds = s: s * 1000000000; # nomad API durations are in nanoseconds
+      vmSystem = (inputs.self.lib.mkNixos "x86_64-linux" name).${name};
       vm = vmSystem.config;
-      # The VM's NICs are the VFs claimed below, added to qemu's args at runtime (microvm-run ignores its own
-      # arguments) so the VM definition stays host-independent; `nix run .#<name>-vm` runs it without NICs.
+      # The VM's NICs are the VFs claimed below, added to qemu's args at runtime
       # note: qemu only enables PCIe, which the vfio-pci devices need, because of the guest's ro-store share
       vfioArgs = pkgs.writeShellScript "vfio-args" ''
         for addr in $MICROVM_VFIO_PCIS; do
@@ -31,40 +33,28 @@ in {
         install -d -o microvm -g kvm -m 0750 ${workDir}
         cd ${workDir}
 
-        # A VF is claimed by holding a flock on its lock file, so two VMs starting at once can't both take (and
-        # configure) the same one. The fds aren't close-on-exec, so qemu inherits them and the claim lasts as long
-        # as the VM; the kernel releases it when the last holder exits, so a crashed VM never leaks a VF.
+        # A VF is claimed by holding a flock on its lock file, so two VMs starting at once can't both take the same one
+        # The fds aren't close-on-exec, so qemu inherits them and the claim lasts as long as the VM
         mkdir -p /run/microvm-vfs
         claim_vf() {
-          local addr fd
-          for addr in $(cat /etc/microvm-vfs); do
+          local mac=$1 vlan=$2 addr pf idx fd
+          while read -r addr pf idx; do
             exec {fd}>"/run/microvm-vfs/$addr.lock"
             if flock -n "$fd"; then
-              claimed=$addr
+              ip link set dev "$pf" vf "$idx" mac "$mac" vlan "$vlan"
+              claimed_vfs="$claimed_vfs $addr"
               return
             fi
             exec {fd}>&-
-          done
+          done </etc/microvm-vfs
           echo "No free VF on this node" >&2
           exit 1 # releases any VFs already claimed; nomad restarts, then reschedules the allocation
         }
 
-        # set the VF's MAC and port VLAN (0 = none), overwriting whatever the last VM to use it left
-        configure_vf() {
-          local addr=$1 mac=$2 vlan=$3 fn idx= pf
-          pf=$(ls /sys/bus/pci/devices/$addr/physfn/net)
-          for fn in /sys/bus/pci/devices/$addr/physfn/virtfn*; do
-            if [ "$(basename "$(readlink "$fn")")" = "$addr" ]; then idx=''${fn##*virtfn}; fi
-          done
-          ip link set dev "$pf" vf "$idx" mac "$mac" vlan "$vlan"
-        }
-
         claimed_vfs=
         ${lib.concatMapStrings (vf: ''
-          claim_vf
-          configure_vf "$claimed" ${vf.mac} ${toString (if vf.vlan == null then 0 else vf.vlan)}
-          claimed_vfs="$claimed_vfs $claimed"
-        '') vfs}
+          claim_vf ${vf.mac} ${toString (if vf.vlan == null then 0 else vf.vlan)}
+        '') microvm.vfs}
         echo "Using VFs:$claimed_vfs" >&2
 
         MICROVM_VFIO_PCIS="$claimed_vfs" setpriv --reuid=microvm --regid=kvm --init-groups --inh-caps=-all \
@@ -86,6 +76,7 @@ in {
         Name = name;
         Type = "service";
         Datacenters = [ "*" ];
+        Meta.managed-by = "nixos"; # lets nomad-sync find (and remove) jobs dropped from the flake
         TaskGroups = [{
           Name = name;
           Count = 1;
@@ -107,7 +98,7 @@ in {
             LTarget = constraint.attribute;
             Operand = constraint.operator;
             RTarget = constraint.value;
-          }) constraints;
+          }) microvm.nomad.constraints;
           Tasks = [{
             Name = "hypervisor";
             Driver = "raw_exec"; # as root (the agent's user), see hypervisor above
@@ -124,29 +115,42 @@ in {
       };
     });
 
-  # Registers a systemd oneshot per microvm that submits the job to the cluster; hosts that run nomad
-  # clients import this (see server-cluster.nix).
-  config.flake.modules.nixos.nomad-job = { config, ... }: {
-    # note: `nomad job run` is a no-op when the job is unchanged
-    systemd.services = lib.mapAttrs' (name: vm: lib.nameValuePair "nomad-job-${name}" {
-      after = [ "nomad.service" ];
-      requires = [ "nomad.service" ];
-      wantedBy = [ "multi-user.target" ];
-      path = [ config.services.nomad.package ];
-      serviceConfig = {
-        Type = "oneshot";
-        RemainAfterExit = true;
-        Restart = "on-failure"; # retry until the cluster has elected a leader
-        RestartSec = 10;
-      };
-      script = "nomad job run -detach -json ${
-        inputs.self.lib.mkNomadJob {
-          inherit name;
-          vmSystem = vm;
-          vfs = microvms.${name}.vfs;
-          constraints = microvms.${name}.nomad.constraints;
-        }
-      }";
-    }) vmSystems;
+  # Every node keeps all job closures, so whichever one nomad picks already has the VM's store paths
+  jobs = pkgs.linkFarm "nomad-jobs"
+    (lib.mapAttrs' (name: microvm: lib.nameValuePair "${name}.json" (mkNomadJob name microvm)) config.flake.microvms);
+
+  nomadSync = pkgs.writeShellApplication {
+    name = "nomad-sync";
+    runtimeInputs = [ nomad pkgs.jq ];
+    text = ''
+      if [ $# -ne 1 ]; then
+        echo "usage: nomad-sync <node host>" >&2
+        exit 1
+      fi
+      export NOMAD_ADDR=http://$1:4646
+      shopt -s nullglob
+
+      # `nomad job run` is a no-op for unchanged jobs, so only changed VMs are touched
+      for job in ${jobs}/*.json; do
+        nomad job run -detach -json "$job"
+      done
+
+      nomad operator api '/v1/jobs?meta=true' </dev/null \
+        | jq -r '.[] | select(.Meta."managed-by" == "nixos") | .ID' \
+        | while read -r id; do
+            if [ ! -e "${jobs}/$id.json" ]; then
+              echo "Stopping removed job $id" >&2
+              nomad job stop -detach -purge -yes "$id" </dev/null
+            fi
+          done
+    '';
+  };
+in {
+  config.flake.modules.nixos.nomad-job.system.extraDependencies = [ jobs ];
+
+  config.flake.apps.x86_64-linux.nomad-sync = {
+    type = "app";
+    program = "${nomadSync}/bin/nomad-sync";
+    meta.description = "Submit the microvm jobs to the nomad cluster and stop removed ones";
   };
 }

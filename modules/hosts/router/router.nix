@@ -17,11 +17,30 @@ let
     (reservations: lib.lists.flatten reservations)
   ];
 
+  reservationNames = map (reservation: reservation.hostname) allReservations;
+  proxyNames = lib.concatMap (microvm: lib.attrNames microvm.proxy) (lib.attrValues inputs.self.microvms);
+
+  proxyAddress = (lib.findFirst (reservation: reservation.hostname == "reverse-proxy")
+    (throw "no reservation for reverse-proxy") allReservations).ip-address;
+
+  # dynamic leases start here, so a new reservation (below it) can't collide with an address already leased
+  poolStart = 100;
+  hostPart = ipAddress: lib.toInt (lib.last (lib.splitString "." ipAddress));
+
 in {
   flake.nixosConfigurations = inputs.self.lib.mkNixos "x86_64-linux" "router";
 
   flake.modules.nixos.router = { config, pkgs, lib, ... }: {
     networking.hostName = "router";
+
+    # a reservation's redirect zone would shadow a proxy record with the same name
+    assertions = [{
+      assertion = lib.intersectLists proxyNames reservationNames == [];
+      message = "microvm proxy names can't be reservation hostnames: ${toString (lib.intersectLists proxyNames reservationNames)}";
+    }] ++ map (reservation: {
+      assertion = hostPart reservation.ip-address < poolStart;
+      message = "reservation ${reservation.hostname} (${reservation.ip-address}) must be below the DHCP pool (.${toString poolStart})";
+    }) allReservations;
 
     imports = with inputs.self.modules.nixos; [
       common
@@ -279,13 +298,7 @@ in {
         subnet4 = lib.mapAttrsToList (id: net: {
           id = lib.toInt id;
           subnet = "10.1.${id}.0/24";
-          pools = let
-            maxHost = builtins.foldl' (a: b: if a > b then a else b) 0 (map (
-              r: lib.toInt (lib.last (lib.splitString "." r.ip-address))
-            ) net.reservations);
-          in [{
-            pool = "10.1.${id}.${toString (maxHost + 1)} - 10.1.${id}.254";
-          }];
+          pools = [{ pool = "10.1.${id}.${toString poolStart} - 10.1.${id}.254"; }];
 
           reservations-in-subnet = true;
           reservations-global = false;
@@ -308,8 +321,8 @@ in {
       settings = {
         server = {
           interface = [ config.constants.loopbackAddr ] ++ (map (id: "10.1.${id}.1") (builtins.attrNames networks));
-          access-control = [ "0.0.0.0/0 refuse" "127.0.0.0/8 allow" ]
-            ++ (map (id: "10.1.${id}.0/24 allow") (builtins.attrNames (lib.filterAttrs (id: net: net.dns) networks)));
+          access-control = [ "0.0.0.0/0 refuse" "127.0.0.0/8 allow" ] ++
+            (map (id: "10.1.${id}.0/24 allow") (builtins.attrNames (lib.filterAttrs (id: net: net.dns) networks)));
 
           port = 53;
           hide-identity = true;
@@ -331,10 +344,12 @@ in {
           ] ++ map (reservation: "${reservation.hostname}.${config.networking.domain} redirect") allReservations;
 
           local-data = [
-            ''"router.${config.networking.domain} IN A 10.1.10.1"''
+            ''"router.${config.networking.domain} IN A 10.1.10.1"'' # TODO: 10.1.10.${id}.1?
           ] ++ map (reservation:
             ''"${reservation.hostname}.${config.networking.domain} IN A ${reservation.ip-address}"''
-          ) allReservations;
+          ) allReservations ++ map (name:
+            ''"${name}.${config.networking.domain} IN A ${proxyAddress}"''
+          ) proxyNames;
         };
 
         forward-zone = [{

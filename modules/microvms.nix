@@ -30,12 +30,30 @@ let
     };
   };
 
+  proxyType = lib.types.submodule {
+    options = {
+      port = lib.mkOption { type = lib.types.port; };
+      scheme = lib.mkOption {
+        type = lib.types.enum [ "http" "https" ];
+        default = "http";
+        description = "protocol the VM serves on port (https upstream certificates aren't verified)";
+      };
+    };
+  };
+
   microvmType = lib.types.submodule {
     options = {
       vfs = lib.mkOption {
         type = lib.types.listOf vfType;
         default = [];
         description = "SR-IOV VFs passed through as the VM's NICs, in order (see modules/hosts/server-cluster/nomad-job.nix)";
+      };
+
+      proxy = lib.mkOption {
+        type = lib.types.attrsOf proxyType;
+        default = {};
+        example = { ha.port = 8123; };
+        description = "services the reverse-proxy VM serves as <name>.<domain>, proxied to the VM's first NIC. Names can't be reservation hostnames, which resolve to the machine (asserted by the router)";
       };
 
       nomad.constraints = lib.mkOption {

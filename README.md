@@ -4,6 +4,7 @@ My personal nixos config
 ## Features
 - **Secrets** are managed through [agenix](https://github.com/ryantm/agenix). The `./agenix-rules.nix` file is located in the repository root, and iterates through the nixos and home-manager configurations to dynamically generate the path and public keys associated with each `.age` file across the repository
 - **Deployments** are performed with [deploy-rs](https://github.com/serokell/deploy-rs). This configuration is dynamically generated for all hosts in `./modules/deploy.nix`
+- **VMs** in `./modules/vms/` run on the server cluster as [nomad](https://www.nomadproject.io/) jobs. After deploying the cluster nodes (so they have the VMs' closures), submit the jobs through any node with `nix run .#nomad-sync -- <NODE_HOST>` (e.g. `node0.willmckinnon.com`). Only added or changed VMs are restarted, and VMs removed from the flake are stopped
 
 ## Installation
 

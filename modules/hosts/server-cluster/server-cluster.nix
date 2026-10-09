@@ -27,7 +27,7 @@ let
       func = builtins.sub idx (8 * builtins.div idx 8);
       bdf = "0000:03:0${toString dev}.${toString func}";
     in
-      { pciAddress = bdf; deviceUnit = "sys-devices-pci0000:00-0000:00:06.2-${bdf}.device"; }
+      { pciAddress = bdf; inherit idx; deviceUnit = "sys-devices-pci0000:00-0000:00:06.2-${bdf}.device"; }
   ) numVfs;
 
   # TODO: router VF will need `trust on`
@@ -190,8 +190,8 @@ in {
 
     environment = {
       etc = {
-        # this node's VFs, one PCI address per line, which the hypervisor scripts claim from
-        microvm-vfs.text = lib.concatMapStrings (vf: "${vf.pciAddress}\n") sfpVfPcis;
+        # this node's VFs, one "<PCI address> <PF> <VF index>" per line, which the hypervisor scripts claim from
+        microvm-vfs.text = lib.concatMapStrings (vf: "${vf.pciAddress} ${lanInterface} ${toString vf.idx}\n") sfpVfPcis;
         "ssh/ssh_host_ed25519_key.pub".source = ./ssh_host_ed25519_key.pub;
       };
       persistence.${config.constants.persistentDir}.directories = [

@@ -20,7 +20,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    impermanence.url = "github:nix-community/impermanence";
+    impermanence = {
+      url = "github:nix-community/impermanence";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     deploy-rs = {
       url = "github:serokell/deploy-rs";
@@ -30,11 +33,10 @@
     agenix = {
       url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.home-manager.follows = "home-manager";
     };
 
     disko = {
-      url = "github:nix-community/disko";
+      url = "github:nix-community/disko/e0ec3e9e7535eba1d6d453184afff216fcbe881c";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -50,6 +52,11 @@
 
     microvm = {
       url = "github:microvm-nix/microvm.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    unifi-os-server = {
+      url = "github:rcambrj/unifi-os-server";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };

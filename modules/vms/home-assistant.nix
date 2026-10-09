@@ -4,9 +4,13 @@ let
   hostName = "home-assistant";
   macAddress = "02:00:00:00:00:01";
   persistentDir = "/persist";
+  uiPort = 8123;
 
 in {
-  flake.microvms.${hostName}.vfs = [{ mac = macAddress; vlan = 10; }];
+  flake.microvms.${hostName} = {
+    vfs = [{ mac = macAddress; vlan = 10; }];
+    proxy.ha.port = uiPort;
+  };
 
   flake.networks."10".reservations = [{
     ip-address = "10.1.10.11";
@@ -22,7 +26,7 @@ in {
 
     networking = {
       inherit hostName;
-      firewall.allowedTCPPorts = [ 8123 ];
+      firewall.allowedTCPPorts = [ uiPort ];
     };
 
     microvm = {

@@ -35,7 +35,7 @@ let
       vfs = lib.mkOption {
         type = lib.types.listOf vfType;
         default = [];
-        description = "SR-IOV VFs passed through as the VM's NICs, in order (see modules/features/nomad.nix)";
+        description = "SR-IOV VFs passed through as the VM's NICs, in order (see modules/hosts/server-cluster/nomad-job.nix)";
       };
 
       nomad.constraints = lib.mkOption {

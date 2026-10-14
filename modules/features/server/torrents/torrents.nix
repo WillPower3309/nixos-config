@@ -68,6 +68,7 @@
     # add transmission to the wireguard network namespace
     systemd.services = {
       transmission = {
+        bindsTo = [ "wireguard-${wgInterface}.service" ];
         after = [ "wireguard-${wgInterface}.service" ];
         serviceConfig.NetworkNamespacePath = "/var/run/netns/${wgNamespace}";
       };
@@ -108,6 +109,8 @@
         presharedKeyFile = config.age.secrets.wireguardPeerPresharedKey.path;
         allowedIPs = [ "0.0.0.0/0" "::/0" ];
         persistentKeepalive = 15;
+        dynamicEndpointRefreshSeconds = 300;
+        dynamicEndpointRefreshRestartSeconds = 5;
       }];
       preSetup = [ "${pkgs.iproute2}/bin/ip netns add ${wgNamespace} || true" ];
       postSetup = [ "${pkgs.iproute2}/bin/ip -n ${wgNamespace} link set lo up" ];

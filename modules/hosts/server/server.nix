@@ -43,6 +43,7 @@ in
         systemd = {
           enable = true;
           users.root.shell = "${pkgs.util-linux}/bin/nologin"; # block interactive shell access
+          storePaths = [ config.boot.initrd.systemd.users.root.shell ];
         };
 
         network = {

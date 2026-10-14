@@ -17,6 +17,12 @@
 
     baseDomain = config.networking.domain;
 
+    ignorePatterns = [
+      ".trash"
+      ".Trash-1000"
+      ".DS_Store"
+    ];
+
     genDevice = hostName: id: { id = id; addresses = [ "tcp://${hostName}.${baseDomain}:22000" ]; };
 
   in {
@@ -55,10 +61,12 @@
             "keepass" = {
               path = "${folderDir}/keepass";
               devices = allDevices;
+              ignorePatterns = ignorePatterns;
             };
             "notes" = {
               path = "${folderDir}/notes";
               devices = allDevices;
+              ignorePatterns = ignorePatterns ++ [ ".obsidian" ];
             };
           };
         };

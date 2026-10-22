@@ -49,6 +49,8 @@
           };
         };
 
+        sleep-idle-seconds = 300;
+
         gpu-layers = "-1";
         ctx-size = 64000;
 

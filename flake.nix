@@ -28,6 +28,7 @@
     deploy-rs = {
       url = "github:serokell/deploy-rs";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-compat.follows = "";
     };
 
     agenix = {
@@ -48,16 +49,7 @@
     lanzaboote = {
       url = "github:nix-community/lanzaboote"; # TODO: use next stable release
       inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    microvm = {
-      url = "github:microvm-nix/microvm.nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    unifi-os-server = {
-      url = "github:rcambrj/unifi-os-server";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.pre-commit.inputs.flake-compat.follows = "";
     };
   };
 }

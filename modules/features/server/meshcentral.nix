@@ -1,10 +1,7 @@
 { inputs, ... }:
 
 {
-  flake.modules.nixos.meshcentral = { config, ... }: let
-    baseDomain = config.networking.fqdn;
-
-  in {
+  flake.modules.nixos.meshcentral = { config, ... }: let baseDomain = config.networking.fqdn; in {
     services = {
       meshcentral = {
         enable = true;
@@ -58,5 +55,26 @@
       user = "meshcentral";
       group = "meshcentral";
     }];
+
+    # Old Intel AMT firmware (no RFC 5746 secure renegotiation) is rejected by
+    # modern OpenSSL by default, so allow legacy TLS renegotiation for this service only.
+    systemd.services.meshcentral.serviceConfig.Environment = [
+      "OPENSSL_CONF=/etc/openssl-meshcentral.cnf"
+    ];
+
+    environment.etc."openssl-meshcentral.cnf".text = ''
+      openssl_conf = openssl_init
+
+      [openssl_init]
+      ssl_conf = ssl_sect
+
+      [ssl_sect]
+      system_default = system_default_sect
+
+      [system_default_sect]
+      MinProtocol = TLSv1
+      CipherString = DEFAULT:@SECLEVEL=0
+      Options = UnsafeLegacyRenegotiation
+    '';
   };
 }

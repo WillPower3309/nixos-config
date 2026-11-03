@@ -2,8 +2,6 @@
 
 # TODO: prometheus and grafana, map Prometheus metrics collection exporters to trace live CAKE drop rates and queue latencies onto Grafana
 let
-  authorizedKey = builtins.readFile ../../features/ssh-client/id_ed25519.pub;
-
   wanInterface = "wan0";
   lanInterface = "lan0";
 
@@ -17,12 +15,6 @@ let
     (reservations: lib.lists.flatten reservations)
   ];
 
-  reservationNames = map (reservation: reservation.hostname) allReservations;
-  proxyNames = lib.concatMap (microvm: lib.attrNames microvm.proxy) (lib.attrValues inputs.self.microvms);
-
-  proxyAddress = (lib.findFirst (reservation: reservation.hostname == "reverse-proxy")
-    (throw "no reservation for reverse-proxy") allReservations).ip-address;
-
   # dynamic leases start here, so a new reservation (below it) can't collide with an address already leased
   poolStart = 100;
   hostPart = ipAddress: lib.toInt (lib.last (lib.splitString "." ipAddress));
@@ -33,11 +25,7 @@ in {
   flake.modules.nixos.router = { config, pkgs, lib, ... }: {
     networking.hostName = "router";
 
-    # a reservation's redirect zone would shadow a proxy record with the same name
-    assertions = [{
-      assertion = lib.intersectLists proxyNames reservationNames == [];
-      message = "microvm proxy names can't be reservation hostnames: ${toString (lib.intersectLists proxyNames reservationNames)}";
-    }] ++ map (reservation: {
+    assertions = map (reservation: {
       assertion = hostPart reservation.ip-address < poolStart;
       message = "reservation ${reservation.hostname} (${reservation.ip-address}) must be below the DHCP pool (.${toString poolStart})";
     }) allReservations;
@@ -347,9 +335,7 @@ in {
             ''"router.${config.networking.domain} IN A 10.1.10.1"'' # TODO: 10.1.10.${id}.1?
           ] ++ map (reservation:
             ''"${reservation.hostname}.${config.networking.domain} IN A ${reservation.ip-address}"''
-          ) allReservations ++ map (name:
-            ''"${name}.${config.networking.domain} IN A ${proxyAddress}"''
-          ) proxyNames;
+          ) allReservations;
         };
 
         forward-zone = [{

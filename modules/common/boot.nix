@@ -25,8 +25,6 @@
         efi.canTouchEfiVariables = true;
       };
 
-      initrd.systemd.enable = true;
-
       tmp = {
         useTmpfs = true; # true lets us configure the size below
         tmpfsSize = "50%";

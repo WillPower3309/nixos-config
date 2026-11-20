@@ -38,9 +38,12 @@
     users.groups.llamacpp = { };
 
     services.llama-cpp = {
+      # TODO: api-key (age secret) + real apiKey in pi, server has no auth otherwise
       enable = true;
       package = pkgs.llama-cpp-rocm;
+      openFirewall = true;
       settings = {
+        host = "0.0.0.0";
         models-preset = (pkgs.formats.ini { }).generate "llama-models.ini" {
           "qwen3.8" = {
             hf-repo = "unsloth/Qwen3.8-27B-GGUF";

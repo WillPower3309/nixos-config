@@ -14,7 +14,7 @@
       '';
 
       models.providers.${config.programs.pi-coding-agent.settings.defaultProvider} = {
-        baseUrl = "http://localhost:8080/v1";
+        baseUrl = "http://desktop.willmckinnon.com:8080/v1";
         api = "openai-completions";
         apiKey = config.programs.pi-coding-agent.settings.defaultProvider;
         models = [{

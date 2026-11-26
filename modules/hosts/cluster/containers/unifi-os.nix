@@ -3,8 +3,6 @@
 let
   pkgs = inputs.nixpkgs.legacyPackages."x86_64-linux";
   name = "unifi-os";
-  mac = "02:00:00:00:00:02";
-  address = "10.1.10.12";
   stateDir = "/var/lib/workloads/${name}";
 
   # Ubiquiti only ships the image inside its installer, use lemker's repackaging
@@ -31,40 +29,45 @@ let
   # what the image expects as tmpfs, for systemd and unifi
   tmpfs = [ "/run" "/tmp" "/var/lib/journal" "/var/opt/unifi/tmp" ];
 in {
-  flake.networks."10".reservations = [{
-    ip-address = address;
-    hostname = name;
-    hw-address = mac;
-  }];
+  flake.modules.nixos.cluster.services.k3s.manifests.${name}.content = {
+    apiVersion = "apps/v1";
+    kind = "Deployment";
+    metadata = {
+      inherit name;
+      namespace = "default";
+    };
+    spec = {
+      replicas = 1;
+      strategy.type = "Recreate"; # only one pod can use the hostPath state
+      selector.matchLabels.app = name;
+      template = {
+        metadata.labels.app = name;
+        spec = {
+          # the image stops systemd with its STOPSIGNAL; give the services time to shut down
+          terminationGracePeriodSeconds = 95;
 
-  flake.modules.nixos.cluster.services.k3s.manifests.${name}.content = inputs.self.lib.mkSriovPod {
-    inherit name mac address;
-    pod = {
-      # the image stops systemd with its STOPSIGNAL; give the services time to shut down
-      terminationGracePeriodSeconds = 95;
-      # docker's host-gateway, which in the pod is the pod itself
-      hostAliases = [{ ip = address; hostnames = [ "host.docker.internal" ]; }];
+          containers = [{
+            inherit name;
+            # nix-snapshotter loads the image from the store path (in every node's closure via this manifest)
+            image = "nix:0${image}";
+            imagePullPolicy = "IfNotPresent";
+            # systemd runs as PID 1 and needs a writable cgroup tree
+            securityContext.privileged = true;
+            env = [
+              # TODO: devices adopt via http://<ip>:8080/inform; needs a stable address now that the pod is on flannel
+              { name = "TZ"; value = "America/Toronto"; }
+            ];
+            # one volume each for state and tmpfs, with a subPath per mount (kubelet creates missing subdirectories)
+            volumeMounts = lib.mapAttrsToList (path: subPath: { name = "state"; mountPath = path; inherit subPath; }) state
+              ++ map (path: { name = "tmpfs"; mountPath = path; subPath = lib.removePrefix "/" path; }) tmpfs;
+          }];
 
-      containers = [{
-        inherit name;
-        # nix-snapshotter loads the image from the store path (in every node's closure via this manifest)
-        image = "nix:0${image}";
-        imagePullPolicy = "IfNotPresent";
-        # systemd runs as PID 1 and needs a writable cgroup tree
-        securityContext.privileged = true;
-        env = [
-          { name = "UOS_SYSTEM_IP"; value = address; } # devices adopt via http://<ip>:8080/inform
-          { name = "TZ"; value = "America/Toronto"; }
-        ];
-        # one volume each for state and tmpfs, with a subPath per mount (kubelet creates missing subdirectories)
-        volumeMounts = lib.mapAttrsToList (path: subPath: { name = "state"; mountPath = path; inherit subPath; }) state
-          ++ map (path: { name = "tmpfs"; mountPath = path; subPath = lib.removePrefix "/" path; }) tmpfs;
-      }];
-
-      volumes = [
-        { name = "state"; hostPath = { path = stateDir; type = "DirectoryOrCreate"; }; }
-        { name = "tmpfs"; emptyDir.medium = "Memory"; }
-      ];
+          volumes = [
+            { name = "state"; hostPath = { path = stateDir; type = "DirectoryOrCreate"; }; }
+            { name = "tmpfs"; emptyDir.medium = "Memory"; }
+          ];
+        };
+      };
     };
   };
 }

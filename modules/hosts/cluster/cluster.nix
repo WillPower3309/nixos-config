@@ -5,9 +5,7 @@ let
   lanInterface = "sfp0";
   lanVlan = 10; # TODO: understand why we have to tag when the trunk port default is 10
   lanVlanInterface = "${lanInterface}.${toString lanVlan}";
-  numVfs = 64;
 
-  # lanMacAddress should point to an SR-IOV capable PF
   # TODO: pass host key too
   nodes = {
     node0 = {
@@ -35,7 +33,7 @@ in {
     imports = with inputs.self.modules.nixos; [
       common
       ssh-server
-      cluster # SR-IOV pod networking and the pods (sriov.nix, home-assistant.nix, unifi-os.nix)
+      cluster # the pods (home-assistant.nix, unifi-os.nix)
     ];
 
     # authorize connected USB4 devices so their network interfaces auto appear
@@ -71,10 +69,7 @@ in {
       links = {
         "10-${lanInterface}" = {
           matchConfig.PermanentMACAddress = node.lanMacAddress;
-          linkConfig = {
-            Name = lanInterface;
-            SR-IOVVirtualFunctions = numVfs;
-          };
+          linkConfig.Name = lanInterface;
         };
         "10-${clusterInterface}" = {
           matchConfig.PermanentMACAddress = node.clusterMacAddress;
@@ -117,10 +112,7 @@ in {
       # the LUKS2 volume is unlocked by the TPM (enrolled against PCR 7, the Secure Boot state)
       initrd = {
         luks.devices.crypted.crypttabExtraOpts = [ "tpm2-device=auto" ];
-        systemd = {
-          enable = true;
-          tpm2.enable = true;
-        };
+        systemd.tpm2.enable = true;
       };
     };
 
@@ -138,6 +130,7 @@ in {
         "--snapshotter nix"
         "--flannel-iface=${clusterInterface}"
         "--tls-san=${node.lanIpAddress}" # kubectl from the LAN
+        "--kube-controller-manager-arg=terminated-pod-gc-threshold=20"
       ];
       gracefulNodeShutdown.enable = true;
     };

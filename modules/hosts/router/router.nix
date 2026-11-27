@@ -15,6 +15,10 @@ let
     (reservations: lib.lists.flatten reservations)
   ];
 
+  # the cluster's floating VIP (features/cluster/vip.nix): wildcard DNS points
+  # every unknown subdomain at it
+  clusterVip = lib.findFirst (reservation: reservation.hostname == "cluster") null allReservations;
+
   # dynamic leases start here, so a new reservation (below it) can't collide with an address already leased
   poolStart = 100;
   hostPart = ipAddress: lib.toInt (lib.last (lib.splitString "." ipAddress));
@@ -28,7 +32,10 @@ in {
     assertions = map (reservation: {
       assertion = hostPart reservation.ip-address < poolStart;
       message = "reservation ${reservation.hostname} (${reservation.ip-address}) must be below the DHCP pool (.${toString poolStart})";
-    }) allReservations;
+    }) allReservations ++ [{
+      assertion = clusterVip != null;
+      message = "the 'cluster' reservation (floating VIP for wildcard DNS) is missing from flake.networks";
+    }];
 
     imports = with inputs.self.modules.nixos; [
       common
@@ -327,12 +334,20 @@ in {
 
           private-domain = config.networking.domain;
 
+          # unbound has no true wildcard records: a "redirect" zone answers
+          # every name in it with its apex data, so the apex zone below makes
+          # the whole domain a wildcard for the cluster VIP, with the more
+          # specific reservation zones overriding it.
           local-zone = [
-            "${config.networking.domain} typetransparent"
+            "${config.networking.domain} redirect"
+            # a redirect zone only carries apex local-data, so the apex
+            # record needs its own zone too
+            "router.${config.networking.domain} redirect"
           ] ++ map (reservation: "${reservation.hostname}.${config.networking.domain} redirect") allReservations;
 
           local-data = [
             ''"router.${config.networking.domain} IN A 10.1.10.1"'' # TODO: 10.1.10.${id}.1?
+            ''"${config.networking.domain} IN A ${clusterVip.ip-address}"'' # the wildcard target
           ] ++ map (reservation:
             ''"${reservation.hostname}.${config.networking.domain} IN A ${reservation.ip-address}"''
           ) allReservations;

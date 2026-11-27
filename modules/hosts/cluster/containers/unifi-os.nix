@@ -3,6 +3,7 @@
 let
   pkgs = inputs.nixpkgs.legacyPackages."x86_64-linux";
   name = "unifi-os";
+  port = 443; # unifi-os serves a self-signed cert (CN=unifi.local)
   stateDir = "/var/lib/workloads/${name}";
 
   # Ubiquiti only ships the image inside its installer, use lemker's repackaging
@@ -43,6 +44,15 @@ in {
       template = {
         metadata.labels.app = name;
         spec = {
+          # pinned to node0: the state lives on node0's disk (until ceph)
+          affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms = [{
+            matchExpressions = [{
+              key = "kubernetes.io/hostname";
+              operator = "In";
+              values = [ "node0" ];
+            }];
+          }];
+
           # the image stops systemd with its STOPSIGNAL; give the services time to shut down
           terminationGracePeriodSeconds = 95;
 
@@ -53,10 +63,7 @@ in {
             imagePullPolicy = "IfNotPresent";
             # systemd runs as PID 1 and needs a writable cgroup tree
             securityContext.privileged = true;
-            env = [
-              # TODO: devices adopt via http://<ip>:8080/inform; needs a stable address now that the pod is on flannel
-              { name = "TZ"; value = "America/Toronto"; }
-            ];
+            env = [{ name = "TZ"; value = "America/Toronto"; }];
             # one volume each for state and tmpfs, with a subPath per mount (kubelet creates missing subdirectories)
             volumeMounts = lib.mapAttrsToList (path: subPath: { name = "state"; mountPath = path; inherit subPath; }) state
               ++ map (path: { name = "tmpfs"; mountPath = path; subPath = lib.removePrefix "/" path; }) tmpfs;
@@ -69,5 +76,42 @@ in {
         };
       };
     };
+  };
+
+  # LAN ingress via k3s's built-in traefik; every *.willmckinnon.com name resolves to the floating VIP.
+  # The route speaks HTTPS upstream and skips certificate verification (self-signed cert, CN=unifi.local)
+  flake.modules.nixos.cluster.services.k3s.manifests."${name}-service".content = {
+    apiVersion = "v1";
+    kind = "Service";
+    metadata = { inherit name; namespace = "default"; };
+    spec = {
+      selector.app = name; # matches the Deployment's pod labels
+      ports = [{ inherit port; targetPort = port; }];
+    };
+  };
+
+  flake.modules.nixos.cluster.services.k3s.manifests."${name}-ingress".content = {
+    apiVersion = "traefik.io/v1alpha1";
+    kind = "IngressRoute";
+    metadata = { inherit name; namespace = "default"; };
+    spec = {
+      entryPoints = [ "web" ];
+      routes = [{
+        kind = "Rule";
+        match = "Host(\`${name}.willmckinnon.com\`)"; # config.constants.domain
+        services = [{
+          inherit name port;
+          scheme = "https";
+          serversTransport = name;
+        }];
+      }];
+    };
+  };
+
+  flake.modules.nixos.cluster.services.k3s.manifests."${name}-servers-transport".content = {
+    apiVersion = "traefik.io/v1alpha1";
+    kind = "ServersTransport";
+    metadata = { inherit name; namespace = "default"; };
+    spec = { insecureSkipVerify = true; };
   };
 }

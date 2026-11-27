@@ -13,9 +13,26 @@ let
       lanMacAddress = "38:05:25:31:58:aa";
       clusterIpAddress = "10.1.90.1";
       clusterMacAddress = "38:05:25:31:58:ac";
+      priority = 101;
     };
+#    node1 = {
+#      lanIpAddress = "10.1.10.4";
+#      lanMacAddress = "";
+#      clusterIpAddress = "10.1.90.2";
+#      clusterMacAddress = "";
+#      priority = 100;
+#    };
+#    node2 = {
+#      lanIpAddress = "10.1.10.5";
+#      lanMacAddress = "";
+#      clusterIpAddress = "10.1.90.3";
+#      clusterMacAddress = "";
+#      priority = 99;
+#    };
   };
   initNode = "node0";
+
+  virtualIP = "10.1.10.20";
 
 # TODO: NTP?
 in {
@@ -23,7 +40,11 @@ in {
     inputs.self.lib.mkNixos "x86_64-linux" hostName
   ) nodes;
 
-  flake.networks."10".reservations = lib.mapAttrsToList (hostName: node: {
+  flake.networks."10".reservations = [{
+    hostname = "cluster";
+    ip-address = virtualIP;
+    hw-address = "00:00:5e:00:01:01"; # keepalived's VRRPv2 virtual MAC is 00:00:5e:00:01:<vrid>
+  }] ++ lib.mapAttrsToList (hostName: node: {
     hostname = hostName;
     ip-address = node.lanIpAddress;
     hw-address = node.lanMacAddress;
@@ -49,7 +70,10 @@ in {
         # pods on flannel (coredns, metrics-server) reach the API server and kubelet through these
         trustedInterfaces = [ "cni0" "flannel.1" ];
         interfaces = {
-          "${lanVlanInterface}".allowedTCPPorts = [ 6443 ]; # kubectl from the LAN
+          "${lanVlanInterface}".allowedTCPPorts = [
+            6443 # kubectl from the LAN
+            80 # traefik
+          ];
           "${clusterInterface}" = {
             allowedTCPPorts = [
               6443 # API server
@@ -118,21 +142,34 @@ in {
 
     hardware.enableAllFirmware = true;
 
-    # TODO: joining needs a shared token (agenix tokenFile)
-    services.k3s = {
-      enable = true;
-      role = "server";
-      clusterInit = hostName == initNode;
-      serverAddr = lib.mkIf (hostName != initNode) "https://${nodes.${initNode}.clusterIpAddress}:6443";
-      nodeIP = node.clusterIpAddress;
-      disable = [ "traefik" "servicelb" ]; # no ingress or load balancer yet
-      extraFlags = [
-        "--snapshotter nix"
-        "--flannel-iface=${clusterInterface}"
-        "--tls-san=${node.lanIpAddress}" # kubectl from the LAN
-        "--kube-controller-manager-arg=terminated-pod-gc-threshold=20"
-      ];
-      gracefulNodeShutdown.enable = true;
+    services = {
+      # TODO: joining needs a shared token (agenix tokenFile)
+      k3s = {
+        enable = true;
+        role = "server";
+        clusterInit = hostName == initNode;
+        serverAddr = lib.mkIf (hostName != initNode) "https://${nodes.${initNode}.clusterIpAddress}:6443";
+        nodeIP = node.clusterIpAddress;
+        extraFlags = [
+          "--snapshotter nix"
+          "--flannel-iface=${clusterInterface}"
+          "--kube-controller-manager-arg=terminated-pod-gc-threshold=20"
+          "--tls-san=${node.lanIpAddress}" # kubectl from the LAN
+          "--tls-san=${virtualIP}"
+        ];
+        gracefulNodeShutdown.enable = true;
+      };
+
+      keepalived = {
+        enable = true;
+        openFirewall = true;
+        vrrpInstances.lan = {
+          interface = "${lanInterface}.${toString lanVlan}";
+          virtualRouterId = 1;
+          priority = node.priority;
+          virtualIps = [{ addr = "${virtualIP}/24"; }];
+        };
+      };
     };
 
     # the nix snapshotter shells out to nix-store; keep it on the k3s service PATH
